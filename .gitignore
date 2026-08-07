@@ -1,6 +1,9 @@
 # Configurações geradas pelos containers
 **/config/
 **/cache/
+**/data/
+**/media/
+**/music/
 
 # Mídia
 **/media/
@@ -12,6 +15,7 @@
 *.secret
 *.key
 *.pem
+*.log
 
 # Logs
 *.log
