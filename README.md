@@ -1,129 +1,313 @@
-# Self-Hosted Media Server
+# 🖥️ Self-Hosted Media Server
 
-Infraestrutura de servidor de mídia self-hosted utilizando Docker,
-Jellyfin e qBittorrent.
+Projeto de infraestrutura **self-hosted** desenvolvido para estudo e demonstração de conhecimentos em **Linux, Docker, Docker Compose, gerenciamento de containers, armazenamento persistente e serviços de mídia**.
+
+O servidor reúne diferentes serviços em containers, permitindo centralizar filmes, séries, músicas e outros conteúdos em uma infraestrutura própria.
+
+---
 
 ## 🚀 Sobre o projeto
 
-Projeto criado para estudar e demonstrar conceitos de Linux,
-Docker, Docker Compose, gerenciamento de containers, volumes
-persistentes e serviços self-hosted.
+A proposta deste projeto é construir e documentar um servidor pessoal utilizando tecnologias open source.
 
-O servidor utiliza o Jellyfin para gerenciamento e reprodução
-da biblioteca de mídia e o qBittorrent para gerenciamento de
-downloads.
+Atualmente, o servidor possui:
 
-## 🛠️ Tecnologias
+* 🎬 **Jellyfin** — servidor de filmes e séries
+* 🎵 **Navidrome** — servidor de música
+* 📥 **qBittorrent** — gerenciamento de downloads
+* 📷 **Immich** — gerenciamento de fotos e vídeos
 
-- Linux
-- Docker
-- Docker Compose
-- Jellyfin
-- qBittorrent
-- Git / GitHub
+O projeto está sendo desenvolvido de forma incremental, adicionando novos serviços conforme a infraestrutura evolui.
+
+---
 
 ## 🏗️ Arquitetura
 
 ```text
-                 ┌─────────────────┐
-                 │   qBittorrent   │
-                 │                 │
-                 │    Downloads    │
-                 └────────┬────────┘
-                          │
-                          ▼
-                 ┌─────────────────┐
-                 │  Media Storage  │
-                 │                 │
-                 │  ├── filmes     │
-                 │  └── series     │
-                 └────────┬────────┘
-                          │
-                          ▼
-                 ┌─────────────────┐
-                 │     Jellyfin    │
-                 │                 │
-                 │ Media Server    │
-                 └────────┬────────┘
-                          │
-             ┌────────────┼────────────┐
-             ▼            ▼            ▼
-           Desktop       TV          Mobile
-📁 Estrutura
-media-server/
-├── jellyfin/
-│   └── docker-compose.yml
-├── qbittorrent/
-│   └── docker-compose.yml
-├── .gitignore
-└── README.md
+                         Self-Hosted Server
+                                │
+                    ┌───────────┴───────────┐
+                    │                       │
+                 Docker                Storage
+                    │                       │
+       ┌────────────┼────────────┐          │
+       │            │            │          │
+       ▼            ▼            ▼          ▼
+   Jellyfin    Navidrome    qBittorrent   Media
+       │            │            │
+       │            │            │
+       ▼            ▼            ▼
+    Filmes       Música       Downloads
+    Séries
+```
 
-As configurações internas dos containers e os arquivos de mídia
-não são versionados no Git.
+---
 
-🐳 Containers
-Jellyfin
+## 🐳 Stack
 
-Responsável pelo gerenciamento e reprodução da biblioteca de mídia.
+| Tecnologia     | Função                          |
+| -------------- | ------------------------------- |
+| Linux          | Sistema operacional do servidor |
+| Docker         | Containerização                 |
+| Docker Compose | Gerenciamento dos serviços      |
+| Jellyfin       | Servidor de mídia               |
+| Navidrome      | Servidor de música              |
+| qBittorrent    | Gerenciamento de downloads      |
+| Immich         | Gerenciamento de fotos e vídeos |
+| Git            | Versionamento                   |
+| GitHub         | Documentação e código           |
+
+---
+
+## 📦 Serviços
+
+### 🎬 Jellyfin
+
+O Jellyfin é responsável pelo gerenciamento e reprodução da biblioteca de filmes e séries.
 
 Porta:
 
+```text
 8096
+```
 
 Acesso:
 
+```text
 http://SERVER_IP:8096
-qBittorrent
+```
 
-Cliente de download com interface Web.
+Estrutura de mídia:
 
-Porta:
-
-8080
-
-Acesso:
-
-http://SERVER_IP:8080
-💾 Volumes
-
-O Jellyfin utiliza volumes persistentes para separar configuração,
-cache e mídia.
-
-/config
-/cache
-/media
-
-A biblioteca de mídia é organizada em:
-
+```text
 /media
 ├── filmes
 └── series
-🔐 Segurança
+```
 
-Arquivos de configuração, credenciais, tokens e biblioteca de
-mídia não são armazenados neste repositório.
+---
 
-O projeto utiliza .gitignore para evitar o versionamento
-acidental desses arquivos.
+### 🎵 Navidrome
 
-📚 Objetivos de aprendizado
-Administração de servidores Linux
-Docker e containers
-Docker Compose
-Persistência de dados
-Gerenciamento de volumes
-Configuração de serviços self-hosted
-Redes e portas
-Git e GitHub
-Documentação de infraestrutura
-🔮 Próximos passos
- Adicionar Radarr
- Adicionar Sonarr
- Automatizar organização da biblioteca
- Implementar monitoramento
- Implementar backup
- Melhorar documentação da infraestrutura
-👨‍💻 Autor
+O Navidrome é utilizado como servidor de música.
 
-Projeto desenvolvido como parte do meu laboratório pessoal de
-Linux, Docker e infraestrutura.
+Porta:
+
+```text
+4533
+```
+
+Acesso:
+
+```text
+http://SERVER_IP:4533
+```
+
+Estrutura:
+
+```text
+music/
+├── Artista/
+│   ├── Álbum/
+│   │   ├── 01 - Música.mp3
+│   │   └── 02 - Música.mp3
+│   └── Outro Álbum/
+│       └── 01 - Música.mp3
+```
+
+---
+
+### 📥 qBittorrent
+
+O qBittorrent é utilizado para gerenciamento dos downloads.
+
+O armazenamento é separado por categorias:
+
+```text
+/downloads
+├── filmes
+└── series
+```
+
+Os dados são armazenados em volumes persistentes para que os containers possam ser recriados sem perder os arquivos.
+
+---
+
+### 📷 Immich
+
+O Immich é utilizado para gerenciamento e armazenamento de fotos e vídeos pessoais.
+
+A instalação do Immich possui seu próprio Docker Compose e não compartilha as configurações internas com os demais serviços.
+
+---
+
+## 📁 Estrutura do projeto
+
+```text
+media-server/
+│
+├── jellyfin/
+│   └── docker-compose.yml
+│
+├── navidrome/
+│   └── docker-compose.yml
+│
+├── qbittorrent/
+│   └── docker-compose.yml
+│
+├── .gitignore
+│
+└── README.md
+```
+
+As configurações internas dos containers, bancos de dados, cache e arquivos de mídia **não são versionados no Git**.
+
+---
+
+## 💾 Persistência
+
+Os containers utilizam volumes persistentes para manter os dados mesmo quando um container é recriado.
+
+Exemplo do Jellyfin:
+
+```text
+./config → /config
+./cache  → /cache
+./media  → /media
+```
+
+Exemplo do Navidrome:
+
+```text
+./data  → /data
+./music → /music
+```
+
+---
+
+## 🔐 Segurança
+
+Informações sensíveis não fazem parte do repositório.
+
+O `.gitignore` impede o versionamento de:
+
+```text
+config/
+cache/
+data/
+media/
+music/
+.env
+*.secret
+*.key
+*.pem
+*.log
+```
+
+Credenciais, tokens e dados pessoais devem permanecer somente no servidor.
+
+---
+
+## 🧰 Gerenciamento
+
+Os serviços são executados através do Docker Compose.
+
+Exemplo:
+
+```bash
+docker compose up -d
+```
+
+Para visualizar os containers:
+
+```bash
+docker ps
+```
+
+Para acompanhar os logs:
+
+```bash
+docker logs -f CONTAINER_NAME
+```
+
+Para atualizar um serviço:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+---
+
+## 📚 Conhecimentos praticados
+
+Este projeto está sendo utilizado para desenvolver conhecimentos em:
+
+* Linux
+* Administração de servidores
+* Docker
+* Docker Compose
+* Containers
+* Volumes persistentes
+* Redes
+* Gerenciamento de serviços
+* Armazenamento
+* Git
+* GitHub
+* Documentação de infraestrutura
+* Self-hosting
+
+---
+
+## 🔮 Roadmap
+
+### Infraestrutura
+
+* [x] Docker
+* [x] Docker Compose
+* [x] Jellyfin
+* [x] qBittorrent
+* [x] Navidrome
+* [x] Immich
+* [ ] Reverse Proxy
+* [ ] HTTPS
+* [ ] DNS
+* [ ] Monitoramento
+* [ ] Backup automático
+
+### Automação
+
+* [ ] Radarr
+* [ ] Sonarr
+* [ ] Organização automática de mídia
+* [ ] Atualização automática dos serviços
+
+### Monitoramento
+
+* [ ] Prometheus
+* [ ] Grafana
+* [ ] Uptime Kuma
+* [ ] Alertas de indisponibilidade
+
+### Backup
+
+* [ ] Backup das configurações
+* [ ] Backup dos bancos de dados
+* [ ] Backup externo
+* [ ] Teste de restauração
+
+---
+
+## 🎯 Objetivo
+
+O objetivo principal é transformar este servidor em um laboratório prático de **Linux, Docker, infraestrutura e DevOps**, documentando a evolução da arquitetura e os conhecimentos adquiridos durante o desenvolvimento.
+
+O projeto continuará sendo expandido conforme novos serviços e práticas de infraestrutura forem implementados.
+
+---
+
+## 👨‍💻 Autor
+
+Projeto desenvolvido como laboratório pessoal de infraestrutura, Linux, Docker e serviços self-hosted.
+
+⭐ Projeto em evolução.
