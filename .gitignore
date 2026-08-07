@@ -1,0 +1,17 @@
+# Configurações geradas pelos containers
+**/config/
+**/cache/
+
+# Mídia
+**/media/
+**/filmes/
+**/series/
+
+# Secrets
+.env
+*.secret
+*.key
+*.pem
+
+# Logs
+*.log
