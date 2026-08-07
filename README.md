@@ -268,7 +268,7 @@ Este projeto está sendo utilizado para desenvolver conhecimentos em:
 * [x] Jellyfin
 * [x] qBittorrent
 * [x] Navidrome
-* [x] Immich
+* [ ] Immich
 * [ ] Reverse Proxy
 * [ ] HTTPS
 * [ ] DNS
