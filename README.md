@@ -6,6 +6,7 @@
 ![Jellyfin](https://img.shields.io/badge/Jellyfin-00A4DC?style=for-the-badge\&logo=jellyfin\&logoColor=white)
 ![Navidrome](https://img.shields.io/badge/Navidrome-000000?style=for-the-badge)
 ![qBittorrent](https://img.shields.io/badge/qBittorrent-2F67BA?style=for-the-badge\&logo=qbittorrent\&logoColor=white)
+![Tailscale](https://img.shields.io/badge/Tailscale-4A4DE6?style=for-the-badge\&logo=tailscale\&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge\&logo=github\&logoColor=white)
 
 Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
@@ -16,8 +17,9 @@ O projeto reúne serviços para gerenciamento e reprodução de:
 * 📺 Séries
 * 🎵 Música
 * ⬇️ Downloads
+* 🔗 Acesso remoto
 
-O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos e serviços independentes**.
+O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, acesso remoto e serviços independentes**.
 
 ---
 
@@ -26,8 +28,8 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 * [🏗️ Arquitetura](#️-arquitetura)
 * [📋 Requisitos](#-requisitos)
 * [🐳 Instalação do Docker](#-instalação-do-docker)
-* [📁 Estrutura do Projeto](#-estrutura-do-projeto)
-* [🔐 Segurança](#-segurança)
+* [👤 Usar Docker sem sudo](#-usar-docker-sem-sudo)
+* [🔗 Acesso Remoto com Tailscale](#-acesso-remoto-com-tailscale)
 * [🗺️ Roadmap](#️-roadmap)
 * [⚠️ Aviso](#️-aviso)
 
@@ -57,6 +59,8 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
                     │
                     ▼
               Filmes / Séries
+
+
 ```
 
 ### Serviços
@@ -67,6 +71,7 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 | Navidrome   | Servidor de música         | `4533` |
 | qBittorrent | Gerenciamento de downloads | `8080` |
 | spotDL      | Download manual de músicas |    CLI |
+| Tailscale   | Acesso remoto privado      |      — |
 
 ---
 
@@ -336,6 +341,21 @@ Acesse:
 http://IP_DO_SERVIDOR:8080
 ```
 
+O diretório `/downloads` do qBittorrent corresponde ao diretório de mídia do Jellyfin:
+
+```text
+Host:
+/opt/jellyfin/media
+
+Container qBittorrent:
+/downloads
+
+Container Jellyfin:
+/media
+```
+
+Isso permite que os arquivos baixados pelo qBittorrent sejam posteriormente encontrados pelo Jellyfin.
+
 ---
 
 # 🎵 Navidrome
@@ -408,7 +428,7 @@ Para desktop, uma opção recomendada é o **Feishin**.
 
 Ele oferece uma interface moderna para servidores compatíveis com Subsonic, incluindo Navidrome.
 
-[Feishin — GitHub](https://github.com/jeffvli/feishin?utm_source=chatgpt.com)
+[Feishin — GitHub](https://github.com/jeffvli/feishin)
 
 ---
 
@@ -416,13 +436,13 @@ Ele oferece uma interface moderna para servidores compatíveis com Subsonic, inc
 
 No iPhone, você pode utilizar um cliente compatível com Navidrome/Subsonic.
 
-Uma opção é o **Amperfy**.
+### Amperfy
 
-[Amperfy — App Store](https://apps.apple.com/app/amperfy-music-player/id1530145038?utm_source=chatgpt.com)
+[Amperfy — App Store](https://apps.apple.com/app/amperfy-music-player/id1530145038)
 
-Outra alternativa bastante conhecida é o **play:Sub**.
+### play:Sub
 
-[play:Sub — App Store](https://apps.apple.com/app/play-sub/id955329386?utm_source=chatgpt.com)
+[play:Sub — App Store](https://apps.apple.com/app/play-sub/id955329386)
 
 ---
 
@@ -432,7 +452,7 @@ No Android, uma opção interessante é o **Symfonium**.
 
 Ele suporta Navidrome e outros servidores de música.
 
-[Symfonium — site oficial](https://symfonium.app/?utm_source=chatgpt.com)
+[Symfonium — site oficial](https://symfonium.app/)
 
 ---
 
@@ -604,6 +624,7 @@ Principalmente:
 
 Para acesso externo, considere utilizar:
 
+* Tailscale
 * VPN
 * Reverse proxy
 * HTTPS
@@ -623,6 +644,124 @@ cache/
 bancos de dados
 mídia
 ```
+
+---
+
+# 🔗 Acesso Remoto com Tailscale
+
+Para acessar o servidor fora da rede doméstica, o projeto utiliza o **Tailscale** como uma rede privada entre os dispositivos.
+
+Com o Tailscale, não é necessário expor diretamente as portas do Jellyfin, Navidrome, qBittorrent ou SSH na internet.
+
+A arquitetura fica:
+
+```text
+                         INTERNET
+                             │
+                             │
+                         Tailscale
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+              ▼              ▼              ▼
+           📱 iPhone       💻 PC        🖥️ Servidor
+                                        100.x.x.x
+                                             │
+                              ┌──────────────┼──────────────┐
+                              │              │              │
+                              ▼              ▼              ▼
+                           Jellyfin      Navidrome      qBittorrent
+                            :8096          :4533           :8080
+```
+
+## Instalação
+
+No servidor Linux:
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+```
+
+Depois autentique o servidor:
+
+```bash
+sudo tailscale up
+```
+
+Verifique os dispositivos conectados:
+
+```bash
+tailscale status
+```
+
+Para descobrir o IP Tailscale do servidor:
+
+```bash
+tailscale ip
+```
+
+O servidor receberá um endereço da rede `100.x.x.x`.
+
+Exemplo:
+
+```text
+100.95.231.76
+```
+
+## Acessando os serviços remotamente
+
+Depois de instalar o Tailscale nos dispositivos e entrar na mesma conta, os serviços podem ser acessados através do IP Tailscale do servidor.
+
+### Jellyfin
+
+```text
+http://100.95.231.76:8096
+```
+
+### Navidrome
+
+```text
+http://100.95.231.76:4533
+```
+
+### qBittorrent
+
+```text
+http://100.95.231.76:8080
+```
+
+### SSH
+
+```bash
+ssh rique@100.95.231.76
+```
+
+## Dispositivos
+
+O Tailscale pode conectar diferentes dispositivos à mesma rede privada:
+
+```text
+Servidor
+100.95.231.76
+      │
+      ├── 📱 iPhone
+      ├── 💻 PC / Linux
+      └── 🤖 Android
+```
+
+Basta instalar o Tailscale em cada dispositivo e entrar na mesma conta.
+
+## Vantagens
+
+* 🔒 Não é necessário abrir portas no roteador
+* 🌐 Acesso aos serviços fora de casa
+* 📱 Acesso pelo celular
+* 💻 Acesso pelo computador
+* 🔑 Autenticação através da conta Tailscale
+* 🛡️ Rede privada entre os dispositivos
+* 🖥️ Possibilidade de acessar o servidor via SSH remotamente
+
+> O Tailscale é utilizado neste projeto como camada de acesso remoto à infraestrutura, mantendo os serviços internos sem exposição direta à internet.
 
 ---
 
@@ -718,6 +857,8 @@ Este projeto demonstra conhecimentos em:
 * Self-hosting
 * Organização de arquivos
 * Troubleshooting
+* Redes
+* Acesso remoto
 * Serviços multimídia
 
 ---
@@ -757,6 +898,12 @@ Linux
            └── Música
                 │
                 └── spotDL
+
+Tailscale
+    │
+    ├── 📱 iPhone
+    ├── 💻 PC
+    └── 🌐 Acesso remoto
 ```
 
-O objetivo é demonstrar, de forma prática, a construção e administração de uma infraestrutura de mídia utilizando tecnologias open source.
+O objetivo é demonstrar, de forma prática, a construção e administração de uma infraestrutura de mídia utilizando tecnologias open source, containers, armazenamento persistente e acesso remoto seguro.
