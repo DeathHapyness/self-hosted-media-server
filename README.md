@@ -358,6 +358,47 @@ Isso permite que os arquivos baixados pelo qBittorrent sejam posteriormente enco
 
 ---
 
+# 🐳 Dozzle
+
+O Dozzle é utilizado para visualizar os logs dos containers Docker em tempo real através de uma interface web.
+
+Ele facilita o monitoramento e troubleshooting dos serviços sem precisar executar manualmente:
+
+docker logs <container>
+Docker Compose
+
+```services:
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+
+    ports:
+      - "9999:8080"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+Iniciar
+cd /opt/dozzle
+docker compose up -d
+```
+A interface pode ser acessada através de:
+
+
+
+http://IP_DO_SERVIDOR:9999
+
+O Dozzle permite visualizar os logs de serviços como:
+
+Jellyfin
+Navidrome
+qBittorrent
+Immich
+Dozzle
+
+--- 
+
+
 # 🎵 Navidrome
 
 O Navidrome é responsável pela biblioteca musical.
