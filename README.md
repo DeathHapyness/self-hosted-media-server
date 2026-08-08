@@ -1,313 +1,762 @@
 # 🖥️ Self-Hosted Media Server
 
-Projeto de infraestrutura **self-hosted** desenvolvido para estudo e demonstração de conhecimentos em **Linux, Docker, Docker Compose, gerenciamento de containers, armazenamento persistente e serviços de mídia**.
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge\&logo=linux\&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
+![Jellyfin](https://img.shields.io/badge/Jellyfin-00A4DC?style=for-the-badge\&logo=jellyfin\&logoColor=white)
+![Navidrome](https://img.shields.io/badge/Navidrome-000000?style=for-the-badge)
+![qBittorrent](https://img.shields.io/badge/qBittorrent-2F67BA?style=for-the-badge\&logo=qbittorrent\&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge\&logo=github\&logoColor=white)
 
-O servidor reúne diferentes serviços em containers, permitindo centralizar filmes, séries, músicas e outros conteúdos em uma infraestrutura própria.
+Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
 
----
+O projeto reúne serviços para gerenciamento e reprodução de:
 
-## 🚀 Sobre o projeto
+* 🎬 Filmes
+* 📺 Séries
+* 🎵 Música
+* ⬇️ Downloads
 
-A proposta deste projeto é construir e documentar um servidor pessoal utilizando tecnologias open source.
-
-Atualmente, o servidor possui:
-
-* 🎬 **Jellyfin** — servidor de filmes e séries
-* 🎵 **Navidrome** — servidor de música
-* 📥 **qBittorrent** — gerenciamento de downloads
-* 📷 **Immich** — gerenciamento de fotos e vídeos
-
-O projeto está sendo desenvolvido de forma incremental, adicionando novos serviços conforme a infraestrutura evolui.
-
----
-
-## 🏗️ Arquitetura
-
-```text
-                         Self-Hosted Server
-                                │
-                    ┌───────────┴───────────┐
-                    │                       │
-                 Docker                Storage
-                    │                       │
-       ┌────────────┼────────────┐          │
-       │            │            │          │
-       ▼            ▼            ▼          ▼
-   Jellyfin    Navidrome    qBittorrent   Media
-       │            │            │
-       │            │            │
-       ▼            ▼            ▼
-    Filmes       Música       Downloads
-    Séries
-```
+O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos e serviços independentes**.
 
 ---
 
-## 🐳 Stack
+## 📑 Sumário
 
-| Tecnologia     | Função                          |
-| -------------- | ------------------------------- |
-| Linux          | Sistema operacional do servidor |
-| Docker         | Containerização                 |
-| Docker Compose | Gerenciamento dos serviços      |
-| Jellyfin       | Servidor de mídia               |
-| Navidrome      | Servidor de música              |
-| qBittorrent    | Gerenciamento de downloads      |
-| Immich         | Gerenciamento de fotos e vídeos |
-| Git            | Versionamento                   |
-| GitHub         | Documentação e código           |
+* [🏗️ Arquitetura](#️-arquitetura)
+* [📋 Requisitos](#-requisitos)
+* [🐳 Instalação do Docker](#-instalação-do-docker)
+* [📁 Estrutura do Projeto](#-estrutura-do-projeto)
+* [🔐 Segurança](#-segurança)
+* [🗺️ Roadmap](#️-roadmap)
+* [⚠️ Aviso](#️-aviso)
 
 ---
 
-## 📦 Serviços
-
-### 🎬 Jellyfin
-
-O Jellyfin é responsável pelo gerenciamento e reprodução da biblioteca de filmes e séries.
-
-Porta:
+# 🏗️ Arquitetura
 
 ```text
-8096
+                         ┌─────────────────┐
+                         │     Usuário     │
+                         └────────┬────────┘
+                                  │
+                    ┌─────────────┼─────────────┐
+                    │             │             │
+                    ▼             ▼             ▼
+                Jellyfin      Navidrome     qBittorrent
+                  :8096          :4533          :8080
+                    │             │             │
+                    │             │             ▼
+                    │             │          Downloads
+                    │             │             │
+                    │             │             ▼
+                    │             │      /opt/jellyfin/media
+                    │             │
+                    │             ▼
+                    │      /opt/navidrome/music
+                    │
+                    ▼
+              Filmes / Séries
 ```
 
-Acesso:
+### Serviços
 
-```text
-http://SERVER_IP:8096
-```
-
-Estrutura de mídia:
-
-```text
-/media
-├── filmes
-└── series
-```
+| Serviço     | Função                     |  Porta |
+| ----------- | -------------------------- | -----: |
+| Jellyfin    | Filmes e séries            | `8096` |
+| Navidrome   | Servidor de música         | `4533` |
+| qBittorrent | Gerenciamento de downloads | `8080` |
+| spotDL      | Download manual de músicas |    CLI |
 
 ---
 
-### 🎵 Navidrome
+# 📋 Requisitos
 
-O Navidrome é utilizado como servidor de música.
+## Hardware
 
-Porta:
+O projeto pode ser executado em um computador antigo, mini PC, notebook ou servidor dedicado.
 
-```text
-4533
-```
+Recomendação inicial:
 
-Acesso:
+* CPU x86_64
+* 4 GB de RAM ou mais
+* SSD para o sistema e containers
+* HD/SSD para armazenamento de mídia
+* Conexão de rede local
 
-```text
-http://SERVER_IP:4533
-```
-
-Estrutura:
-
-```text
-music/
-├── Artista/
-│   ├── Álbum/
-│   │   ├── 01 - Música.mp3
-│   │   └── 02 - Música.mp3
-│   └── Outro Álbum/
-│       └── 01 - Música.mp3
-```
+O armazenamento necessário depende principalmente da quantidade de filmes, séries e músicas.
 
 ---
 
-### 📥 qBittorrent
+# 🐧 Sistema Operacional
 
-O qBittorrent é utilizado para gerenciamento dos downloads.
+O projeto foi desenvolvido para Linux.
 
-O armazenamento é separado por categorias:
+Exemplo de ambiente:
 
 ```text
-/downloads
-├── filmes
-└── series
+Linux
+Docker
+Docker Compose
 ```
 
-Os dados são armazenados em volumes persistentes para que os containers possam ser recriados sem perder os arquivos.
+O Docker Engine possui suporte oficial para diversas distribuições Linux.
 
 ---
 
-### 📷 Immich
+# 🐳 Instalação do Docker
 
-O Immich é utilizado para gerenciamento e armazenamento de fotos e vídeos pessoais.
+## 1. Atualizar o sistema
 
-A instalação do Immich possui seu próprio Docker Compose e não compartilha as configurações internas com os demais serviços.
-
----
-
-## 📁 Estrutura do projeto
-
-```text
-media-server/
-│
-├── jellyfin/
-│   └── docker-compose.yml
-│
-├── navidrome/
-│   └── docker-compose.yml
-│
-├── qbittorrent/
-│   └── docker-compose.yml
-│
-├── .gitignore
-│
-└── README.md
-```
-
-As configurações internas dos containers, bancos de dados, cache e arquivos de mídia **não são versionados no Git**.
-
----
-
-## 💾 Persistência
-
-Os containers utilizam volumes persistentes para manter os dados mesmo quando um container é recriado.
-
-Exemplo do Jellyfin:
-
-```text
-./config → /config
-./cache  → /cache
-./media  → /media
-```
-
-Exemplo do Navidrome:
-
-```text
-./data  → /data
-./music → /music
-```
-
----
-
-## 🔐 Segurança
-
-Informações sensíveis não fazem parte do repositório.
-
-O `.gitignore` impede o versionamento de:
-
-```text
-config/
-cache/
-data/
-media/
-music/
-.env
-*.secret
-*.key
-*.pem
-*.log
-```
-
-Credenciais, tokens e dados pessoais devem permanecer somente no servidor.
-
----
-
-## 🧰 Gerenciamento
-
-Os serviços são executados através do Docker Compose.
-
-Exemplo:
+Em Ubuntu/Debian:
 
 ```bash
-docker compose up -d
+sudo apt update
+sudo apt upgrade -y
 ```
 
-Para visualizar os containers:
+## 2. Instalar dependências
+
+```bash
+sudo apt install -y ca-certificates curl
+```
+
+## 3. Adicionar a chave oficial do Docker
+
+```bash
+sudo install -m 0755 -d /etc/apt/keyrings
+
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+  -o /etc/apt/keyrings/docker.asc
+
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+```
+
+## 4. Adicionar o repositório
+
+```bash
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+```
+
+Atualize:
+
+```bash
+sudo apt update
+```
+
+## 5. Instalar Docker
+
+```bash
+sudo apt install -y \
+  docker-ce \
+  docker-ce-cli \
+  containerd.io \
+  docker-buildx-plugin \
+  docker-compose-plugin
+```
+
+## 6. Testar
+
+```bash
+sudo systemctl status docker
+```
+
+```bash
+sudo docker run hello-world
+```
+
+Verifique o Compose:
+
+```bash
+docker compose version
+```
+
+---
+
+# 👤 Usar Docker sem sudo
+
+Adicione seu usuário ao grupo Docker:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+Depois encerre a sessão e entre novamente.
+
+Teste:
 
 ```bash
 docker ps
 ```
 
-Para acompanhar os logs:
+---
 
-```bash
-docker logs -f CONTAINER_NAME
+# 📁 Estrutura do Projeto
+
+```text
+media-server/
+│
+├── jellyfin/
+│   ├── docker-compose.yml
+│   ├── config/
+│   ├── cache/
+│   └── media/
+│       ├── filmes/
+│       └── series/
+│
+├── qbittorrent/
+│   ├── docker-compose.yml
+│   └── config/
+│
+├── navidrome/
+│   ├── docker-compose.yml
+│   ├── data/
+│   └── music/
+│
+├── .gitignore
+└── README.md
 ```
 
-Para atualizar um serviço:
+> As pastas de configuração, banco de dados, cache e mídia não devem ser enviadas para o GitHub.
+
+---
+
+# 🎬 Jellyfin
+
+O Jellyfin é responsável pela biblioteca de **filmes e séries**.
+
+## Criar diretórios
 
 ```bash
-docker compose pull
+sudo mkdir -p /opt/jellyfin
+
+cd /opt/jellyfin
+
+mkdir -p config
+mkdir -p cache
+mkdir -p media/filmes
+mkdir -p media/series
+```
+
+## Docker Compose
+
+Crie:
+
+```bash
+nano docker-compose.yml
+```
+
+```yaml
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+
+    ports:
+      - "8096:8096"
+
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - ./media:/media
+
+    environment:
+      - TZ=America/Sao_Paulo
+```
+
+Inicie:
+
+```bash
 docker compose up -d
 ```
 
+Acesse:
+
+```text
+http://IP_DO_SERVIDOR:8096
+```
+
 ---
 
-## 📚 Conhecimentos praticados
+# 📥 qBittorrent
 
-Este projeto está sendo utilizado para desenvolver conhecimentos em:
+O qBittorrent é utilizado para gerenciamento de downloads.
+
+## Criar diretórios
+
+```bash
+sudo mkdir -p /opt/qbittorrent
+cd /opt/qbittorrent
+
+mkdir -p config
+```
+
+## Docker Compose
+
+```yaml
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - WEBUI_PORT=8080
+
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+
+    volumes:
+      - ./config:/config
+      - /opt/jellyfin/media:/downloads
+```
+
+Inicie:
+
+```bash
+docker compose up -d
+```
+
+Acesse:
+
+```text
+http://IP_DO_SERVIDOR:8080
+```
+
+---
+
+# 🎵 Navidrome
+
+O Navidrome é responsável pela biblioteca musical.
+
+Ele lê os arquivos presentes em:
+
+```text
+/opt/navidrome/music
+```
+
+e disponibiliza a biblioteca através de clientes compatíveis.
+
+## Criar diretórios
+
+```bash
+sudo mkdir -p /opt/navidrome
+
+cd /opt/navidrome
+
+mkdir -p data
+mkdir -p music
+```
+
+## Docker Compose
+
+```yaml
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    restart: unless-stopped
+
+    ports:
+      - "4533:4533"
+
+    environment:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+      TZ: America/Sao_Paulo
+
+    volumes:
+      - ./data:/data
+      - ./music:/music:ro
+```
+
+Inicie:
+
+```bash
+docker compose up -d
+```
+
+Acesse:
+
+```text
+http://IP_DO_SERVIDOR:4533
+```
+
+---
+
+# 🎧 Clientes Recomendados
+
+O Navidrome funciona como **servidor**, enquanto os aplicativos abaixo funcionam como clientes.
+
+## 💻 PC — Feishin
+
+Para desktop, uma opção recomendada é o **Feishin**.
+
+Ele oferece uma interface moderna para servidores compatíveis com Subsonic, incluindo Navidrome.
+
+[Feishin — GitHub](https://github.com/jeffvli/feishin?utm_source=chatgpt.com)
+
+---
+
+## 📱 iPhone / iOS
+
+No iPhone, você pode utilizar um cliente compatível com Navidrome/Subsonic.
+
+Uma opção é o **Amperfy**.
+
+[Amperfy — App Store](https://apps.apple.com/app/amperfy-music-player/id1530145038?utm_source=chatgpt.com)
+
+Outra alternativa bastante conhecida é o **play:Sub**.
+
+[play:Sub — App Store](https://apps.apple.com/app/play-sub/id955329386?utm_source=chatgpt.com)
+
+---
+
+## 🤖 Android
+
+No Android, uma opção interessante é o **Symfonium**.
+
+Ele suporta Navidrome e outros servidores de música.
+
+[Symfonium — site oficial](https://symfonium.app/?utm_source=chatgpt.com)
+
+---
+
+# 🎶 spotDL
+
+O spotDL pode ser utilizado para downloads manuais de músicas.
+
+## Instalar dependências
+
+```bash
+sudo apt install -y python3 python3-pip ffmpeg
+```
+
+Instale:
+
+```bash
+pip install spotdl
+```
+
+Verifique:
+
+```bash
+spotdl --version
+```
+
+---
+
+# 📥 Baixando músicas
+
+Para manter a organização da biblioteca:
+
+```bash
+spotdl \
+  --output "/opt/navidrome/music/{artist}/{album}/{track-number} - {title}.{output-ext}" \
+  "LINK_DO_SPOTIFY"
+```
+
+Exemplo:
+
+```bash
+spotdl \
+  --output "/opt/navidrome/music/{artist}/{album}/{track-number} - {title}.{output-ext}" \
+  "https://open.spotify.com/track/ID"
+```
+
+Sempre coloque a URL entre aspas.
+
+Isso permite organizar automaticamente:
+
+```text
+/opt/navidrome/music/
+│
+├── Artista/
+│   ├── Álbum/
+│   │   ├── 01 - Música.mp3
+│   │   ├── 02 - Música.mp3
+│   │   └── 03 - Música.mp3
+│   │
+│   └── Outro Álbum/
+│
+└── Outro Artista/
+```
+
+---
+
+# 🔄 Atualizando o Navidrome
+
+Depois de adicionar novas músicas:
+
+```bash
+docker exec -it navidrome /app/navidrome scan
+```
+
+Também existe um scan automático configurado:
+
+```yaml
+ND_SCANSCHEDULE: 1h
+```
+
+---
+
+# 🔄 Fluxo da Música
+
+```text
+              Spotify URL
+                   │
+                   ▼
+                spotDL
+                   │
+                   ▼
+        /opt/navidrome/music
+                   │
+          ┌────────┴────────┐
+          │                 │
+       Artista           Artista
+          │                 │
+        Álbum             Álbum
+          │                 │
+        Faixas            Faixas
+          │                 │
+          └────────┬────────┘
+                   ▼
+               Navidrome
+                   │
+          ┌────────┼────────┐
+          ▼        ▼        ▼
+        Feishin   iOS    Android
+          PC
+```
+
+---
+
+# 🔍 Verificação e Troubleshooting
+
+## Verificar arquivos no host
+
+```bash
+find /opt/navidrome/music -type f
+```
+
+Somente MP3:
+
+```bash
+find /opt/navidrome/music -type f -name "*.mp3"
+```
+
+## Verificar arquivos dentro do Navidrome
+
+```bash
+docker exec -it navidrome find /music -type f
+```
+
+Se o arquivo estiver no host e dentro do container, o volume está funcionando corretamente.
+
+## Verificar volumes
+
+Jellyfin:
+
+```bash
+docker inspect jellyfin \
+  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
+```
+
+qBittorrent:
+
+```bash
+docker inspect qbittorrent \
+  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
+```
+
+Navidrome:
+
+```bash
+docker inspect navidrome \
+  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
+```
+
+---
+
+# 🔐 Segurança
+
+Evite expor diretamente serviços administrativos para a internet.
+
+Principalmente:
+
+```text
+8080 → qBittorrent
+```
+
+Para acesso externo, considere utilizar:
+
+* VPN
+* Reverse proxy
+* HTTPS
+* Autenticação adequada
+* Firewall
+
+Nunca coloque no GitHub:
+
+```text
+senhas
+tokens
+API keys
+.env
+config/
+data/
+cache/
+bancos de dados
+mídia
+```
+
+---
+
+# 🐙 GitHub
+
+Inicialize o repositório:
+
+```bash
+git init
+```
+
+Utilize `main`:
+
+```bash
+git branch -M main
+```
+
+Adicione os arquivos:
+
+```bash
+git add .
+```
+
+Crie o commit:
+
+```bash
+git commit -m "docs: add media server setup"
+```
+
+Adicione o repositório:
+
+```bash
+git remote add origin URL_DO_SEU_REPOSITORIO
+```
+
+Envie:
+
+```bash
+git push -u origin main
+```
+
+---
+
+# 🧹 .gitignore
+
+Exemplo:
+
+```gitignore
+# Docker
+*.env
+
+# Jellyfin
+jellyfin/config/
+jellyfin/cache/
+jellyfin/media/
+
+# qBittorrent
+qbittorrent/config/
+
+# Navidrome
+navidrome/data/
+navidrome/music/
+
+# Logs
+*.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Sistema
+.DS_Store
+Thumbs.db
+```
+
+---
+
+# 🧠 O que este projeto demonstra
+
+Este projeto demonstra conhecimentos em:
 
 * Linux
-* Administração de servidores
 * Docker
 * Docker Compose
 * Containers
-* Volumes persistentes
-* Redes
+* Volumes
+* Persistência de dados
+* Permissões Linux
+* Administração de servidores
 * Gerenciamento de serviços
-* Armazenamento
-* Git
-* GitHub
-* Documentação de infraestrutura
+* Git/GitHub
 * Self-hosting
+* Organização de arquivos
+* Troubleshooting
+* Serviços multimídia
 
 ---
 
-## 🔮 Roadmap
+# 🗺️ Roadmap
 
-### Infraestrutura
-
-* [x] Docker
-* [x] Docker Compose
-* [x] Jellyfin
-* [x] qBittorrent
-* [x] Navidrome
-* [ ] Immich
-* [ ] Reverse Proxy
-* [ ] HTTPS
-* [ ] DNS
-* [ ] Monitoramento
-* [ ] Backup automático
-
-### Automação
-
-* [ ] Radarr
-* [ ] Sonarr
-* [ ] Organização automática de mídia
-* [ ] Atualização automática dos serviços
-
-### Monitoramento
-
-* [ ] Prometheus
-* [ ] Grafana
-* [ ] Uptime Kuma
-* [ ] Alertas de indisponibilidade
-
-### Backup
-
-* [ ] Backup das configurações
-* [ ] Backup dos bancos de dados
-* [ ] Backup externo
-* [ ] Teste de restauração
+* [ ] Integrar **Lidarr** para gerenciamento automático da biblioteca musical
+* [ ] Configurar **reverse proxy + HTTPS**
+* [ ] Implementar **backup das configurações**
 
 ---
 
-## 🎯 Objetivo
+# ⚠️ Aviso
 
-O objetivo principal é transformar este servidor em um laboratório prático de **Linux, Docker, infraestrutura e DevOps**, documentando a evolução da arquitetura e os conhecimentos adquiridos durante o desenvolvimento.
+Este projeto é destinado a aprendizado, administração de servidores e gerenciamento de mídia que o usuário possui ou tem autorização para armazenar.
 
-O projeto continuará sendo expandido conforme novos serviços e práticas de infraestrutura forem implementados.
+O responsável pela implantação deve verificar as leis e os termos de serviço aplicáveis ao conteúdo utilizado.
 
 ---
 
-## 👨‍💻 Autor
+# 👨‍💻 Projeto
 
-Projeto desenvolvido como laboratório pessoal de infraestrutura, Linux, Docker e serviços self-hosted.
+Servidor de mídia **self-hosted** baseado em Linux e Docker.
 
-⭐ Projeto em evolução.
+```text
+Linux
+ │
+ └── Docker
+      │
+      ├── Jellyfin
+      │    └── Filmes / Séries
+      │
+      ├── qBittorrent
+      │    └── Downloads
+      │
+      └── Navidrome
+           └── Música
+                │
+                └── spotDL
+```
+
+O objetivo é demonstrar, de forma prática, a construção e administração de uma infraestrutura de mídia utilizando tecnologias open source.
