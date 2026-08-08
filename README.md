@@ -881,29 +881,6 @@ Thumbs.db
 
 ---
 
-# 🧠 O que este projeto demonstra
-
-Este projeto demonstra conhecimentos em:
-
-* Linux
-* Docker
-* Docker Compose
-* Containers
-* Volumes
-* Persistência de dados
-* Permissões Linux
-* Administração de servidores
-* Gerenciamento de serviços
-* Git/GitHub
-* Self-hosting
-* Organização de arquivos
-* Troubleshooting
-* Redes
-* Acesso remoto
-* Serviços multimídia
-
----
-
 # 🗺️ Roadmap
 
 * [ ] Integrar **Lidarr** para gerenciamento automático da biblioteca musical
