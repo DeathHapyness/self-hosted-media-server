@@ -1,13 +1,12 @@
 # 🖥️ Self-Hosted Media Server
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge\&logo=linux\&logoColor=black)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
-![Jellyfin](https://img.shields.io/badge/Jellyfin-00A4DC?style=for-the-badge\&logo=jellyfin\&logoColor=white)
-![Navidrome](https://img.shields.io/badge/Navidrome-000000?style=for-the-badge)
-![qBittorrent](https://img.shields.io/badge/qBittorrent-2F67BA?style=for-the-badge\&logo=qbittorrent\&logoColor=white)
-![Tailscale](https://img.shields.io/badge/Tailscale-4A4DE6?style=for-the-badge\&logo=tailscale\&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge\&logo=github\&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?logo=docker&logoColor=white)
+![Jellyfin](https://img.shields.io/badge/Jellyfin-Media-00A4DC?logo=jellyfin&logoColor=white)
+![Navidrome](https://img.shields.io/badge/Navidrome-Music-000000?logo=navidrome&logoColor=white)
+![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent&logoColor=white)
+![Dozzle](https://img.shields.io/badge/Dozzle-Logs-009688?logo=docker&logoColor=white)
+![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale&logoColor=white)
 
 Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
 
