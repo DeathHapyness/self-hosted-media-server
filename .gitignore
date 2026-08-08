@@ -1,21 +1,32 @@
-# Configurações geradas pelos containers
-**/config/
-**/cache/
-**/data/
-**/media/
-**/music/
+# Docker
+*.env
 
-# Mídia
-**/media/
-**/filmes/
-**/series/
+# Jellyfin
+jellyfin/config/
+jellyfin/cache/
+jellyfin/media/
 
-# Secrets
-.env
-*.secret
+# qBittorrent
+qbittorrent/config/
+
+# Navidrome
+navidrome/data/
+navidrome/music/
+
+# Tailscale
+tailscale/
 *.key
 *.pem
-*.log
+*.token
 
 # Logs
 *.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Sistema
+.DS_Store
+Thumbs.db
