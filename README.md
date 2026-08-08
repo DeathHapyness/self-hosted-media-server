@@ -715,25 +715,25 @@ Depois de instalar o Tailscale nos dispositivos e entrar na mesma conta, os serv
 ### Jellyfin
 
 ```text
-http://100.95.231.76:8096
+http://IP DO SEU TAILSCALE:8096
 ```
 
 ### Navidrome
 
 ```text
-http://100.95.231.76:4533
+http://IP DO SEU TAILSCALE:4533
 ```
 
 ### qBittorrent
 
 ```text
-http://100.95.231.76:8080
+http://IP DO SEU TAILSCALE:8080
 ```
 
 ### SSH
 
 ```bash
-ssh rique@100.95.231.76
+ssh rique@IP DO SEU TAILSCALE
 ```
 
 ## Dispositivos
@@ -742,7 +742,7 @@ O Tailscale pode conectar diferentes dispositivos à mesma rede privada:
 
 ```text
 Servidor
-100.95.231.76
+IP DO SEU TAILSCALE
       │
       ├── 📱 iPhone
       ├── 💻 PC / Linux
