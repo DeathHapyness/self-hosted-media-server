@@ -174,8 +174,10 @@ def check_os() -> None:
 def check_docker() -> None:
     if shutil.which("docker") is None:
         raise InstallError(
-            "Docker não encontrado. Instale o Docker antes de continuar: "
-            "https://docs.docker.com/engine/install/"
+            "Docker não encontrado.\n"
+            "    Instale com: curl -fsSL https://get.docker.com | sh\n"
+            "    Ou veja: https://docs.docker.com/engine/install/\n"
+            "    Fonte do script: https://github.com/docker/docker-install"
         )
     result = run(["docker", "--version"])
     if result.returncode != 0:
