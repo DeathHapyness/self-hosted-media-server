@@ -124,13 +124,13 @@ Guia completo de instalação do Docker: [docs/docker.md](docs/docker.md)
 
 ## 📚 Documentação detalhada
 
-* [🐳 Instalação do Docker](docs/docker.md)
-* [🎬 Jellyfin](docs/jellyfin.md)
-* [🎵 Navidrome + spotDL](docs/navidrome.md)
-* [📥 qBittorrent](docs/qbittorrent.md)
-* [🛡️ AdGuard Home](docs/adguard.md)
-* [🔗 Acesso remoto com Tailscale](docs/tailscale.md)
-* [🔍 Verificação e Troubleshooting](docs/troubleshooting.md)
+* [🐳 Instalação do Docker](docs/Docker.md)
+* [🎬 Jellyfin](docs/Jellyfin.md)
+* [🎵 Navidrome + spotDL](docs/Navidrome.md)
+* [📥 qBittorrent](docs/Qbittorrent.md)
+* [🛡️ AdGuard Home](docs/Adguard.md)
+* [🔗 Acesso remoto com Tailscale](docs/Tailscale.md)
+* [🔍 Verificação e Troubleshooting](docs/Troubleshooting.md)
 
 ---
 
