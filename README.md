@@ -30,6 +30,16 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 
 ---
 
+## INSTALADOR 
+
+Antes de usar leia [`docs/readme-instalador.md`](docs/readme-instalador.md)
+
+
+ Quer saber exatamente o que o instalador faz (e o que ele deliberadamente não faz)? Veja [`docs/installer-actions.md`](docs/installer-actions.md).
+
+
+---
+
 ## 🏗️ Arquitetura
 
 ```text
