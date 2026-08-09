@@ -2,17 +2,12 @@
 
 <div align="center">
 
-![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker\&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?logo=docker\&logoColor=white)
-![Jellyfin](https://img.shields.io/badge/Jellyfin-Media-00A4DC?logo=jellyfin\&logoColor=white)
-![Navidrome](https://img.shields.io/badge/Navidrome-Music-000000?logo=navidrome\&logoColor=white)
-![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent\&logoColor=white)
-![Dozzle](https://img.shields.io/badge/Dozzle-Logs-009688?logo=docker\&logoColor=white)
-![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale\&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Jellyfin](https://img.shields.io/badge/Jellyfin-Media-00A4DC?logo=jellyfin&logoColor=white)
+![Navidrome](https://img.shields.io/badge/Navidrome-Music-1DB954?logo=navidrome&logoColor=white)
+![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent&logoColor=white)
 ![AdGuard Home](https://img.shields.io/badge/AdGuard%20Home-DNS-68BC71?logo=adguard&logoColor=white)
-
-</div>
-
+![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale&logoColor=white)
 
 Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
 
@@ -29,20 +24,7 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 
 ---
 
-## 📑 Sumário
-
-* [🏗️ Arquitetura](#️-arquitetura)
-* [📋 Requisitos](#-requisitos)
-* [🐳 Instalação do Docker](#-instalação-do-docker)
-* [👤 Usar Docker sem sudo](#-usar-docker-sem-sudo)
-* [🛡️ AdGuard Home](#️-adguard-home)
-* [🔗 Acesso Remoto com Tailscale](#-acesso-remoto-com-tailscale)
-* [🗺️ Roadmap](#️-roadmap)
-* [⚠️ Aviso](#️-aviso)
-
----
-
-# 🏗️ Arquitetura
+## 🏗️ Arquitetura
 
 ```text
                          ┌─────────────────┐
@@ -66,152 +48,26 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
                     │
                     ▼
               Filmes / Séries
-
-
 ```
 
-### Serviços
-
-| Serviço      | Função                       |         Porta |
-| ------------ | ----------------------------- | -------------: |
-| Jellyfin     | Filmes e séries               |         `8096` |
-| Navidrome    | Servidor de música            |         `4533` |
-| qBittorrent  | Gerenciamento de downloads    |         `8080` |
-| AdGuard Home | DNS e bloqueio de anúncios    | `53` / `3000` |
-| spotDL       | Download manual de músicas    |            CLI |
-| Tailscale    | Acesso remoto privado         |              — |
+Acesso remoto entre dispositivos via **Tailscale**, sem expor portas diretamente na internet.
 
 ---
 
-# 📋 Requisitos
+## 📦 Serviços
 
-## Hardware
-
-O projeto pode ser executado em um computador antigo, mini PC, notebook ou servidor dedicado.
-
-Recomendação inicial:
-
-* CPU x86_64
-* 4 GB de RAM ou mais
-* SSD para o sistema e containers
-* HD/SSD para armazenamento de mídia
-* Conexão de rede local
-
-O armazenamento necessário depende principalmente da quantidade de filmes, séries e músicas.
+| Serviço      | Função                     |          Porta | Documentação                        |
+| ------------ | --------------------------- | --------------: | ------------------------------------ |
+| Jellyfin     | Filmes e séries              |          `8096` | [docs/jellyfin.md](docs/jellyfin.md)   |
+| Navidrome    | Servidor de música            |          `4533` | [docs/navidrome.md](docs/navidrome.md) |
+| qBittorrent  | Gerenciamento de downloads    |          `8080` | [docs/qbittorrent.md](docs/qbittorrent.md) |
+| AdGuard Home | DNS e bloqueio de anúncios    | `53` / `3000` | [docs/adguard.md](docs/adguard.md)     |
+| spotDL       | Download manual de músicas    |             CLI | [docs/navidrome.md](docs/navidrome.md) |
+| Tailscale    | Acesso remoto privado         |               — | [docs/tailscale.md](docs/tailscale.md) |
 
 ---
 
-# 🐧 Sistema Operacional
-
-O projeto foi desenvolvido para Linux.
-
-Exemplo de ambiente:
-
-```text
-Linux
-Docker
-Docker Compose
-```
-
-O Docker Engine possui suporte oficial para diversas distribuições Linux.
-
----
-
-# 🐳 Instalação do Docker
-
-## 1. Atualizar o sistema
-
-Em Ubuntu/Debian:
-
-```bash
-sudo apt update
-sudo apt upgrade -y
-```
-
-## 2. Instalar dependências
-
-```bash
-sudo apt install -y ca-certificates curl
-```
-
-## 3. Adicionar a chave oficial do Docker
-
-```bash
-sudo install -m 0755 -d /etc/apt/keyrings
-
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-  -o /etc/apt/keyrings/docker.asc
-
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-```
-
-## 4. Adicionar o repositório
-
-```bash
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-Components: stable
-Architectures: $(dpkg --print-architecture)
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-```
-
-Atualize:
-
-```bash
-sudo apt update
-```
-
-## 5. Instalar Docker
-
-```bash
-sudo apt install -y \
-  docker-ce \
-  docker-ce-cli \
-  containerd.io \
-  docker-buildx-plugin \
-  docker-compose-plugin
-```
-
-## 6. Testar
-
-```bash
-sudo systemctl status docker
-```
-
-```bash
-sudo docker run hello-world
-```
-
-Verifique o Compose:
-
-```bash
-docker compose version
-```
-
----
-
-# 👤 Usar Docker sem sudo
-
-Adicione seu usuário ao grupo Docker:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-Depois encerre a sessão e entre novamente.
-
-Teste:
-
-```bash
-docker ps
-```
-
----
-
-# 📁 Estrutura do Projeto
+## 📁 Estrutura do Projeto
 
 ```text
 media-server/
@@ -221,8 +77,6 @@ media-server/
 │   ├── config/
 │   ├── cache/
 │   └── media/
-│       ├── filmes/
-│       └── series/
 │
 ├── qbittorrent/
 │   ├── docker-compose.yml
@@ -238,744 +92,71 @@ media-server/
 │   ├── work/
 │   └── conf/
 │
+├── docs/
+│   ├── docker.md
+│   ├── jellyfin.md
+│   ├── navidrome.md
+│   ├── qbittorrent.md
+│   ├── adguard.md
+│   ├── tailscale.md
+│   └── troubleshooting.md
+│
 ├── .gitignore
 └── README.md
 ```
 
-> As pastas de configuração, banco de dados, cache e mídia não devem ser enviadas para o GitHub.
+> As pastas de configuração, banco de dados, cache e mídia não são versionadas — ver [.gitignore](.gitignore).
 
 ---
 
-# 🎬 Jellyfin
+## 📋 Requisitos
 
-O Jellyfin é responsável pela biblioteca de **filmes e séries**.
+* CPU x86_64
+* 4 GB de RAM ou mais
+* SSD para o sistema e containers
+* HD/SSD para armazenamento de mídia
+* Conexão de rede local
+* Linux + Docker + Docker Compose
 
-## Criar diretórios
-
-```bash
-sudo mkdir -p /opt/jellyfin
-
-cd /opt/jellyfin
-
-mkdir -p config
-mkdir -p cache
-mkdir -p media/filmes
-mkdir -p media/series
-```
-
-## Docker Compose
-
-Crie:
-
-```bash
-nano docker-compose.yml
-```
-
-```yaml
-services:
-  jellyfin:
-    image: jellyfin/jellyfin:latest
-    container_name: jellyfin
-    restart: unless-stopped
-
-    ports:
-      - "8096:8096"
-
-    volumes:
-      - ./config:/config
-      - ./cache:/cache
-      - ./media:/media
-
-    environment:
-      - TZ=America/Sao_Paulo
-```
-
-Inicie:
-
-```bash
-docker compose up -d
-```
-
-Acesse:
-
-```text
-http://IP_DO_SERVIDOR:8096
-```
+Guia completo de instalação do Docker: [docs/docker.md](docs/docker.md)
 
 ---
 
-# 📥 qBittorrent
+## 📚 Documentação detalhada
 
-O qBittorrent é utilizado para gerenciamento de downloads.
-
-## Criar diretórios
-
-```bash
-sudo mkdir -p /opt/qbittorrent
-cd /opt/qbittorrent
-
-mkdir -p config
-```
-
-## Docker Compose
-
-```yaml
-services:
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    restart: unless-stopped
-
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Sao_Paulo
-      - WEBUI_PORT=8080
-
-    ports:
-      - "8080:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
-
-    volumes:
-      - ./config:/config
-      - /opt/jellyfin/media:/downloads
-```
-
-Inicie:
-
-```bash
-docker compose up -d
-```
-
-Acesse:
-
-```text
-http://IP_DO_SERVIDOR:8080
-```
-
-O diretório `/downloads` do qBittorrent corresponde ao diretório de mídia do Jellyfin:
-
-```text
-Host:
-/opt/jellyfin/media
-
-Container qBittorrent:
-/downloads
-
-Container Jellyfin:
-/media
-```
-
-Isso permite que os arquivos baixados pelo qBittorrent sejam posteriormente encontrados pelo Jellyfin.
+* [🐳 Instalação do Docker](docs/docker.md)
+* [🎬 Jellyfin](docs/jellyfin.md)
+* [🎵 Navidrome + spotDL](docs/navidrome.md)
+* [📥 qBittorrent](docs/qbittorrent.md)
+* [🛡️ AdGuard Home](docs/adguard.md)
+* [🔗 Acesso remoto com Tailscale](docs/tailscale.md)
+* [🔍 Verificação e Troubleshooting](docs/troubleshooting.md)
 
 ---
 
-# 🎵 Navidrome
+## 🔐 Segurança
 
-O Navidrome é responsável pela biblioteca musical.
+Evite expor diretamente serviços administrativos para a internet (`8080` qBittorrent, `3000` AdGuard Home). Prefira Tailscale, VPN, reverse proxy com HTTPS e firewall.
 
-Ele lê os arquivos presentes em:
-
-```text
-/opt/navidrome/music
-```
-
-e disponibiliza a biblioteca através de clientes compatíveis.
-
-## Criar diretórios
-
-```bash
-sudo mkdir -p /opt/navidrome
-
-cd /opt/navidrome
-
-mkdir -p data
-mkdir -p music
-```
-
-## Docker Compose
-
-```yaml
-services:
-  navidrome:
-    image: deluan/navidrome:latest
-    container_name: navidrome
-    restart: unless-stopped
-
-    ports:
-      - "4533:4533"
-
-    environment:
-      ND_SCANSCHEDULE: 1h
-      ND_LOGLEVEL: info
-      ND_SESSIONTIMEOUT: 24h
-      TZ: America/Sao_Paulo
-
-    volumes:
-      - ./data:/data
-      - ./music:/music:ro
-```
-
-Inicie:
-
-```bash
-docker compose up -d
-```
-
-Acesse:
-
-```text
-http://IP_DO_SERVIDOR:4533
-```
+Nunca versionar: senhas, tokens, API keys, `.env`, `config/`, `data/`, `cache/`, `work/`, config real do AdGuard, bancos de dados, mídia.
 
 ---
 
-# 🎧 Clientes Recomendados
+## 🧠 O que este projeto demonstra
 
-O Navidrome funciona como **servidor**, enquanto os aplicativos abaixo funcionam como clientes.
-
-## 💻 PC — Feishin
-
-Para desktop, uma opção recomendada é o **Feishin**.
-
-Ele oferece uma interface moderna para servidores compatíveis com Subsonic, incluindo Navidrome.
-
-[Feishin — GitHub](https://github.com/jeffvli/feishin)
+Linux · Docker · Docker Compose · Volumes e persistência de dados · Administração de servidores · DNS e bloqueio de anúncios · Git/GitHub · Self-hosting · Redes e acesso remoto · Troubleshooting
 
 ---
 
-## 📱 iPhone / iOS
-
-No iPhone, você pode utilizar um cliente compatível com Navidrome/Subsonic.
-
-### Amperfy
-
-[Amperfy — App Store](https://apps.apple.com/app/amperfy-music-player/id1530145038)
-
-### play:Sub
-
-[play:Sub — App Store](https://apps.apple.com/app/play-sub/id955329386)
-
----
-
-## 🤖 Android
-
-No Android, uma opção interessante é o **Symfonium**.
-
-Ele suporta Navidrome e outros servidores de música.
-
-[Symfonium — site oficial](https://symfonium.app/)
-
----
-
-# 🎶 spotDL
-
-O spotDL pode ser utilizado para downloads manuais de músicas.
-
-## Instalar dependências
-
-```bash
-sudo apt install -y python3 python3-pip ffmpeg
-```
-
-Instale:
-
-```bash
-pip install spotdl
-```
-
-Verifique:
-
-```bash
-spotdl --version
-```
-
----
-
-# 📥 Baixando músicas
-
-Para manter a organização da biblioteca:
-
-```bash
-spotdl \
-  --output "/opt/navidrome/music/{artist}/{album}/{track-number} - {title}.{output-ext}" \
-  "LINK_DO_SPOTIFY"
-```
-
-Exemplo:
-
-```bash
-spotdl \
-  --output "/opt/navidrome/music/{artist}/{album}/{track-number} - {title}.{output-ext}" \
-  "https://open.spotify.com/track/ID"
-```
-
-Sempre coloque a URL entre aspas.
-
-Isso permite organizar automaticamente:
-
-```text
-/opt/navidrome/music/
-│
-├── Artista/
-│   ├── Álbum/
-│   │   ├── 01 - Música.mp3
-│   │   ├── 02 - Música.mp3
-│   │   └── 03 - Música.mp3
-│   │
-│   └── Outro Álbum/
-│
-└── Outro Artista/
-```
-
----
-
-# 🔄 Atualizando o Navidrome
-
-Depois de adicionar novas músicas:
-
-```bash
-docker exec -it navidrome /app/navidrome scan
-```
-
-Também existe um scan automático configurado:
-
-```yaml
-ND_SCANSCHEDULE: 1h
-```
-
----
-
-# 🔄 Fluxo da Música
-
-```text
-              Spotify URL
-                   │
-                   ▼
-                spotDL
-                   │
-                   ▼
-        /opt/navidrome/music
-                   │
-          ┌────────┴────────┐
-          │                 │
-       Artista           Artista
-          │                 │
-        Álbum             Álbum
-          │                 │
-        Faixas            Faixas
-          │                 │
-          └────────┬────────┘
-                   ▼
-               Navidrome
-                   │
-          ┌────────┼────────┐
-          ▼        ▼        ▼
-        Feishin   iOS    Android
-          PC
-```
-
----
-
-# 🛡️ AdGuard Home
-
-O AdGuard Home atua como **servidor DNS local**, bloqueando anúncios e rastreadores para todos os dispositivos da rede que o utilizam como resolvedor.
-
-## Criar diretórios
-
-```bash
-sudo mkdir -p /opt/adguard
-cd /opt/adguard
-
-mkdir -p work
-mkdir -p conf
-```
-
-## Docker Compose
-
-```yaml
-services:
-  adguardhome:
-    image: adguard/adguardhome
-    container_name: adguardhome
-    restart: unless-stopped
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "3000:3000/tcp"
-      - "8081:80/tcp"
-    volumes:
-      - ./work:/opt/adguardhome/work
-      - ./conf:/opt/adguardhome/conf
-```
-
-Inicie:
-
-```bash
-docker compose up -d
-```
-
-## Primeiro acesso
-
-Acesse a interface de configuração inicial:
-
-```text
-http://IP_DO_SERVIDOR:3000
-```
-
-No primeiro acesso, o AdGuard Home guia a criação do usuário administrador e a configuração inicial (interface de escuta, porta do painel, upstream DNS). Como o repositório não inclui a config real (`conf/AdGuardHome.yaml` é ignorado pelo Git), esse arquivo é gerado automaticamente na primeira execução.
-
-## Usando como DNS da rede
-
-Depois de configurado, aponte o DNS do seu roteador (ou dos dispositivos individualmente) para o IP do servidor na porta `53`, para que o bloqueio de anúncios valha para toda a rede.
-
-> ⚠️ A porta `80` do container está mapeada para `8081` no host neste setup, para não conflitar com outros serviços que já usem a porta 80.
-
----
-
-# 🔍 Verificação e Troubleshooting
-
-## Verificar arquivos no host
-
-```bash
-find /opt/navidrome/music -type f
-```
-
-Somente MP3:
-
-```bash
-find /opt/navidrome/music -type f -name "*.mp3"
-```
-
-## Verificar arquivos dentro do Navidrome
-
-```bash
-docker exec -it navidrome find /music -type f
-```
-
-Se o arquivo estiver no host e dentro do container, o volume está funcionando corretamente.
-
-## Verificar volumes
-
-Jellyfin:
-
-```bash
-docker inspect jellyfin \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-```
-
-qBittorrent:
-
-```bash
-docker inspect qbittorrent \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-```
-
-Navidrome:
-
-```bash
-docker inspect navidrome \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-```
-
-AdGuard Home:
-
-```bash
-docker inspect adguardhome \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-```
-
----
-
-# 🔐 Segurança
-
-Evite expor diretamente serviços administrativos para a internet.
-
-Principalmente:
-
-```text
-8080 → qBittorrent
-3000 → Painel do AdGuard Home
-```
-
-Para acesso externo, considere utilizar:
-
-* Tailscale
-* VPN
-* Reverse proxy
-* HTTPS
-* Autenticação adequada
-* Firewall
-
-Nunca coloque no GitHub:
-
-```text
-senhas
-tokens
-API keys
-.env
-config/
-data/
-cache/
-work/
-conf/AdGuardHome.yaml
-bancos de dados
-mídia
-```
-
-> O `conf/AdGuardHome.yaml` real contém o hash da senha do administrador e a lista de clientes/dispositivos da rede — por isso ele é ignorado pelo Git, e apenas o `docker-compose.yml` (sem dados sensíveis) é versionado.
-
----
-
-# 🔗 Acesso Remoto com Tailscale
-
-Para acessar o servidor fora da rede doméstica, o projeto utiliza o **Tailscale** como uma rede privada entre os dispositivos.
-
-Com o Tailscale, não é necessário expor diretamente as portas do Jellyfin, Navidrome, qBittorrent, AdGuard Home ou SSH na internet.
-
-A arquitetura fica:
-
-```text
-                         INTERNET
-                             │
-                             │
-                         Tailscale
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-              ▼              ▼              ▼
-           📱 iPhone       💻 PC        🖥️ Servidor
-                                        100.x.x.x
-                                             │
-                    ┌──────────────┬─────────┼──────────────┐
-                    │              │         │              │
-                    ▼              ▼         ▼              ▼
-                 Jellyfin      Navidrome  qBittorrent   AdGuard Home
-                  :8096          :4533       :8080          :3000
-```
-
-## Instalação
-
-No servidor Linux:
-
-```bash
-curl -fsSL https://tailscale.com/install.sh | sh
-```
-
-Depois autentique o servidor:
-
-```bash
-sudo tailscale up
-```
-
-Verifique os dispositivos conectados:
-
-```bash
-tailscale status
-```
-
-Para descobrir o IP Tailscale do servidor:
-
-```bash
-tailscale ip
-```
-
-O servidor receberá um endereço da rede `100.x.x.x`.
-
-Exemplo:
-
-```text
-100.95.231.76
-```
-
-## Acessando os serviços remotamente
-
-Depois de instalar o Tailscale nos dispositivos e entrar na mesma conta, os serviços podem ser acessados através do IP Tailscale do servidor.
-
-### Jellyfin
-
-```text
-http://IP DO SEU TAILSCALE:8096
-```
-
-### Navidrome
-
-```text
-http://IP DO SEU TAILSCALE:4533
-```
-
-### qBittorrent
-
-```text
-http://IP DO SEU TAILSCALE:8080
-```
-
-### AdGuard Home
-
-```text
-http://IP DO SEU TAILSCALE:3000
-```
-
-### SSH
-
-```bash
-ssh rique@IP DO SEU TAILSCALE
-```
-
-## Dispositivos
-
-O Tailscale pode conectar diferentes dispositivos à mesma rede privada:
-
-```text
-Servidor
-IP DO SEU TAILSCALE
-      │
-      ├── 📱 iPhone
-      ├── 💻 PC / Linux
-      └── 🤖 Android
-```
-
-Basta instalar o Tailscale em cada dispositivo e entrar na mesma conta.
-
-## Vantagens
-
-* 🔒 Não é necessário abrir portas no roteador
-* 🌐 Acesso aos serviços fora de casa
-* 📱 Acesso pelo celular
-* 💻 Acesso pelo computador
-* 🔑 Autenticação através da conta Tailscale
-* 🛡️ Rede privada entre os dispositivos
-* 🖥️ Possibilidade de acessar o servidor via SSH remotamente
-
-> O Tailscale é utilizado neste projeto como camada de acesso remoto à infraestrutura, mantendo os serviços internos sem exposição direta à internet.
-
----
-
-# 🐙 GitHub
-
-Inicialize o repositório:
-
-```bash
-git init
-```
-
-Utilize `main`:
-
-```bash
-git branch -M main
-```
-
-Adicione os arquivos:
-
-```bash
-git add .
-```
-
-Crie o commit:
-
-```bash
-git commit -m "docs: add media server setup"
-```
-
-Adicione o repositório:
-
-```bash
-git remote add origin URL_DO_SEU_REPOSITORIO
-```
-
-Envie:
-
-```bash
-git push -u origin main
-```
-
----
-
-# 🧹 .gitignore
-
-Exemplo:
-
-```gitignore
-# Docker
-*.env
-
-# Jellyfin
-jellyfin/config/
-jellyfin/cache/
-jellyfin/media/
-
-# qBittorrent
-qbittorrent/config/
-
-# Navidrome
-navidrome/data/
-navidrome/music/
-
-# AdGuard Home
-adguard/work/
-adguard/conf/AdGuardHome.yaml
-
-# Logs
-*.log
-
-# Databases
-*.db
-*.sqlite
-*.sqlite3
-
-# Sistema
-.DS_Store
-Thumbs.db
-```
-
----
-
-# 🗺️ Roadmap
+## 🗺️ Roadmap
 
 * [ ] Integrar **Lidarr** para gerenciamento automático da biblioteca musical
 * [ ] Configurar **reverse proxy + HTTPS**
 * [ ] Implementar **backup das configurações**
-* [ ] Adicionar regras de DNS rewrite / listas de bloqueio personalizadas no AdGuard Home
+* [ ] Regras de DNS rewrite / listas de bloqueio personalizadas no AdGuard Home
 
 ---
 
-# ⚠️ Aviso
+## ⚠️ Aviso
 
-Este projeto é destinado a aprendizado, administração de servidores e gerenciamento de mídia que o usuário possui ou tem autorização para armazenar.
-
-O responsável pela implantação deve verificar as leis e os termos de serviço aplicáveis ao conteúdo utilizado.
-
----
-
-# 👨‍💻 Projeto
-
-Servidor de mídia **self-hosted** baseado em Linux e Docker.
-
-```text
-Linux
- │
- └── Docker
-      │
-      ├── Jellyfin
-      │    └── Filmes / Séries
-      │
-      ├── qBittorrent
-      │    └── Downloads
-      │
-      ├── Navidrome
-      │    └── Música
-      │         │
-      │         └── spotDL
-      │
-      └── AdGuard Home
-           └── DNS / Bloqueio de anúncios
-
-Tailscale
-    │
-    ├── 📱 iPhone
-    ├── 💻 PC
-    └── 🌐 Acesso remoto
-```
-
-O objetivo é demonstrar, de forma prática, a construção e administração de uma infraestrutura de mídia utilizando tecnologias open source, containers, armazenamento persistente e acesso remoto seguro.
+Este projeto é destinado a aprendizado, administração de servidores e gerenciamento de mídia que o usuário possui ou tem autorização para armazenar. O responsável pela implantação deve verificar as leis e os termos de serviço aplicáveis ao conteúdo utilizado.
