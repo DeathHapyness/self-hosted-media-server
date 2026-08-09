@@ -1,6 +1,10 @@
-<h1 align="center">🖥️ Self-Hosted Media Server</h1>
+<div align="center">
+  <img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="900" height="340" style="border-radius: 20px;" >
+</div>
 
 <div align="center">
+
+---
 
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Jellyfin](https://img.shields.io/badge/Jellyfin-Media-00A4DC?logo=jellyfin&logoColor=white)
