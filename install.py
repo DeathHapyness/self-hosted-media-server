@@ -295,7 +295,7 @@ def check_ports() -> None:
             in_use = s.connect_ex(("127.0.0.1", port)) == 0
         if in_use:
             busy.append((port, service))
-from __future__ import annotations
+
     if busy:
         print_fail("Portas em uso detectadas:")
         for port, service in busy:
