@@ -37,6 +37,8 @@ ASCII_ART = r"""  ___           _        _           _              ____       _
 |___|_| |_|___/\__\__,_|_|\__,_|\__,_|\___/|_|    |____/ \___|_|_|       |_| |_|\___/|___/\__\___|\__,_|
 """
 
+ADVERTENCIA = """\033[1;31mADVERTÊNCIA:\033[0m Este script é fornecido "como está" e não se responsabiliza por quaisquer danos ou perda de dados. Use por sua própria conta e risco."""
+
 # --------------------------------------------------------------------------
 # Configuração
 # --------------------------------------------------------------------------
@@ -109,10 +111,7 @@ REPO_SERVICE_DIRS = [
     "homepage",
 ]
 
-
-# --------------------------------------------------------------------------
 # Saída no terminal
-# --------------------------------------------------------------------------
 
 class Color:
     GREEN = "\033[92m"
@@ -172,10 +171,7 @@ def run(cmd, **kwargs):
         **kwargs,
     )
 
-
-# --------------------------------------------------------------------------
 # Verificações
-# --------------------------------------------------------------------------
 
 def check_os() -> None:
     if sys.platform.startswith("linux"):
@@ -335,10 +331,7 @@ def check_ports() -> None:
         )
     print_ok("Required ports available")
 
-
-# --------------------------------------------------------------------------
 # Criação de diretórios e permissões
-# --------------------------------------------------------------------------
 
 def create_directories() -> None:
     print_section("Creating directories...")
@@ -415,10 +408,7 @@ def configure_permissions() -> None:
         )
     print_info("Jellyfin e Navidrome devem montar a mídia como somente leitura (:ro) no docker-compose.yml")
 
-
-# --------------------------------------------------------------------------
 # .env
-# --------------------------------------------------------------------------
 
 def ensure_env_file() -> None:
     script_dir = Path(__file__).resolve().parent
@@ -439,10 +429,7 @@ def ensure_env_file() -> None:
             "credenciais, crie um .env manualmente antes de continuar."
         )
 
-
-# --------------------------------------------------------------------------
 # Docker Compose
-# --------------------------------------------------------------------------
 
 def validate_compose() -> Dict[str, Path]:
     print_section("Validating Docker Compose...")
@@ -495,13 +482,11 @@ def start_services(compose_files: Dict[str, Path]) -> None:
             print_info(error)
         raise InstallError("Verifique os logs acima e 'docker compose logs' de cada serviço para mais detalhes.")
 
-
-# --------------------------------------------------------------------------
 # Main
-# --------------------------------------------------------------------------
 
 def main() -> int:
     print(ASCII_ART)
+    print(ADVERTENCIA)
     print_header("MEDIA SERVER INSTALLER")
 
     steps = [
