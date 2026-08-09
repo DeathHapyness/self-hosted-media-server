@@ -64,13 +64,13 @@ Acesso remoto entre dispositivos via **Tailscale**, sem expor portas diretamente
 
 | Serviço      | Função                     |          Porta | Documentação                        |
 | ------------ | --------------------------- | --------------: | ------------------------------------ |
-| Jellyfin     | Filmes e séries              |          `8096` | [docs/jellyfin.md](docs/jellyfin.md)   |
-| Navidrome    | Servidor de música            |          `4533` | [docs/navidrome.md](docs/navidrome.md) |
-| qBittorrent  | Gerenciamento de downloads    |          `8080` | [docs/qbittorrent.md](docs/qbittorrent.md) |
-| AdGuard Home | DNS e bloqueio de anúncios    | `53` / `3000` | [docs/adguard.md](docs/adguard.md)     |
-| spotDL       | Download manual de músicas    |             CLI | [docs/navidrome.md](docs/navidrome.md) |
-| Tailscale    | Acesso remoto privado         |               — | [docs/tailscale.md](docs/tailscale.md) |
-| Dozzle       | Monitoramento de containers   | `9999`          | [docs/tailscale.md](docs/dozzle.md) |
+| Jellyfin     | Filmes e séries              |          `8096` | [docs/jellyfin.md](docs/Jellyfin.md)   |
+| Navidrome    | Servidor de música            |          `4533` | [docs/navidrome.md](docs/Navidrome.md) |
+| qBittorrent  | Gerenciamento de downloads    |          `8080` | [docs/qbittorrent.md](docs/Qbittorrent.md) |
+| AdGuard Home | DNS e bloqueio de anúncios    | `53` / `3000` | [docs/adguard.md](docs/Adguard.md)     |
+| spotDL       | Download manual de músicas    |             CLI | [docs/navidrome.md](docs/Navidrome.md) |
+| Tailscale    | Acesso remoto privado         |               — | [docs/tailscale.md](docs/Tailscale.md) |
+| Dozzle       | Monitoramento de containers   | `9999`          | [docs/tailscale.md](docs/Dozzle.md) |
 
 ---
 
@@ -135,6 +135,7 @@ Guia completo de instalação do Docker: [docs/docker.md](docs/docker.md)
 * [🎬 Jellyfin](docs/Jellyfin.md)
 * [🎵 Navidrome + spotDL](docs/Navidrome.md)
 * [📥 qBittorrent](docs/Qbittorrent.md)
+* [📊 Dozzle](docs/Dozzle.md)
 * [🛡️ AdGuard Home](docs/Adguard.md)
 * [🔗 Acesso remoto com Tailscale](docs/Tailscale.md)
 * [🔍 Verificação e Troubleshooting](docs/Troubleshooting.md)
