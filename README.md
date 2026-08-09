@@ -12,6 +12,8 @@
 ![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent&logoColor=white)
 ![AdGuard Home](https://img.shields.io/badge/AdGuard%20Home-DNS-68BC71?logo=adguard&logoColor=white)
 ![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale&logoColor=white)
+![MIT License](https://img.shields.io/badge/License-MIT-3DA639?logo=opensourceinitiative&logoColor=white)
+
 
 Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
 
@@ -68,6 +70,7 @@ Acesso remoto entre dispositivos via **Tailscale**, sem expor portas diretamente
 | AdGuard Home | DNS e bloqueio de anúncios    | `53` / `3000` | [docs/adguard.md](docs/adguard.md)     |
 | spotDL       | Download manual de músicas    |             CLI | [docs/navidrome.md](docs/navidrome.md) |
 | Tailscale    | Acesso remoto privado         |               — | [docs/tailscale.md](docs/tailscale.md) |
+| Dozzle       | Monitoramento de containers   | `9999`          | [docs/tailscale.md](docs/dozzle.md) |
 
 ---
 
