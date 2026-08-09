@@ -1,13 +1,17 @@
-# 🖥️ Self-Hosted Media Server
+<h1 align="center">🖥️ Self-Hosted Media Server</h1>
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge\&logo=linux\&logoColor=black)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
-![Jellyfin](https://img.shields.io/badge/Jellyfin-00A4DC?style=for-the-badge\&logo=jellyfin\&logoColor=white)
-![Navidrome](https://img.shields.io/badge/Navidrome-000000?style=for-the-badge)
-![qBittorrent](https://img.shields.io/badge/qBittorrent-2F67BA?style=for-the-badge\&logo=qbittorrent\&logoColor=white)
-![Tailscale](https://img.shields.io/badge/Tailscale-4A4DE6?style=for-the-badge\&logo=tailscale\&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge\&logo=github\&logoColor=white)
+<div align="center">
+
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker\&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-Orchestration-2496ED?logo=docker\&logoColor=white)
+![Jellyfin](https://img.shields.io/badge/Jellyfin-Media-00A4DC?logo=jellyfin\&logoColor=white)
+![Navidrome](https://img.shields.io/badge/Navidrome-Music-000000?logo=navidrome\&logoColor=white)
+![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent\&logoColor=white)
+![Dozzle](https://img.shields.io/badge/Dozzle-Logs-009688?logo=docker\&logoColor=white)
+![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale\&logoColor=white)
+
+</div>
+
 
 Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
 
@@ -357,6 +361,47 @@ Container Jellyfin:
 Isso permite que os arquivos baixados pelo qBittorrent sejam posteriormente encontrados pelo Jellyfin.
 
 ---
+
+# 🐳 Dozzle
+
+O Dozzle é utilizado para visualizar os logs dos containers Docker em tempo real através de uma interface web.
+
+Ele facilita o monitoramento e troubleshooting dos serviços sem precisar executar manualmente:
+
+docker logs <container>
+Docker Compose
+
+```services:
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+
+    ports:
+      - "9999:8080"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+Iniciar
+cd /opt/dozzle
+docker compose up -d
+```
+A interface pode ser acessada através de:
+
+
+
+http://IP_DO_SERVIDOR:9999
+
+O Dozzle permite visualizar os logs de serviços como:
+
+Jellyfin
+Navidrome
+qBittorrent
+Immich
+Dozzle
+
+--- 
+
 
 # 🎵 Navidrome
 
@@ -837,29 +882,6 @@ navidrome/music/
 .DS_Store
 Thumbs.db
 ```
-
----
-
-# 🧠 O que este projeto demonstra
-
-Este projeto demonstra conhecimentos em:
-
-* Linux
-* Docker
-* Docker Compose
-* Containers
-* Volumes
-* Persistência de dados
-* Permissões Linux
-* Administração de servidores
-* Gerenciamento de serviços
-* Git/GitHub
-* Self-hosting
-* Organização de arquivos
-* Troubleshooting
-* Redes
-* Acesso remoto
-* Serviços multimídia
 
 ---
 
