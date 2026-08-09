@@ -1,6 +1,8 @@
 <h1 align="center">🖥️ Self-Hosted Media Server</h1>
 
-<img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="600" align="center">
+<div align="center">
+  <img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="900" height="350" style="border-radius: 20px;">
+</div>
 
 <div align="center">
 
@@ -187,7 +189,10 @@ Linux · Docker · Docker Compose · Volumes e persistência de dados · Adminis
 * [ ] Configurar **reverse proxy + HTTPS**
 * [ ] Implementar **backup das configurações**
 * [x] Regras de DNS rewrite / listas de bloqueio personalizadas no AdGuard Home
+<<<<<<< HEAD
 * [ ] Substituir o Filebrowser por solução própria com monitor de discos integrado (forck do file browser)
+=======
+>>>>>>> b777d9194ccd40990fc85cf4c6d9abc797fed559
 
 ---
 
