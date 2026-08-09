@@ -97,6 +97,19 @@ DEFAULT_EXPECTED_PORTS = {
 
 COMPOSE_CANDIDATES = ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"]
 
+# Nomes das pastas no repositório (ao lado de install.py), cada uma com seu
+# próprio arquivo de compose.
+REPO_SERVICE_DIRS = [
+    "adguard",
+    "dozzle",
+    "filebrowser",
+    "jellyfin",
+    "navidrome",
+    "qbittorrent",
+    "homepage",
+]
+
+
 # --------------------------------------------------------------------------
 # Saída no terminal
 # --------------------------------------------------------------------------
@@ -174,10 +187,8 @@ def check_os() -> None:
 def check_docker() -> None:
     if shutil.which("docker") is None:
         raise InstallError(
-            "Docker não encontrado.\n"
-            "    Instale com: curl -fsSL https://get.docker.com | sh\n"
-            "    Ou veja: https://docs.docker.com/engine/install/\n"
-            "    Fonte do script: https://github.com/docker/docker-install"
+            "Docker não encontrado. Instale o Docker antes de continuar: "
+            "https://docs.docker.com/engine/install/"
         )
     result = run(["docker", "--version"])
     if result.returncode != 0:
@@ -250,13 +261,24 @@ def check_disk_space() -> None:
         print_ok(f"Storage available ({media_free_gb:.1f}GB free on {MEDIA_DIR})")
 
 
-def find_compose_file() -> Optional[Path]:
+def find_compose_files() -> Dict[str, Path]:
+    """Procura um arquivo de compose dentro de cada pasta de serviço do repo.
+
+    Retorna um dicionário {nome_do_serviço: caminho_do_compose}. Serviços sem
+    compose encontrado são omitidos (e reportados separadamente).
+    """
     script_dir = Path(__file__).resolve().parent
-    for name in COMPOSE_CANDIDATES:
-        candidate = script_dir / name
-        if candidate.exists():
-            return candidate
-    return None
+    found: Dict[str, Path] = {}
+    for service_dir_name in REPO_SERVICE_DIRS:
+        service_dir = script_dir / service_dir_name
+        if not service_dir.is_dir():
+            continue
+        for candidate_name in COMPOSE_CANDIDATES:
+            candidate = service_dir / candidate_name
+            if candidate.exists():
+                found[service_dir_name] = candidate
+                break
+    return found
 
 
 def extract_ports_from_compose(compose_path: Path) -> Dict[int, str]:
@@ -284,10 +306,15 @@ def extract_ports_from_compose(compose_path: Path) -> Dict[int, str]:
 
 
 def check_ports() -> None:
-    compose_path = find_compose_file()
-    expected = extract_ports_from_compose(compose_path) if compose_path else {}
+    compose_files = find_compose_files()
+    expected: Dict[int, str] = {}
+    for service_name, compose_path in compose_files.items():
+        service_ports = extract_ports_from_compose(compose_path)
+        for port, container_name in service_ports.items():
+            expected[port] = f"{service_name}/{container_name}"
+
     if not expected:
-        print_warn("Não foi possível extrair portas do docker-compose.yml, usando lista padrão.")
+        print_warn("Não foi possível extrair portas dos compose files, usando lista padrão.")
         expected = {p: svc for p, svc in DEFAULT_EXPECTED_PORTS.items()}
 
     busy = []
@@ -417,32 +444,56 @@ def ensure_env_file() -> None:
 # Docker Compose
 # --------------------------------------------------------------------------
 
-def validate_compose() -> Path:
+def validate_compose() -> Dict[str, Path]:
     print_section("Validating Docker Compose...")
-    compose_path = find_compose_file()
-    if compose_path is None:
+    compose_files = find_compose_files()
+    if not compose_files:
         raise InstallError(
-            "Nenhum arquivo docker-compose.yml/yaml encontrado ao lado de install.py."
+            "Nenhum arquivo docker-compose.yml/yaml encontrado dentro das pastas de "
+            f"serviço ({', '.join(REPO_SERVICE_DIRS)})."
         )
 
-    result = run(["docker", "compose", "-f", str(compose_path), "config"])
-    if result.returncode != 0:
-        print_fail("Configuração do Docker Compose inválida:")
-        print_info(result.stderr.strip())
-        raise InstallError("Corrija o docker-compose.yml e execute o instalador novamente.")
+    missing = [name for name in REPO_SERVICE_DIRS if name not in compose_files]
+    if missing:
+        print_warn(f"Sem compose encontrado para: {', '.join(missing)} (pulando esses serviços)")
 
-    print_ok("Configuration valid")
-    return compose_path
+    failed = []
+    for service_name, compose_path in compose_files.items():
+        result = run(["docker", "compose", "-f", str(compose_path), "config"])
+        if result.returncode != 0:
+            failed.append((service_name, result.stderr.strip()))
+        else:
+            print_ok(f"{service_name} compose válido")
+
+    if failed:
+        for service_name, error in failed:
+            print_fail(f"{service_name}: configuração inválida")
+            print_info(error)
+        raise InstallError("Corrija os compose files acima e execute o instalador novamente.")
+
+    return compose_files
 
 
-def start_services(compose_path: Path) -> None:
+def start_services(compose_files: Dict[str, Path]) -> None:
     print_section("Starting services...")
-    result = run(["docker", "compose", "-f", str(compose_path), "up", "-d"])
-    if result.returncode != 0:
-        print_fail("Falha ao iniciar os containers:")
-        print_info(result.stderr.strip())
-        raise InstallError("Verifique os logs acima e execute 'docker compose logs' para mais detalhes.")
-    print_ok("Containers started")
+    failed = []
+    for service_name, compose_path in compose_files.items():
+        result = run([
+            "docker", "compose",
+            "-f", str(compose_path),
+            "-p", service_name,
+            "up", "-d",
+        ])
+        if result.returncode != 0:
+            failed.append((service_name, result.stderr.strip()))
+        else:
+            print_ok(f"{service_name} container(s) started")
+
+    if failed:
+        for service_name, error in failed:
+            print_fail(f"{service_name}: falha ao iniciar")
+            print_info(error)
+        raise InstallError("Verifique os logs acima e 'docker compose logs' de cada serviço para mais detalhes.")
 
 
 # --------------------------------------------------------------------------
@@ -471,8 +522,8 @@ def main() -> int:
         create_directories()
         configure_permissions()
         ensure_env_file()
-        compose_path = validate_compose()
-        start_services(compose_path)
+        compose_files = validate_compose()
+        start_services(compose_files)
 
     except InstallError as e:
         print_fail(str(e))
