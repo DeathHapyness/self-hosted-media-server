@@ -1,6 +1,6 @@
 <h1 align="center">🖥️ Self-Hosted Media Server</h1>
 
-<img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="600" align="center">
+  <img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="900" height="350" style="border-radius: 20px;" >
 
 <div align="center">
 
