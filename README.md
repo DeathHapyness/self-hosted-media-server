@@ -9,6 +9,7 @@
 ![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent\&logoColor=white)
 ![Dozzle](https://img.shields.io/badge/Dozzle-Logs-009688?logo=docker\&logoColor=white)
 ![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale\&logoColor=white)
+![AdGuard Home](https://img.shields.io/badge/AdGuard%20Home-DNS-68BC71?logo=adguard&logoColor=white)
 
 </div>
 
@@ -21,6 +22,7 @@ O projeto reúne serviços para gerenciamento e reprodução de:
 * 📺 Séries
 * 🎵 Música
 * ⬇️ Downloads
+* 🛡️ DNS / Bloqueio de anúncios
 * 🔗 Acesso remoto
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, acesso remoto e serviços independentes**.
@@ -33,6 +35,7 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 * [📋 Requisitos](#-requisitos)
 * [🐳 Instalação do Docker](#-instalação-do-docker)
 * [👤 Usar Docker sem sudo](#-usar-docker-sem-sudo)
+* [🛡️ AdGuard Home](#️-adguard-home)
 * [🔗 Acesso Remoto com Tailscale](#-acesso-remoto-com-tailscale)
 * [🗺️ Roadmap](#️-roadmap)
 * [⚠️ Aviso](#️-aviso)
@@ -46,12 +49,12 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
                          │     Usuário     │
                          └────────┬────────┘
                                   │
-                    ┌─────────────┼─────────────┐
-                    │             │             │
-                    ▼             ▼             ▼
-                Jellyfin      Navidrome     qBittorrent
-                  :8096          :4533          :8080
-                    │             │             │
+                    ┌─────────────┼─────────────┬─────────────┐
+                    │             │             │             │
+                    ▼             ▼             ▼             ▼
+                Jellyfin      Navidrome     qBittorrent    AdGuard Home
+                  :8096          :4533          :8080         :3000
+                    │             │             │           (DNS: 53)
                     │             │             ▼
                     │             │          Downloads
                     │             │             │
@@ -69,13 +72,14 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 
 ### Serviços
 
-| Serviço     | Função                     |  Porta |
-| ----------- | -------------------------- | -----: |
-| Jellyfin    | Filmes e séries            | `8096` |
-| Navidrome   | Servidor de música         | `4533` |
-| qBittorrent | Gerenciamento de downloads | `8080` |
-| spotDL      | Download manual de músicas |    CLI |
-| Tailscale   | Acesso remoto privado      |      — |
+| Serviço      | Função                       |         Porta |
+| ------------ | ----------------------------- | -------------: |
+| Jellyfin     | Filmes e séries               |         `8096` |
+| Navidrome    | Servidor de música            |         `4533` |
+| qBittorrent  | Gerenciamento de downloads    |         `8080` |
+| AdGuard Home | DNS e bloqueio de anúncios    | `53` / `3000` |
+| spotDL       | Download manual de músicas    |            CLI |
+| Tailscale    | Acesso remoto privado         |              — |
 
 ---
 
@@ -229,6 +233,11 @@ media-server/
 │   ├── data/
 │   └── music/
 │
+├── adguard/
+│   ├── docker-compose.yml
+│   ├── work/
+│   └── conf/
+│
 ├── .gitignore
 └── README.md
 ```
@@ -361,47 +370,6 @@ Container Jellyfin:
 Isso permite que os arquivos baixados pelo qBittorrent sejam posteriormente encontrados pelo Jellyfin.
 
 ---
-
-# 🐳 Dozzle
-
-O Dozzle é utilizado para visualizar os logs dos containers Docker em tempo real através de uma interface web.
-
-Ele facilita o monitoramento e troubleshooting dos serviços sem precisar executar manualmente:
-
-docker logs <container>
-Docker Compose
-
-```services:
-  dozzle:
-    image: amir20/dozzle:latest
-    container_name: dozzle
-    restart: unless-stopped
-
-    ports:
-      - "9999:8080"
-
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-Iniciar
-cd /opt/dozzle
-docker compose up -d
-```
-A interface pode ser acessada através de:
-
-
-
-http://IP_DO_SERVIDOR:9999
-
-O Dozzle permite visualizar os logs de serviços como:
-
-Jellyfin
-Navidrome
-qBittorrent
-Immich
-Dozzle
-
---- 
-
 
 # 🎵 Navidrome
 
@@ -610,6 +578,62 @@ ND_SCANSCHEDULE: 1h
 
 ---
 
+# 🛡️ AdGuard Home
+
+O AdGuard Home atua como **servidor DNS local**, bloqueando anúncios e rastreadores para todos os dispositivos da rede que o utilizam como resolvedor.
+
+## Criar diretórios
+
+```bash
+sudo mkdir -p /opt/adguard
+cd /opt/adguard
+
+mkdir -p work
+mkdir -p conf
+```
+
+## Docker Compose
+
+```yaml
+services:
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "3000:3000/tcp"
+      - "8081:80/tcp"
+    volumes:
+      - ./work:/opt/adguardhome/work
+      - ./conf:/opt/adguardhome/conf
+```
+
+Inicie:
+
+```bash
+docker compose up -d
+```
+
+## Primeiro acesso
+
+Acesse a interface de configuração inicial:
+
+```text
+http://IP_DO_SERVIDOR:3000
+```
+
+No primeiro acesso, o AdGuard Home guia a criação do usuário administrador e a configuração inicial (interface de escuta, porta do painel, upstream DNS). Como o repositório não inclui a config real (`conf/AdGuardHome.yaml` é ignorado pelo Git), esse arquivo é gerado automaticamente na primeira execução.
+
+## Usando como DNS da rede
+
+Depois de configurado, aponte o DNS do seu roteador (ou dos dispositivos individualmente) para o IP do servidor na porta `53`, para que o bloqueio de anúncios valha para toda a rede.
+
+> ⚠️ A porta `80` do container está mapeada para `8081` no host neste setup, para não conflitar com outros serviços que já usem a porta 80.
+
+---
+
 # 🔍 Verificação e Troubleshooting
 
 ## Verificar arquivos no host
@@ -655,6 +679,13 @@ docker inspect navidrome \
   --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
 ```
 
+AdGuard Home:
+
+```bash
+docker inspect adguardhome \
+  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
+```
+
 ---
 
 # 🔐 Segurança
@@ -665,6 +696,7 @@ Principalmente:
 
 ```text
 8080 → qBittorrent
+3000 → Painel do AdGuard Home
 ```
 
 Para acesso externo, considere utilizar:
@@ -686,9 +718,13 @@ API keys
 config/
 data/
 cache/
+work/
+conf/AdGuardHome.yaml
 bancos de dados
 mídia
 ```
+
+> O `conf/AdGuardHome.yaml` real contém o hash da senha do administrador e a lista de clientes/dispositivos da rede — por isso ele é ignorado pelo Git, e apenas o `docker-compose.yml` (sem dados sensíveis) é versionado.
 
 ---
 
@@ -696,7 +732,7 @@ mídia
 
 Para acessar o servidor fora da rede doméstica, o projeto utiliza o **Tailscale** como uma rede privada entre os dispositivos.
 
-Com o Tailscale, não é necessário expor diretamente as portas do Jellyfin, Navidrome, qBittorrent ou SSH na internet.
+Com o Tailscale, não é necessário expor diretamente as portas do Jellyfin, Navidrome, qBittorrent, AdGuard Home ou SSH na internet.
 
 A arquitetura fica:
 
@@ -712,11 +748,11 @@ A arquitetura fica:
            📱 iPhone       💻 PC        🖥️ Servidor
                                         100.x.x.x
                                              │
-                              ┌──────────────┼──────────────┐
-                              │              │              │
-                              ▼              ▼              ▼
-                           Jellyfin      Navidrome      qBittorrent
-                            :8096          :4533           :8080
+                    ┌──────────────┬─────────┼──────────────┐
+                    │              │         │              │
+                    ▼              ▼         ▼              ▼
+                 Jellyfin      Navidrome  qBittorrent   AdGuard Home
+                  :8096          :4533       :8080          :3000
 ```
 
 ## Instalação
@@ -773,6 +809,12 @@ http://IP DO SEU TAILSCALE:4533
 
 ```text
 http://IP DO SEU TAILSCALE:8080
+```
+
+### AdGuard Home
+
+```text
+http://IP DO SEU TAILSCALE:3000
 ```
 
 ### SSH
@@ -870,6 +912,10 @@ qbittorrent/config/
 navidrome/data/
 navidrome/music/
 
+# AdGuard Home
+adguard/work/
+adguard/conf/AdGuardHome.yaml
+
 # Logs
 *.log
 
@@ -890,6 +936,7 @@ Thumbs.db
 * [ ] Integrar **Lidarr** para gerenciamento automático da biblioteca musical
 * [ ] Configurar **reverse proxy + HTTPS**
 * [ ] Implementar **backup das configurações**
+* [ ] Adicionar regras de DNS rewrite / listas de bloqueio personalizadas no AdGuard Home
 
 ---
 
@@ -916,10 +963,13 @@ Linux
       ├── qBittorrent
       │    └── Downloads
       │
-      └── Navidrome
-           └── Música
-                │
-                └── spotDL
+      ├── Navidrome
+      │    └── Música
+      │         │
+      │         └── spotDL
+      │
+      └── AdGuard Home
+           └── DNS / Bloqueio de anúncios
 
 Tailscale
     │
