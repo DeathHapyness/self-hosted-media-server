@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-print(r"""  ___           _        _           _              ____       _  __       _   _           _           _ 
- |_ _|_ __  ___| |_ __ _| | __ _  __| | ___  _ __  / ___|  ___| |/ _|     | | | | ___  ___| |_ ___  __| |
- | || '_ \/ __| __/ _` | |/ _` |/ _` |/ _ \| '__| \___ \ / _ \ | |_ _____| |_| |/ _ \/ __| __/ _ \/ _` |
- | || | | \__ \ || (_| | | (_| | (_| | (_) | |     ___) |  __/ |  _|_____|  _  | (_) \__ \ ||  __/ (_| |
-|___|_| |_|___/\__\__,_|_|\__,_|\__,_|\___/|_|    |____/ \___|_|_|       |_| |_|\___/|___/\__\___|\__,_|
-""")
-
 """
 install.py - Instalador do Home Lab / Self-Hosted Media Server
 
@@ -24,8 +17,6 @@ Requisitos:
     - Sem dependências externas (somente biblioteca padrão)
 """
 
-from __future__ import annotations
-
 import os
 import re
 import shutil
@@ -33,6 +24,18 @@ import socket
 import subprocess
 import sys
 from pathlib import Path
+from typing import Dict, Optional, Tuple
+
+# --------------------------------------------------------------------------
+# Banner
+# --------------------------------------------------------------------------
+
+ASCII_ART = r"""  ___           _        _           _              ____       _  __       _   _           _           _
+ |_ _|_ __  ___| |_ __ _| | __ _  __| | ___  _ __  / ___|  ___| |/ _|     | | | | ___  ___| |_ ___  __| |
+ | || '_ \/ __| __/ _` | |/ _` |/ _` |/ _ \| '__| \___ \ / _ \ | |_ _____| |_| |/ _ \/ __| __/ _ \/ _` |
+ | || | | \__ \ || (_| | | (_| | (_| | (_) | |     ___) |  __/ |  _|_____|  _  | (_) \__ \ ||  __/ (_| |
+|___|_| |_|___/\__\__,_|_|\__,_|\__,_|\___/|_|    |____/ \___|_|_|       |_| |_|\___/|___/\__\___|\__,_|
+"""
 
 # --------------------------------------------------------------------------
 # Configuração
@@ -245,7 +248,7 @@ def check_disk_space() -> None:
         print_ok(f"Storage available ({media_free_gb:.1f}GB free on {MEDIA_DIR})")
 
 
-def find_compose_file() -> Path | None:
+def find_compose_file() -> Optional[Path]:
     script_dir = Path(__file__).resolve().parent
     for name in COMPOSE_CANDIDATES:
         candidate = script_dir / name
@@ -254,13 +257,13 @@ def find_compose_file() -> Path | None:
     return None
 
 
-def extract_ports_from_compose(compose_path: Path) -> dict[int, str]:
+def extract_ports_from_compose(compose_path: Path) -> Dict[int, str]:
     """Extrai portas host (formato 'HOST:CONTAINER') do compose via regex.
 
     Evita dependência de PyYAML. Não é um parser YAML completo, mas cobre o
     formato padrão de 'ports:' usado neste projeto.
     """
-    ports: dict[int, str] = {}
+    ports: Dict[int, str] = {}
     try:
         text = compose_path.read_text()
     except OSError:
@@ -292,7 +295,7 @@ def check_ports() -> None:
             in_use = s.connect_ex(("127.0.0.1", port)) == 0
         if in_use:
             busy.append((port, service))
-
+from __future__ import annotations
     if busy:
         print_fail("Portas em uso detectadas:")
         for port, service in busy:
@@ -331,7 +334,7 @@ def create_directories() -> None:
             print_ok(f"/mnt/media/{sub} created")
 
 
-def resolve_puid_pgid() -> tuple[int, int] | None:
+def resolve_puid_pgid() -> Optional[Tuple[int, int]]:
     """Lê PUID/PGID de um .env na raiz do projeto, se existir."""
     script_dir = Path(__file__).resolve().parent
     env_path = script_dir / ".env"
@@ -445,6 +448,7 @@ def start_services(compose_path: Path) -> None:
 # --------------------------------------------------------------------------
 
 def main() -> int:
+    print(ASCII_ART)
     print_header("MEDIA SERVER INSTALLER")
 
     steps = [
