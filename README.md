@@ -189,10 +189,7 @@ Linux · Docker · Docker Compose · Volumes e persistência de dados · Adminis
 * [ ] Configurar **reverse proxy + HTTPS**
 * [ ] Implementar **backup das configurações**
 * [x] Regras de DNS rewrite / listas de bloqueio personalizadas no AdGuard Home
-<<<<<<< HEAD
 * [ ] Substituir o Filebrowser por solução própria com monitor de discos integrado (forck do file browser)
-=======
->>>>>>> b777d9194ccd40990fc85cf4c6d9abc797fed559
 
 ---
 
