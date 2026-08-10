@@ -88,58 +88,6 @@ Acesso remoto entre dispositivos via **Tailscale**, sem expor portas diretamente
 
 ---
 
-## 📁 Estrutura do Projeto
-
-```text
-media-server/
-│
-├── jellyfin/
-│   ├── docker-compose.yml
-│   ├── config/
-│   ├── cache/
-│   └── media/
-│
-├── qbittorrent/
-│   ├── docker-compose.yml
-│   └── config/
-│
-├── navidrome/
-│   ├── docker-compose.yml
-│   ├── data/
-│   └── music/
-│
-├── adguard/
-│   ├── docker-compose.yml
-│   ├── work/
-│   └── conf/
-│
-├── dozzle/
-│   └── docker-compose.yml
-│
-├── filebrowser/
-│   ├── docker-compose.yml
-│   ├── database.db
-│   └── config/
-│
-├── docs/
-│   ├── docker.md
-│   ├── jellyfin.md
-│   ├── navidrome.md
-│   ├── qbittorrent.md
-│   ├── adguard.md
-│   ├── dozzle.md
-│   ├── filebrowser.md
-│   ├── tailscale.md
-│   └── troubleshooting.md
-│
-├── .gitignore
-└── README.md
-```
-
-> As pastas de configuração, banco de dados, cache e mídia não são versionadas — ver [.gitignore](.gitignore).
-
----
-
 ## 📋 Requisitos
 
 * CPU x86_64
