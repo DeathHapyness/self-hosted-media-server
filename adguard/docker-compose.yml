@@ -3,13 +3,16 @@ services:
     image: adguard/adguardhome
     container_name: adguardhome
     restart: unless-stopped
-
+    volumes:
+      - ./conf:/opt/adguardhome/conf
+      - ./work:/opt/adguardhome/work
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "3000:3000/tcp"
-      - "8081:80/tcp"
-
-    volumes:
-      - ./work:/opt/adguardhome/work
-      - ./conf:/opt/adguardhome/conf
+      - "8181:80/tcp"
+    labels:
+      - homepage.group=Administração
+      - homepage.name=AdGuard Home
+      - homepage.icon=adguard-home.png
+      - homepage.href= IP DO SEU ADGUARD
+      - homepage.description=DNS e bloqueio de anúncios
