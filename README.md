@@ -27,7 +27,7 @@ O projeto reúne serviços para gerenciamento e reprodução de:
 * 🔗 Acesso remoto
 * 📋 Logs dos containers
 * 📁 Navegação de arquivos
-
+* 🧅 gluetun-qbittorrent.md
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, acesso remoto e serviços independentes**.
 
 ---
@@ -86,6 +86,7 @@ Acesso remoto entre dispositivos via **Tailscale**, sem expor portas diretamente
 | spotDL       | Download manual de músicas       |             CLI | [docs/navidrome.md](docs/navidrome.md)       |
 | Tailscale    | Acesso remoto privado            |               — | [docs/tailscale.md](docs/tailscale.md)       |
 | Homepage    | Dashboard com todos seus servicos |               — | [docs/homepage.md](docs/homepage.md)       |
+| gluetun-qbittorrent.md    | Tunel de vpn para qbittorrent  |               — | [docs/gluetun-qbittorrent.md](docs/gluetun-qbittorrent.md)       |
 
 ---
 
@@ -114,6 +115,8 @@ Guia completo de instalação do Docker: [docs/docker.md](docs/docker.md)
 * [   Homapege](docs/homepage.md)
 * [🔗 Acesso remoto com Tailscale](docs/tailscale.md)
 * [🔍 Verificação e Troubleshooting](docs/troubleshooting.md)
+* [   gluetun-qbittorrent](docs gluetun-qbittorrent.md)
+
 
 ---
 
