@@ -37,6 +37,8 @@ ASCII_ART = r"""  ___           _        _           _              ____       _
 |___|_| |_|___/\__\__,_|_|\__,_|\__,_|\___/|_|    |____/ \___|_|_|       |_| |_|\___/|___/\__\___|\__,_|
 """
 
+ADVERTENCIA = """\033[1;31mADVERTÊNCIA:\033[0m Este script é fornecido "como está" e não se responsabiliza por quaisquer danos ou perda de dados. Use por sua própria conta e risco."""
+
 # --------------------------------------------------------------------------
 # Configuração
 # --------------------------------------------------------------------------
@@ -860,6 +862,7 @@ def main() -> int:
     DRY_RUN = args.dry_run
 
     print(ASCII_ART)
+    print(ADVERTENCIA)
 
     try:
         check_privileges()
