@@ -11,3 +11,11 @@ services:
       - /mnt/media:/srv
       - ./database:/database
       - ./config:/config
+
+
+    labels:
+      - homepage.group=Administração
+      - homepage.name=File Browser
+      - homepage.icon=filebrowser.png
+      - homepage.href= IP DO SEU FILEBROWSER AQUI
+      - homepage.description=Gerenciador de arquivos

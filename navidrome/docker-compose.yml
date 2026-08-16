@@ -15,4 +15,10 @@ services:
 
     volumes:
       - ./data:/data
-      - ./music:/music:ro
+      - /mnt/media/musicas:/music:ro  
+    labels:
+      - homepage.group=Mídia
+      - homepage.name=Navidrome
+      - homepage.icon=navidrome.png
+      - homepage.href= IP DO SEU NAVIDRONE AQUI
+      - homepage.description=Servidor de música

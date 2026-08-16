@@ -10,7 +10,14 @@ services:
     volumes:
       - ./config:/config
       - ./cache:/cache
-      - ./media:/media
+      - /mnt/media:/media
 
     environment:
       - TZ=America/Sao_Paulo
+
+    labels:
+      - homepage.group=Mídia
+      - homepage.name=Jellyfin
+      - homepage.icon=jellyfin.png
+      - homepage.href= IP DO SEU FELLYFIN AQUI
+      - homepage.description=Servidor de filmes e séries

@@ -17,4 +17,11 @@ services:
 
     volumes:
       - ./config:/config
-      - /opt/jellyfin/media:/downloads
+      - /mnt/media:/downloads
+
+    labels:
+      - homepage.group=Mídia
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href= IP DO SEU QBITORRENT AQUI
+      - homepage.description=Download manager

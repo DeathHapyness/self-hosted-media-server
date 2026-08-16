@@ -27,7 +27,7 @@ O projeto reúne serviços para gerenciamento e reprodução de:
 * 🔗 Acesso remoto
 * 📋 Logs dos containers
 * 📁 Navegação de arquivos
-
+* 🧅 gluetun-qbittorrent.md
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, acesso remoto e serviços independentes**.
 
 ---
@@ -85,58 +85,8 @@ Acesso remoto entre dispositivos via **Tailscale**, sem expor portas diretamente
 | Filebrowser  | Navegação e gerenciamento de arquivos |          `8081` | [docs/filebrowser.md](docs/filebrowser.md)   |
 | spotDL       | Download manual de músicas       |             CLI | [docs/navidrome.md](docs/navidrome.md)       |
 | Tailscale    | Acesso remoto privado            |               — | [docs/tailscale.md](docs/tailscale.md)       |
-
----
-
-## 📁 Estrutura do Projeto
-
-```text
-media-server/
-│
-├── jellyfin/
-│   ├── docker-compose.yml
-│   ├── config/
-│   ├── cache/
-│   └── media/
-│
-├── qbittorrent/
-│   ├── docker-compose.yml
-│   └── config/
-│
-├── navidrome/
-│   ├── docker-compose.yml
-│   ├── data/
-│   └── music/
-│
-├── adguard/
-│   ├── docker-compose.yml
-│   ├── work/
-│   └── conf/
-│
-├── dozzle/
-│   └── docker-compose.yml
-│
-├── filebrowser/
-│   ├── docker-compose.yml
-│   ├── database.db
-│   └── config/
-│
-├── docs/
-│   ├── docker.md
-│   ├── jellyfin.md
-│   ├── navidrome.md
-│   ├── qbittorrent.md
-│   ├── adguard.md
-│   ├── dozzle.md
-│   ├── filebrowser.md
-│   ├── tailscale.md
-│   └── troubleshooting.md
-│
-├── .gitignore
-└── README.md
-```
-
-> As pastas de configuração, banco de dados, cache e mídia não são versionadas — ver [.gitignore](.gitignore).
+| Homepage    | Dashboard com todos seus servicos |               — | [docs/homepage.md](docs/homepage.md)       |
+| gluetun-qbittorrent.md    | Tunel de vpn para qbittorrent  |               — | [docs/gluetun-qbittorrent.md](docs/gluetun-qbittorrent.md)       |
 
 ---
 
@@ -162,8 +112,11 @@ Guia completo de instalação do Docker: [docs/docker.md](docs/docker.md)
 * [🛡️ AdGuard Home](docs/adguard.md)
 * [📋 Dozzle](docs/dozzle.md)
 * [📁 Filebrowser](docs/filebrowser.md)
+* [   Homapege](docs/homepage.md)
 * [🔗 Acesso remoto com Tailscale](docs/tailscale.md)
 * [🔍 Verificação e Troubleshooting](docs/troubleshooting.md)
+* [   gluetun-qbittorrent](docs gluetun-qbittorrent.md)
+
 
 ---
 
@@ -189,10 +142,7 @@ Linux · Docker · Docker Compose · Volumes e persistência de dados · Adminis
 * [ ] Configurar **reverse proxy + HTTPS**
 * [ ] Implementar **backup das configurações**
 * [x] Regras de DNS rewrite / listas de bloqueio personalizadas no AdGuard Home
-<<<<<<< HEAD
 * [ ] Substituir o Filebrowser por solução própria com monitor de discos integrado (forck do file browser)
-=======
->>>>>>> b777d9194ccd40990fc85cf4c6d9abc797fed559
 
 ---
 

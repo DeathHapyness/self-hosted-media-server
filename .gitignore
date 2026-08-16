@@ -30,3 +30,15 @@ tailscale/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Configurações geradas pelos containers
+filebrowser/config/
+adguard/config/
+dozzle/config/
+filebrowser/config/
+jellyfin/config/
+navidrome/config/
+qbittorrent/config/
+sonarr/config/
+lidarr/config/
+homepage/config/

@@ -9,3 +9,11 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+
+    labels:
+      - homepage.group=Administração
+      - homepage.name=Dozzle
+      - homepage.icon=dozzle.png
+      - homepage.href= IP DO SEU DOZZER AQUI
+      - homepage.description=Logs dos containers
