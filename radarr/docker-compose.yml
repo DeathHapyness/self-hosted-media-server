@@ -1,0 +1,24 @@
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+
+    volumes:
+      - /mnt/media:/media
+      - ./config:/config
+
+    ports:
+      - "7878:7878"
+
+    labels:
+      - homepage.group=Media
+      - homepage.name=Radarr
+      - homepage.icon=radarr.png
+      - homepage.href=http://192.168.15.118:7878
+      - homepage.description=Gerenciador de filmes
