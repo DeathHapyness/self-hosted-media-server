@@ -42,3 +42,11 @@ qbittorrent/config/
 sonarr/config/
 lidarr/config/
 homepage/config/
+
+config/
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.xml
+*.json
