@@ -1,0 +1,29 @@
+services:
+  scrutiny:
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    container_name: scrutiny
+    restart: unless-stopped
+
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+
+    devices:
+      - /dev/sda:/dev/sda
+      - /dev/sdb:/dev/sdb
+      - /dev/sdc:/dev/sdc
+      - /dev/sdd:/dev/sdd
+
+    volumes:
+      - ./config:/opt/scrutiny/config
+      - /run/udev:/run/udev:ro
+
+    ports:
+      - "8090:8080"
+    
+    labels:
+      - homepage.group=Administração
+      - homepage.name=Scrutiny
+      - homepage.icon=scrutiny.png
+      - homepage.href=http://192.168.15.118:8090
+      - homepage.description=Saúde dos discos
