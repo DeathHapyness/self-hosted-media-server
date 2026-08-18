@@ -1,0 +1,52 @@
+# Docker
+*.env
+
+# Jellyfin
+jellyfin/config/
+jellyfin/cache/
+jellyfin/media/
+
+# qBittorrent
+qbittorrent/config/
+
+# Navidrome
+navidrome/data/
+navidrome/music/
+
+# Tailscale
+tailscale/
+*.key
+*.pem
+*.token
+
+# Logs
+*.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Configurações geradas pelos containers
+filebrowser/config/
+adguard/config/
+dozzle/config/
+filebrowser/config/
+jellyfin/config/
+navidrome/config/
+qbittorrent/config/
+sonarr/config/
+lidarr/config/
+homepage/config/
+
+config/
+*.db
+*.db-shm
+*.db-wal
+*.log
+*.xml
+*.json
