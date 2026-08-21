@@ -1,0 +1,25 @@
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ./config:/app/config
+    ports:
+      - "5055:5055"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: media_network
+    external: true
+
+    labels:
+      - homepage.group=Mídia
+      - homepage.name=Jellyseerr
+      - homepage.icon=jellyseerr.png
+      - homepage.href=IP JELLYSEERR
+      - homepage.description=Requisições de filmes e séries
