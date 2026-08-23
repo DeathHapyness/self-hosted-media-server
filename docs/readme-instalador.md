@@ -5,6 +5,8 @@ do zero: verifica pré-requisitos, cria os diretórios necessários em
 `/opt/media-server`, ajusta permissões, valida o `docker-compose.yml` e sobe
 os containers.
 
+Instalador atualizado conforme novos programas são adicionados ao repo.
+
 ## <span style="color: red; font-weight: bold;">ADVERTÊNCIA:</span> 
 <span style="color: darkorange;">Este script é fornecido "como está" e não se responsabiliza por quaisquer danos ou perda de dados. Use por sua própria conta e risco.</span>
 

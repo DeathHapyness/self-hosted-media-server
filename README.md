@@ -45,6 +45,8 @@ O projeto reúne serviços para gerenciamento, organização, monitoramento e re
 * 📁 Gerenciamento de arquivos
 * 💾 Monitoramento de discos
 * 🎛️ Dashboard dos serviços
+* 🏔️ Mat2 Web
+* 🔀 N8n 
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
 
@@ -185,6 +187,7 @@ O acesso remoto entre dispositivos é realizado através do **Tailscale**, evita
 | Tailscale    | VPN e acesso remoto privado           |           — | [docs/tailscale.md](docs/tailscale.md)                     |
 | Gluetun      | VPN para o qBittorrent                |           — | [docs/gluetun-qbittorrent.md](docs/gluetun-qbittorrent.md) |
 | spotDL       | Download manual de músicas            |         CLI | [docs/navidrome.md](docs/navidrome.md)                     |
+| Mat2 Web     | Remocao de meta dados de imagens e videos|    `8282` | [docs/mat2-web](docs/mat2-web)                            |
 
 > **Nota:** algumas portas acima podem entrar em conflito dependendo da configuração dos containers.
 
@@ -273,6 +276,11 @@ Guia completo de instalação do Docker:
 * [📋 Dozzle](docs/dozzle.md)
 * [📁 Filebrowser](docs/filebrowser.md)
 * [🔐 Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
+
+### 🛠️ Ferramentas
+
+* [🏔️ mat2-web](docs/mat2-web.md)
+* [🔀 N8n](docs/n8n.md)
 
 ---
 
