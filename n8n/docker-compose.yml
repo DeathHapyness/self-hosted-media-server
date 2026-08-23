@@ -1,0 +1,22 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - TZ=America/Sao_Paulo
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - N8N_SECURE_COOKIE=false
+    labels:
+      - homepage.group=Ferramentas
+      - homepage.name=N8n
+      - homepage.icon=n8n.png
+      - homepage.href=IP DO SEU N8N
+      - homepage.description=Automacoes
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
