@@ -1,0 +1,32 @@
+services:
+  mat2-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: mat2-web
+    restart: unless-stopped
+
+    ports:
+      - "8282:8080"
+
+    read_only: true
+
+    tmpfs:
+      - /tmp
+      - /run/uwsgi
+      - /app/upload
+
+    security_opt:
+      - no-new-privileges:true
+
+    volumes:
+      - ./nginx/upload.conf:/etc/nginx/conf.d/upload.conf:ro
+      - ./nginx/default:/etc/nginx/sites-enabled/default:ro
+
+    labels:
+      - homepage.group=Ferramentas
+      - homepage.name=MAT2 Web
+      - homepage.icon=mat2.png
+      - homepage.href=IP DO SEU MAT2 WEB
+      - homepage.description=Remocao de metadados de arquivos
