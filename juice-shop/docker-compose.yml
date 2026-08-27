@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    container_name: juice-shop
+    restart: unless-stopped
+    ports:
+      - "3050:3000"
+    environment:
+      - NODE_ENV=production
