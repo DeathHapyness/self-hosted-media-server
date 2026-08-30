@@ -65,6 +65,9 @@ SERVICE_DIRS = {
         BASE_DIR / "jellyfin" / "config",
         BASE_DIR / "jellyfin" / "cache",
     ],
+    "Jellyseerr": [
+        BASE_DIR / "jellyseerr" / "config",
+    ],
     "Navidrome": [
         BASE_DIR / "navidrome" / "data",
     ],
@@ -73,6 +76,22 @@ SERVICE_DIRS = {
     ],
     "Homepage": [
         BASE_DIR / "homepage" / "config",
+    ],
+    "Prowlarr": [
+        BASE_DIR / "prowlarr" / "config",
+    ],
+    "Radarr": [
+        BASE_DIR / "radarr" / "config",
+    ],
+    "Sonarr": [
+        BASE_DIR / "sonarr" / "config",
+    ],
+    "Scrutiny": [
+        BASE_DIR / "scrutiny" / "config",
+    ],
+    "Monitoring": [
+        BASE_DIR / "monitoring" / "prometheus-data",
+        BASE_DIR / "monitoring" / "grafana-data",
     ],
 }
 
@@ -83,12 +102,25 @@ WRITABLE_MODE = 0o770
 
 DEFAULT_EXPECTED_PORTS = {
     53: "AdGuard Home (DNS)",
-    3000: "AdGuard Home (setup UI) / Homepage",
+    3000: "AdGuard Home (setup UI) / Grafana",
+    3001: "Homepage",
+    3050: "Juice Shop",
+    4533: "Navidrome",
+    5055: "Jellyseerr",
+    5678: "n8n",
+    7878: "Radarr",
+    8080: "qBittorrent",
     8081: "Dozzle",
     8082: "File Browser",
+    8085: "cAdvisor",
+    8090: "Scrutiny",
     8096: "Jellyfin",
-    4533: "Navidrome",
-    8080: "qBittorrent",
+    8181: "AdGuard Home (UI)",
+    8282: "MAT2 Web",
+    8989: "Sonarr",
+    9090: "Prometheus",
+    9100: "Node Exporter",
+    9696: "Prowlarr",
 }
 
 COMPOSE_CANDIDATES = ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"]
@@ -97,10 +129,19 @@ REPO_SERVICE_DIRS = [
     "adguard",
     "dozzle",
     "filebrowser",
-    "jellyfin",
-    "navidrome",
-    "qbittorrent",
     "homepage",
+    "jellyfin",
+    "jellyseerr",
+    "juice-shop",
+    "mat2-web",
+    "monitoring",
+    "n8n",
+    "navidrome",
+    "prowlarr",
+    "qbittorrent",
+    "radarr",
+    "scrutiny",
+    "sonarr",
 ]
 
 # --------------------------------------------------------------------------
