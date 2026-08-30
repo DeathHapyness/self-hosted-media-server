@@ -54,6 +54,17 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 
 ---
 
+## 💡 Recomendações
+
+### [PortWatch](https://github.com/DeathHapyness/PortWatch)
+
+O **PortWatch** é uma ferramenta para monitorar portas, containers e serviços Docker por meio de uma interface web moderna. É uma ótima adição para visualizar e organizar os serviços executados em um servidor self-hosted.
+
+Confira o projeto e as instruções de instalação no [repositório oficial do PortWatch](https://github.com/DeathHapyness/PortWatch).
+
+
+---
+
 ## 🚀 INSTALADOR
 
 Antes de usar, leia:
