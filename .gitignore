@@ -1,53 +1,45 @@
-# Docker
+# Python (cache do install.py)
+__pycache__/
+*.pyc
+
+# Ambiente / segredos
+.env
 *.env
-
-# Jellyfin
-jellyfin/config/
-jellyfin/cache/
-jellyfin/media/
-
-# qBittorrent
-qbittorrent/config/
-
-# Navidrome
-navidrome/data/
-navidrome/music/
-
-# Tailscale
-tailscale/
 *.key
 *.pem
 *.token
 
-# Logs
-*.log
+# Diretórios de configuração/dados gerados pelos containers
+# (cobre config/, config/logs/, config/database.db etc. de qualquer serviço)
+config/
+data/
+cache/
+work/
 
-# Databases
+# Pastas específicas de dados que não seguem o padrão "config/"
+monitoring/prometheus-data/
+monitoring/grafana-data/
+scrutiny/influxdb/
+ntopng/redis-data/
+ntopng/ntopng-data/
+jellyfin/cache/
+jellyfin/media/
+navidrome/music/
+
+# Tailscale
+tailscale/
+
+# Bancos de dados e logs
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
+*.log
 
 # Sistema
 .DS_Store
 Thumbs.db
 
-# Configurações geradas pelos containers
-filebrowser/config/
-adguard/config/
-dozzle/config/
-filebrowser/config/
-jellyfin/config/
-navidrome/config/
-qbittorrent/config/
-sonarr/config/
-lidarr/config/
-homepage/config/
-
-config/
-*.db
-*.db-shm
-*.db-wal
-*.log
-*.xml
-*.json
+# Ferramentas externas clonadas manualmente dentro do repo (ex.: PortWatch)
 PortWatch/
