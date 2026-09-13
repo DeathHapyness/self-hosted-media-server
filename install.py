@@ -93,6 +93,13 @@ SERVICE_DIRS = {
         BASE_DIR / "monitoring" / "prometheus-data",
         BASE_DIR / "monitoring" / "grafana-data",
     ],
+    "ntopng": [
+        BASE_DIR / "ntopng" / "redis-data",
+        BASE_DIR / "ntopng" / "ntopng-data",
+    ],
+    "Speedtest Tracker": [
+        BASE_DIR / "speedtest-tracker" / "config",
+    ],
 }
 
 MEDIA_SUBDIRS = ["filmes", "series", "musicas", "fotos", "downloads", "inbox"]
@@ -105,6 +112,7 @@ DEFAULT_EXPECTED_PORTS = {
     3000: "AdGuard Home (setup UI) / Grafana",
     3001: "Homepage",
     3050: "Juice Shop",
+    3100: "ntopng",
     4533: "Navidrome",
     5055: "Jellyseerr",
     5678: "n8n",
@@ -117,6 +125,7 @@ DEFAULT_EXPECTED_PORTS = {
     8096: "Jellyfin",
     8181: "AdGuard Home (UI)",
     8282: "MAT2 Web",
+    8765: "Speedtest Tracker",
     8989: "Sonarr",
     9090: "Prometheus",
     9100: "Node Exporter",
@@ -137,11 +146,13 @@ REPO_SERVICE_DIRS = [
     "monitoring",
     "n8n",
     "navidrome",
+    "ntopng",
     "prowlarr",
     "qbittorrent",
     "radarr",
     "scrutiny",
     "sonarr",
+    "speedtest-tracker",
 ]
 
 # --------------------------------------------------------------------------
