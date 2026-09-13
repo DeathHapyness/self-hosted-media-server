@@ -1,0 +1,28 @@
+services:
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest-tracker
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE=*/30 * * * *
+
+    volumes:
+      - ./config:/config
+
+    ports:
+      - "8765:80"
+
+    labels:
+      - homepage.group=Monitoramento
+      - homepage.name=Speedtest Tracker
+      - homepage.icon=speedtest-tracker.png
+      - homepage.href=http://IP_DO_SERVIDOR:8765
+      - homepage.description=Historico de testes de velocidade

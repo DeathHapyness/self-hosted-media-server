@@ -1,0 +1,29 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ntopng-redis
+    restart: unless-stopped
+    volumes:
+      - ./redis-data:/data
+    command: redis-server --appendonly yes
+
+  ntopng:
+    image: ntop/ntopng:latest
+    container_name: ntopng
+    restart: unless-stopped
+    depends_on:
+      - redis
+    command: >
+      --redis=redis:6379
+      --http-port=3000
+    ports:
+      - "3100:3000"
+    volumes:
+      - ./ntopng-data:/var/lib/ntopng
+
+    labels:
+      - homepage.group=Monitoramento
+      - homepage.name=ntopng
+      - homepage.icon=ntopng.png
+      - homepage.href=http://IP_DO_SERVIDOR:3100
+      - homepage.description=Monitoramento de trafego de rede
