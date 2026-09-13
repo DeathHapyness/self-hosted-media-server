@@ -54,6 +54,8 @@ config/
 └── widgets.yaml
 ```
 
+Para uma referência completa do que cada arquivo faz (`bookmarks.yaml`, `docker.yaml`, `kubernetes.yaml`, `proxmox.yaml`, `services.yaml`, `settings.yaml`, `widgets.yaml`, `custom.css`, `custom.js` e a pasta `logs/`), veja [docs/homepage-config.md](homepage-config.md).
+
 O arquivo `services.yaml` é utilizado para adicionar e organizar os serviços exibidos no dashboard.
 
 Exemplo:
