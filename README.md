@@ -26,6 +26,8 @@
 ![Homepage](https://img.shields.io/badge/Homepage-Dashboard-1C1C1C?logo=docker&logoColor=white)
 ![n8n](https://img.shields.io/badge/n8n-Automa%C3%A7%C3%B5es-EA4B71?logo=n8n&logoColor=white)
 ![MAT2 Web](https://img.shields.io/badge/MAT2%20Web-Privacidade-5C6BC0?logo=linux&logoColor=white)
+![ntopng](https://img.shields.io/badge/ntopng-Tr%C3%A1fego%20de%20Rede-1A73E8?logo=cachet&logoColor=white)
+![Speedtest Tracker](https://img.shields.io/badge/Speedtest%20Tracker-Velocidade-00BFA5?logo=speedtest&logoColor=white)
 
 </div>
 
@@ -48,7 +50,9 @@ O projeto reúne serviços para gerenciamento, organização, monitoramento e re
 * 💾 Monitoramento de discos
 * 🎛️ Dashboard dos serviços
 * 🏔️ Mat2 Web
-* 🔀 N8n 
+* 🔀 N8n
+* 📡 Monitoramento de tráfego de rede
+* 📶 Histórico de velocidade da internet
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
 
@@ -201,6 +205,10 @@ O acesso remoto entre dispositivos é realizado através do **Tailscale**, evita
 | Gluetun      | VPN para o qBittorrent                |           — | [docs/gluetun-qbittorrent.md](docs/gluetun-qbittorrent.md) |
 | spotDL       | Download manual de músicas            |         CLI | [docs/navidrome.md](docs/navidrome.md)                     |
 | Mat2 Web     | Remocao de meta dados de imagens e videos|    `8282` | [docs/mat2-web](docs/mat2-web)                            |
+| n8n          | Automação de workflows                |      `5678` | [docs/n8n.md](docs/n8n.md)                                  |
+| Juice Shop   | Laboratório de segurança web (OWASP)  |      `3050` | [docs/juice-shop.md](docs/juice-shop.md)                    |
+| ntopng       | Monitoramento de tráfego de rede      |      `3100` | [docs/ntopng.md](docs/ntopng.md)                            |
+| Speedtest Tracker | Histórico de testes de velocidade|      `8765` | [docs/speedtest-tracker.md](docs/speedtest-tracker.md)      |
 
 > **Nota:** algumas portas acima podem entrar em conflito dependendo da configuração dos containers.
 
@@ -281,10 +289,13 @@ Guia completo de instalação do Docker:
 
 * [📊 Monitoring — Grafana + Prometheus](docs/monitoring.md)
 * [💾 Scrutiny](docs/scrutiny.md)
+* [📡 ntopng](docs/ntopng.md)
+* [📶 Speedtest Tracker](docs/speedtest-tracker.md)
 
 ### 🖥️ Serviços
 
 * [🏠 Homepage](docs/homepage.md)
+* [⚙️ Homepage — referência da pasta config/](docs/homepage-config.md)
 * [🛡️ AdGuard Home](docs/adguard.md)
 * [📋 Dozzle](docs/dozzle.md)
 * [📁 Filebrowser](docs/filebrowser.md)
@@ -294,6 +305,7 @@ Guia completo de instalação do Docker:
 
 * [🏔️ mat2-web](docs/mat2-web.md)
 * [🔀 N8n](docs/n8n.md)
+* [🧃 Juice Shop](docs/juice-shop.md)
 
 ---
 
@@ -315,6 +327,10 @@ Jellyseerr    → 5055
 Prometheus    → 9090
 Grafana       → 3000
 Scrutiny      → porta configurada
+n8n           → 5678
+Juice Shop    → 3050
+ntopng        → 3100
+Speedtest Tracker → 8765
 ```
 
 devem preferencialmente ser acessados através de:

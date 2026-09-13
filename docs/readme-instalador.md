@@ -33,8 +33,8 @@ e ajusta permissões de pastas usadas pelos containers.
 - Verifica sistema operacional, Docker, Docker Compose, daemon do Docker,
   montagem de `/mnt/media`, espaço em disco e portas livres.
 - Cria a estrutura de diretórios em `/opt/media-server/` para cada serviço
-  (AdGuard Home, Dozzle, File Browser, Jellyfin, Navidrome, qBittorrent,
-  Homepage), sem apagar nada que já exista.
+  com dados persistentes (lista completa e sempre atualizada em
+  `SERVICE_DIRS` no `install.py`), sem apagar nada que já exista.
 - Ajusta permissões das pastas que os containers precisam gravar.
 - Cria um `.env` a partir de `.env.example`, caso ainda não exista.
 - Valida o `docker-compose.yml` com `docker compose config`.
