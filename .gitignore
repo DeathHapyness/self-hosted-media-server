@@ -16,6 +16,14 @@ data/
 cache/
 work/
 
+# Exceção: homepage/config guarda a configuração do dashboard (não são
+# dados gerados pelo container), então deve ser versionada. O .env
+# continua ignorado pelas regras de segredo acima.
+!homepage/config/
+!homepage/config/*.yaml
+!homepage/config/*.css
+!homepage/config/*.env
+
 # Pastas específicas de dados que não seguem o padrão "config/"
 monitoring/prometheus-data/
 monitoring/grafana-data/
