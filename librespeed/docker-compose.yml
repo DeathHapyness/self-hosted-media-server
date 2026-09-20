@@ -1,0 +1,21 @@
+services:
+  librespeed:
+    image: lscr.io/linuxserver/librespeed:latest
+    container_name: librespeed
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - DB_TYPE=sqlite
+    volumes:
+      - ./config:/config
+    ports:
+      - "8111:80"
+    restart: unless-stopped
+
+
+
+
+
+
+
