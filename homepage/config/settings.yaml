@@ -1,0 +1,70 @@
+title: "MEDIA SERVER // CORE"
+
+background:
+  image: "https://wallpapercave.com/wp/wp12113165.jpg"
+  blur: sm
+  saturate: 75
+  brightness: 50
+  opacity: 30
+
+theme: dark
+color: zinc
+iconStyle: theme
+cardBlur: md
+
+target: _blank
+fullWidth: true
+useEqualHeights: true
+preloadAllWidgets: true
+
+showStats: true
+
+layout:
+  Mídia:
+    tab: Principal
+    style: row
+    columns: 3
+
+  Automação de mídia:
+    tab: Principal
+    style: row
+    columns: 3
+
+  Downloads:
+    tab: Principal
+    style: row
+    columns: 2
+
+  Administração:
+    tab: Sistema
+    style: row
+    columns: 4
+
+  Privacidade e segurança:
+    tab: Sistema
+    style: row
+    columns: 4
+
+  Backup:
+    tab: Sistema
+    style: row
+    columns: 1
+
+  Disponibilidade e rede:
+    tab: Monitoramento
+    style: row
+    columns: 4
+
+  Métricas:
+    tab: Monitoramento
+    style: row
+    columns: 3
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  showSearchSuggestions: true
+  provider: custom
+  url: "https://www.ecosia.org/search?method=index&q="
+  suggestionUrl: "https://www.google.com/complete/search?client=chrome&q="
+  target: _blank

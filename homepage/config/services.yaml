@@ -1,0 +1,280 @@
+- Mídia:
+    - Jellyfin:
+        icon: jellyfin.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8096"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8096"
+        server: local
+        container: jellyfin  
+        description: Servidor de filmes e séries
+
+    - Jellyseerr:
+        icon: jellyseerr.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5055"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5055"
+        server: local
+        container: jellyseerr 
+        description: Catálogo e pedidos de filmes e séries
+
+    - Navidrome:
+        icon: navidrome.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:4533"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:4533"
+        server: local
+        container: navidrome 
+        description: Servidor de música
+
+    - Immich:
+        icon: immich.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:2283"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:2283"
+        server: local
+        container: immich_server
+        description: Backup e gerenciamento de fotos
+        widget:
+          type: immich
+          url: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:2283"
+          key: "{{HOMEPAGE_VAR_IMMICH_KEY}}"
+          version: 2
+          fields:
+            - photos
+            - videos
+            - storage
+
+- Automação de mídia:
+    - Prowlarr:
+        icon: prowlarr.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9696"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9696"
+        server: local
+        container: prowlarr  
+        description: Gerenciador de indexadores
+
+    - Radarr:
+        icon: radarr.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:7878"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:7878"
+        server: local
+        container: radarr 
+        description: Gerenciador de filmes
+
+    - Sonarr:
+        icon: sonarr.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8989"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8989" 
+        server: local
+        container: sonarr
+        description: Gerenciador de séries
+
+
+- Downloads:
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8080"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8080"
+        server: local
+        container: qbittorrent
+        description: Gerenciador de downloads
+
+    - Gluetun:
+        icon: gluetun.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8080"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8080"
+        container: gluetun
+        description: VPN utilizada pelos downloads
+
+- Administração:
+    - Dozzle:
+        icon: dozzle.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9999"
+        server: local
+        container: dozzle  
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9999"
+        description: Logs dos containers
+
+    - File Browser:
+        icon: filebrowser.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8082"
+        container: filebrowser   
+        server: local
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8082"
+        description: Gerenciador de arquivos
+
+    - Forgejo:
+        icon: forgejo.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3044"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3044"
+        server: local
+        container: forgejo
+        description: Servidor Git local
+
+    - n8n:
+        icon: n8n.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5678"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5678"
+        server: local
+        container: n8n
+        description: Automações e fluxos de trabalho
+
+    - Portainer:
+        icon: portainer.png
+        href: "https://{{HOMEPAGE_VAR_INTERNAL_IP}}:9443"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9443"
+        server: local
+        container: portainer
+        description: Gerenciamento dos containers
+
+- Privacidade e segurança:
+    - AdGuard Home:
+        icon: adguard-home.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8181"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8181"
+        server: local 
+        container: adguardhome
+        description: DNS e bloqueio de anúncios
+
+    - Tailscale:
+        icon: tailscale.png
+        href: "https://login.tailscale.com/admin/machines"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8096"
+        server: local
+        container: tailscale
+        description: VPN para acesso remoto seguro
+
+    - MAT2 Web:
+        icon: mat2.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8282"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8282"
+        server: local
+        container: mat2-web
+        description: Remoção de metadados de arquivos
+
+    - Juice Shop:
+        icon: mdi-security
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3050"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3050"
+        server: local
+        container: juice-shop
+        description: Laboratório de segurança para aplicações web
+
+
+- Backup:
+    - Kopia:
+        icon: kopia.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:51515"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:51515"
+        server: local
+        container: kopia
+        description: Backup de arquivos
+
+
+- Disponibilidade e rede:
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3020"
+        server: local
+        container: uptime-kuma
+        description: Disponibilidade dos serviços
+        widget:
+          type: uptimekuma
+          url: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3020"
+          slug: serviso-homepage
+          fields:
+            - up
+            - down
+            - uptime
+            - incident
+
+
+    - PortWatch:
+        icon: mdi-ethernet
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8087"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8087"
+        server: local
+        container: portwatch-frontend-1
+        description: Monitoramento de portas e containers
+    - Speedtest Tracker:
+        icon: speedtest-tracker.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8765"
+        server: local
+        container: speedtest-tracker
+        description: Velocidade e latência
+        widget:
+          type: speedtest
+          url: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8765"
+          version: 2
+          key: "{{HOMEPAGE_VAR_SPEEDTEST_KEY}}"
+          bitratePrecision: 3
+          fields:
+            - download
+            - upload
+            - ping
+
+    - LibreSpeed:
+        icon: librespeed.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8111"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8111"
+        server: local
+        container: librespeed
+        description: Teste local de velocidade
+
+
+- Métricas:
+    - Grafana:
+        icon: grafana.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3000"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:3000"
+        server: local
+        container: grafana
+        description: Dashboards e visualização de métricas
+
+    - Prometheus:
+        icon: prometheus.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9090"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9090"
+        server: local
+        container: prometheus
+        description: Coletor e armazenamento de métricas
+
+    - Node Exporter:
+        icon: prometheus.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9100"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9100"
+        server: local
+        container: node-exporter
+        description: Métricas do servidor
+
+    - cAdvisor:
+        icon: cadvisor.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8085"
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8085"
+        server: local 
+        container: cadvisor
+        description: Métricas individuais dos containers
+
+    - Glances CPU:
+        icon: glances.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:61208"
+        server: local
+        container: glances
+        description: Monitoramento da CPU
+        widget:
+          type: glances
+          url: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:61208"
+          version: 4
+          metric: cpu
+          refreshInterval: 5000
+          pointsLimit: 15
+
+    - Scrutiny:
+        icon: scrutiny.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8090/web"
+        server: local
+        container: scrutiny
+        description: Saúde dos discos
+        widget:
+          type: scrutiny
+          url: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8090"
+          fields:
+            - passed
+            - failed
+            - unknown

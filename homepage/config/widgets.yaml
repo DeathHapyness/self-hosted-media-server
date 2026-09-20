@@ -1,0 +1,24 @@
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/info-widgets/
+
+#- resources:
+#    cpu: true
+#    memory: true
+#    disk: /
+
+- glances:
+    url: IP DO SEU GLANCES
+    version: 4
+    cpu: true
+    mem: true
+    cputemp: true
+    uptime: true
+    disk: /
+    expanded: true
+
+- datetime:
+    text_size: l
+    format:
+      dateStyle: short
+      timeStyle: short
+      hour12: false

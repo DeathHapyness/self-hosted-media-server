@@ -1,0 +1,61 @@
+- Tools:
+    - Perplexity:
+        - icon: https://www.perplexity.ai/favicon.png
+          href: https://www.perplexity.ai/
+
+    - Claude:
+        - abbr: CL
+          icon: https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/lobe-icons/public/claude.svg  
+          href: https://claude.ai/
+
+    - ChatGPT:
+        - icon: https://chatgpt.com/favicon.ico
+          href: https://chatgpt.com/
+
+    - Tailscale Admin:
+        - icon: https://tailscale.com/favicon.ico
+          href: https://login.tailscale.com/admin/machines
+
+- Development:
+    - Docker Hub:
+        - icon: https://hub.docker.com/favicon.ico
+          href: https://hub.docker.com/
+    - Github:
+        - icon: https://github.com/favicon.ico
+          href: https://github.com/
+
+- Social:
+    - Reddit:
+        - abbr: RE
+          icon: reddit.png
+          href: https://reddit.com/
+
+- Entertainment:
+    - YouTube:
+        - abbr: YT
+          icon: youtube.png
+          href: https://www.youtube.com/
+
+    - Twitch:
+        - abbr: TTV
+          icon: twitch.png
+          href: https://www.twitch.tv
+
+    - AkashiFlix:
+        - abbr: AK
+          icon: https://cdn-icons-png.flaticon.com/512/1038/1038100.png
+          href: https://akashi-flix.up.railway.app/
+
+- Shopping:
+    - Mercado Livre:
+        - abbr: ML
+          icon: https://www.mercadolivre.com.br/favicon.ico
+          href: https://www.mercadolivre.com.br/
+    - OLX:
+        - abbr: OLX
+          icon: https://www.olx.ro/favicon.ico
+          href: https://www.olx.com.br/
+    - Aliexpress:
+        - abbr: ALI
+          icon: https://www.aliexpress.com/favicon.ico
+          href: https://aliexpress.com/

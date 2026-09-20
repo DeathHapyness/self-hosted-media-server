@@ -1,0 +1,54 @@
+/*COLOQUE DE ACORDO COM O SEU GOSTO OU CONFIG ESSA E A MINHA*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap');
+
+:root {
+    --cyber-cyan: #00f3ff;
+    --cyber-magenta: #ff00ff;
+    --cyber-yellow: #fcee0a;
+    --cyber-red: #ff003c;
+    --card-bg: rgba(10, 10, 20, 0.8);
+}
+
+body {
+    font-family: 'Fira Code', monospace !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card {
+    border: 1px solid var(--cyber-cyan) !important;
+    background-color: var(--card-bg) !important;
+    backdrop-filter: blur(8px) !important;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1) !important;
+    border-radius: 0px !important; /* Colțuri drepte pentru look industrial */
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4) !important;
+    transform: translateY(-2px);
+    border-color: var(--cyber-magenta) !important;
+}
+
+.section-title {
+    color: var(--cyber-magenta) !important;
+    text-shadow: 0 0 10px var(--cyber-magenta);
+    font-weight: 700;
+    border-bottom: 2px solid var(--cyber-magenta);
+    display: inline-block;
+    margin-bottom: 1rem !important;
+}
+
+.graph-bar-filler {
+    background: linear-gradient(90deg, var(--cyber-cyan), var(--cyber-blue)) !important;
+    box-shadow: 0 0 8px var(--cyber-cyan);
+}
+
+.text-xs {
+    font-family: 'Fira Code', monospace !important;
+    color: var(--cyber-cyan) !important;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--cyber-cyan); box-shadow: 0 0 10px var(--cyber-cyan); }
