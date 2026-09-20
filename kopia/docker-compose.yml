@@ -1,0 +1,40 @@
+services:
+  kopia:
+    image: kopia/kopia:latest
+    container_name: kopia
+    hostname: kopia
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      KOPIA_CONFIG_PATH: /app/config/repository.config
+      KOPIA_CACHE_DIRECTORY: /app/cache
+      KOPIA_LOG_DIR: /app/logs
+
+    ports:
+      - "51515:51515"
+
+    command:
+      - server
+      - start
+      - --insecure
+      - --address=0.0.0.0:51515
+      - --server-username=${KOPIA_SERVER_USERNAME}
+      - --server-password=${KOPIA_SERVER_PASSWORD}
+
+    volumes:
+      - ./config:/app/config
+      - ./cache:/app/cache
+      - ./logs:/app/logs
+
+      # Destino do backup
+      - /mnt/backup/kopia-repository:/repository
+
+      # Origens disponíveis somente para leitura
+      - /home/rique:/data/home:ro
+      - /var/lib/docker/volumes/n8n_n8n_data/_data:/data/n8n:ro
+      - /mnt/media:/data/media:ro
+
+
