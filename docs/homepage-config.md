@@ -2,7 +2,7 @@
 
 Este documento explica **para que serve cada arquivo** dentro de `homepage/config/`. Todo o conteúdo aqui é genérico/ilustrativo — nenhum IP, token ou dado real deve ser copiado destes exemplos para produção, e nada do seu ambiente real foi usado para escrevê-lo.
 
-> A pasta `config/` inteira é ignorada pelo Git (ver `.gitignore` da raiz do repositório e `homepage/.gitignore`). Isso é proposital: os arquivos abaixo tendem a acumular URLs internas, nomes de host e, em alguns casos, tokens de API — nada disso deve ir para o GitHub.
+> Exemplo de config em [homepage/config](homepage/config/).
 
 ## 📁 Visão geral
 
