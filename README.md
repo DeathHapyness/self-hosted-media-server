@@ -28,6 +28,10 @@
 ![MAT2 Web](https://img.shields.io/badge/MAT2%20Web-Privacidade-5C6BC0?logo=linux&logoColor=white)
 ![ntopng](https://img.shields.io/badge/ntopng-Tr%C3%A1fego%20de%20Rede-1A73E8?logo=cachet&logoColor=white)
 ![Speedtest Tracker](https://img.shields.io/badge/Speedtest%20Tracker-Velocidade-00BFA5?logo=speedtest&logoColor=white)
+![LibreSpeed](https://img.shields.io/badge/LibreSpeed-Teste%20de%20Velocidade-00BCD4?logo=speedtest&logoColor=white)
+![Kopia](https://img.shields.io/badge/Kopia-Backup-4B32C3?logo=backblaze&logoColor=white)
+![Forgejo](https://img.shields.io/badge/Forgejo-Git-FB923C?logo=forgejo&logoColor=white)
+![Glances](https://img.shields.io/badge/Glances-Monitoramento-00A99D?logo=glances&logoColor=white)
 
 </div>
 
@@ -209,6 +213,10 @@ O acesso remoto entre dispositivos é realizado através do **Tailscale**, evita
 | Juice Shop   | Laboratório de segurança web (OWASP)  |      `3050` | [docs/juice-shop.md](docs/juice-shop.md)                    |
 | ntopng       | Monitoramento de tráfego de rede      |      `3100` | [docs/ntopng.md](docs/ntopng.md)                            |
 | Speedtest Tracker | Histórico de testes de velocidade|      `8765` | [docs/speedtest-tracker.md](docs/speedtest-tracker.md)      |
+| LibreSpeed   | Servidor de teste de velocidade       |      `8111` | [docs/librespeed.md](docs/librespeed.md)                    |
+| Kopia        | Backup com deduplicação e criptografia|     `51515` | [docs/kopia.md](docs/kopia.md)                              |
+| Forgejo      | Servidor Git self-hosted              | `3044 / 222` | [docs/forgejo.md](docs/forgejo.md)                          |
+| Glances      | Monitoramento de sistema em tempo real|     `61208` | [docs/glances.md](docs/glances.md)                          |
 
 > **Nota:** algumas portas acima podem entrar em conflito dependendo da configuração dos containers.
 
@@ -291,6 +299,8 @@ Guia completo de instalação do Docker:
 * [💾 Scrutiny](docs/scrutiny.md)
 * [📡 ntopng](docs/ntopng.md)
 * [📶 Speedtest Tracker](docs/speedtest-tracker.md)
+* [📶 LibreSpeed](docs/librespeed.md)
+* [📊 Glances](docs/glances.md)
 
 ### 🖥️ Serviços
 
@@ -300,12 +310,14 @@ Guia completo de instalação do Docker:
 * [📋 Dozzle](docs/dozzle.md)
 * [📁 Filebrowser](docs/filebrowser.md)
 * [🔐 Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
+* [🦊 Forgejo](docs/forgejo.md)
 
 ### 🛠️ Ferramentas
 
 * [🏔️ mat2-web](docs/mat2-web.md)
 * [🔀 N8n](docs/n8n.md)
 * [🧃 Juice Shop](docs/juice-shop.md)
+* [💾 Kopia](docs/kopia.md)
 
 ---
 
@@ -331,6 +343,10 @@ n8n           → 5678
 Juice Shop    → 3050
 ntopng        → 3100
 Speedtest Tracker → 8765
+LibreSpeed    → 8111
+Kopia         → 51515
+Forgejo       → 3044 / 222
+Glances       → 61208
 ```
 
 devem preferencialmente ser acessados através de:
