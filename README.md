@@ -410,3 +410,11 @@ Ao utilizar este projeto, o usuário reconhece que possui conhecimento suficient
 Este projeto é disponibilizado para fins educacionais e de uso pessoal.
 
 Consulte o arquivo [`LICENSE`](LICENSE) para mais informações.
+
+---
+
+## Nota sobre contribuições assistidas por IA
+
+O Claude aparece na lista de contribuidores deste repositório porque alguns commits foram registrados com sua participação durante o desenvolvimento. Essa indicação reflete apenas o histórico e a autoria técnica desses commits e não significa que o Claude seja mantenedor, proprietário ou colaborador humano do projeto.
+
+Todas as decisões, revisões e responsabilidades relacionadas ao projeto permanecem sob responsabilidade do mantenedor do repositório.
