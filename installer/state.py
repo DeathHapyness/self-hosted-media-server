@@ -1,0 +1,3 @@
+DRY_RUN = False
+CONTAINER_ENGINE = "docker"
+COMPOSE_STANDALONE = False
