@@ -1,4 +1,4 @@
-<h1 align="center">🖥️ Self-Hosted Media Server</h1>
+<h1 align="center">Self-Hosted Media Server</h1>
 
 <div align="center">
 
@@ -39,30 +39,30 @@ Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker
 
 O projeto reúne serviços para gerenciamento, organização, monitoramento e reprodução de:
 
-* 🎬 Filmes
-* 📺 Séries
-* 🎵 Música
-* ⬇️ Downloads
-* 🔎 Indexadores
-* 📋 Solicitações de filmes e séries
-* 🛡️ DNS / Bloqueio de anúncios
-* 🔗 Acesso remoto
-* 📊 Monitoramento e métricas
-* 📈 Dashboards
-* 📋 Logs dos containers
-* 📁 Gerenciamento de arquivos
-* 💾 Monitoramento de discos
-* 🎛️ Dashboard dos serviços
-* 🏔️ Mat2 Web
-* 🔀 N8n
-* 📡 Monitoramento de tráfego de rede
-* 📶 Histórico de velocidade da internet
+* Filmes
+* Séries
+* Música
+* Downloads
+* Indexadores
+* Solicitações de filmes e séries
+* DNS / Bloqueio de anúncios
+* Acesso remoto
+* Monitoramento e métricas
+* Dashboards
+* Logs dos containers
+* Gerenciamento de arquivos
+* Monitoramento de discos
+* Dashboard dos serviços
+* Mat2 Web
+* N8n
+* Monitoramento de tráfego de rede
+* Histórico de velocidade da internet
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
 
 ---
 
-## 💡 Recomendações
+## Recomendações
 
 ### [PortWatch](https://github.com/DeathHapyness/PortWatch)
 
@@ -73,7 +73,7 @@ Confira o projeto e as instruções de instalação no [repositório oficial do 
 
 ---
 
-## 🚀 INSTALADOR
+## INSTALADOR
 
 Antes de usar, leia:
 
@@ -85,7 +85,7 @@ Para entender exatamente o que o instalador faz e o que ele deliberadamente não
 
 ---
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 ```text
                               ┌─────────────────┐
@@ -187,7 +187,7 @@ O acesso remoto entre dispositivos é realizado através do **Tailscale**, evita
 
 ---
 
-## 📦 Serviços
+## Serviços
 
 | Serviço      | Função                                |       Porta | Documentação                                               |
 | ------------ | ------------------------------------- | ----------: | ---------------------------------------------------------- |
@@ -229,9 +229,9 @@ O acesso remoto entre dispositivos é realizado através do **Tailscale**, evita
 
 ---
 
-## 🔄 Fluxo de mídia
+## Fluxo de mídia
 
-### 🎬 Filmes
+### Filmes
 
 ```text
 Jellyseerr
@@ -258,7 +258,7 @@ qBittorrent
  Jellyfin
 ```
 
-## 📋 Requisitos
+## Requisitos
 
 * CPU x86_64
 * 4 GB de RAM ou mais
@@ -275,53 +275,53 @@ Guia completo de instalação do Docker:
 
 ---
 
-## 📚 Documentação
+## Documentação
 
-### 🐳 Infraestrutura
+### Infraestrutura
 
-* [🐳 Instalação do Docker](docs/docker.md)
-* [🔗 Tailscale](docs/tailscale.md)
-* [🔍 Troubleshooting](docs/troubleshooting.md)
+* [Instalação do Docker](docs/docker.md)
+* [Tailscale](docs/tailscale.md)
+* [Troubleshooting](docs/troubleshooting.md)
 
-### 🎬 Mídia
+### Mídia
 
-* [🎬 Jellyfin](docs/jellyfin.md)
-* [🎬 Radarr](docs/radarr.md)
-* [📺 Sonarr](docs/sonarr.md)
-* [🔎 Prowlarr](docs/prowlarr.md)
-* [🎬 Jellyseerr](docs/jellyseerr.md)
-* [🎵 Navidrome + spotDL](docs/navidrome.md)
-* [📥 qBittorrent](docs/qbittorrent.md)
+* [Jellyfin](docs/jellyfin.md)
+* [Radarr](docs/radarr.md)
+* [Sonarr](docs/sonarr.md)
+* [Prowlarr](docs/prowlarr.md)
+* [Jellyseerr](docs/jellyseerr.md)
+* [Navidrome + spotDL](docs/navidrome.md)
+* [qBittorrent](docs/qbittorrent.md)
 
-### 📊 Monitoramento
+### Monitoramento
 
-* [📊 Monitoring — Grafana + Prometheus](docs/monitoring.md)
-* [💾 Scrutiny](docs/scrutiny.md)
-* [📡 ntopng](docs/ntopng.md)
-* [📶 Speedtest Tracker](docs/speedtest-tracker.md)
-* [📶 LibreSpeed](docs/librespeed.md)
-* [📊 Glances](docs/glances.md)
+* [Monitoring — Grafana + Prometheus](docs/monitoring.md)
+* [Scrutiny](docs/scrutiny.md)
+* [ntopng](docs/ntopng.md)
+* [Speedtest Tracker](docs/speedtest-tracker.md)
+* [LibreSpeed](docs/librespeed.md)
+* [Glances](docs/glances.md)
 
-### 🖥️ Serviços
+### Serviços
 
-* [🏠 Homepage](docs/homepage.md)
-* [⚙️ Homepage — referência da pasta config/](docs/homepage-config.md)
-* [🛡️ AdGuard Home](docs/adguard.md)
-* [📋 Dozzle](docs/dozzle.md)
-* [📁 Filebrowser](docs/filebrowser.md)
-* [🔐 Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
-* [🦊 Forgejo](docs/forgejo.md)
+* [Homepage](docs/homepage.md)
+* [Homepage — referência da pasta config/](docs/homepage-config.md)
+* [AdGuard Home](docs/adguard.md)
+* [Dozzle](docs/dozzle.md)
+* [Filebrowser](docs/filebrowser.md)
+* [Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
+* [Forgejo](docs/forgejo.md)
 
-### 🛠️ Ferramentas
+### Ferramentas
 
-* [🏔️ mat2-web](docs/mat2-web.md)
-* [🔀 N8n](docs/n8n.md)
-* [🧃 Juice Shop](docs/juice-shop.md)
-* [💾 Kopia](docs/kopia.md)
+* [mat2-web](docs/mat2-web.md)
+* [N8n](docs/n8n.md)
+* [Juice Shop](docs/juice-shop.md)
+* [Kopia](docs/kopia.md)
 
 ---
 
-## 🔐 Segurança
+## Segurança
 
 Evite expor diretamente serviços administrativos para a internet.
 
@@ -400,7 +400,7 @@ Também não devem ser versionados:
 ---
 
 
-## ⚠️ Aviso de responsabilidade
+## Aviso de responsabilidade
 
 Este projeto é fornecido **"como está"**, exclusivamente para fins educacionais e de uso pessoal.
 
@@ -421,7 +421,7 @@ Ao utilizar este projeto, o usuário reconhece que possui conhecimento suficient
 
 ---
 
-## 📄 Licença
+## Licença
 
 Este projeto é disponibilizado para fins educacionais e de uso pessoal.
 
