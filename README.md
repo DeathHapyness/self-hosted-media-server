@@ -8,60 +8,19 @@
 
 <div align="center">
 
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Jellyfin](https://img.shields.io/badge/Jellyfin-Media-00A4DC?logo=jellyfin&logoColor=white)
-![Navidrome](https://img.shields.io/badge/Navidrome-Music-1DB954?logo=navidrome&logoColor=white)
-![qBittorrent](https://img.shields.io/badge/qBittorrent-Downloads-2F67BA?logo=qbittorrent&logoColor=white)
-![Radarr](https://img.shields.io/badge/Radarr-Filmes-FFC230?logo=radarr&logoColor=white)
-![Sonarr](https://img.shields.io/badge/Sonarr-Séries-35C5F0?logo=sonarr&logoColor=white)
-![Prowlarr](https://img.shields.io/badge/Prowlarr-Indexadores-5C5C5C?logo=prowlarr&logoColor=white)
-![Jellyseerr](https://img.shields.io/badge/Jellyseerr-Requests-8B5CF6?logo=jellyfin&logoColor=white)
-![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?logo=prometheus&logoColor=white)
-![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana&logoColor=white)
-![Scrutiny](https://img.shields.io/badge/Scrutiny-Disk%20Monitoring-5C6BC0?logo=linux&logoColor=white)
-![AdGuard Home](https://img.shields.io/badge/AdGuard%20Home-DNS-68BC71?logo=adguard&logoColor=white)
-![Tailscale](https://img.shields.io/badge/Tailscale-VPN-242424?logo=tailscale&logoColor=white)
-![Dozzle](https://img.shields.io/badge/Dozzle-Logs-1E90FF?logo=docker&logoColor=white)
-![Filebrowser](https://img.shields.io/badge/Filebrowser-Arquivos-4B4B4B?logo=files&logoColor=white)
-![Homepage](https://img.shields.io/badge/Homepage-Dashboard-1C1C1C?logo=docker&logoColor=white)
-![n8n](https://img.shields.io/badge/n8n-Automa%C3%A7%C3%B5es-EA4B71?logo=n8n&logoColor=white)
-![MAT2 Web](https://img.shields.io/badge/MAT2%20Web-Privacidade-5C6BC0?logo=linux&logoColor=white)
-![ntopng](https://img.shields.io/badge/ntopng-Tr%C3%A1fego%20de%20Rede-1A73E8?logo=cachet&logoColor=white)
-![Speedtest Tracker](https://img.shields.io/badge/Speedtest%20Tracker-Velocidade-00BFA5?logo=speedtest&logoColor=white)
-![LibreSpeed](https://img.shields.io/badge/LibreSpeed-Teste%20de%20Velocidade-00BCD4?logo=speedtest&logoColor=white)
-![Kopia](https://img.shields.io/badge/Kopia-Backup-4B32C3?logo=backblaze&logoColor=white)
-![Forgejo](https://img.shields.io/badge/Forgejo-Git-FB923C?logo=forgejo&logoColor=white)
-![Glances](https://img.shields.io/badge/Glances-Monitoramento-00A99D?logo=glances&logoColor=white)
+Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
+
+
+
+
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Podman](https://img.shields.io/badge/Podman-892CA0?style=for-the-badge&logo=podman&logoColor=white)
 
 </div>
 
-Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
-
-O projeto reúne serviços para gerenciamento, organização, monitoramento e reprodução de:
-
-* Filmes
-* Séries
-* Música
-* Downloads
-* Indexadores
-* Solicitações de filmes e séries
-* DNS / Bloqueio de anúncios
-* Acesso remoto
-* Monitoramento e métricas
-* Dashboards
-* Logs dos containers
-* Gerenciamento de arquivos
-* Monitoramento de discos
-* Dashboard dos serviços
-* Mat2 Web
-* N8n
-* Monitoramento de tráfego de rede
-* Histórico de velocidade da internet
-
-O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
-
 ---
-
 
 ## INSTALADOR
 
@@ -75,107 +34,6 @@ Para entender exatamente o que o instalador faz e o que ele deliberadamente não
 
 ---
 
-## Arquitetura
-
-```text
-                              ┌─────────────────┐
-                              │     Usuário     │
-                              └────────┬────────┘
-                                       │
-              ┌────────────────────────┼────────────────────────┐
-              │                        │                        │
-              ▼                        ▼                        ▼
-          Jellyseerr               Homepage                Filebrowser
-          Solicitações             Dashboard                Arquivos
-              │
-              │
-       ┌──────┴──────┐
-       │             │
-       ▼             ▼
-    Radarr         Sonarr
-    Filmes         Séries
-       │             │
-       └──────┬──────┘
-              │
-              ▼
-         ┌─────────────┐
-         │  Prowlarr   │
-         │ Indexadores  │
-         └──────┬──────┘
-                │
-                ▼
-         ┌─────────────┐
-         │ qBittorrent │
-         │  Downloads  │
-         └──────┬──────┘
-                │
-                ▼
-            /mnt/media
-                │
-       ┌────────┼─────────┐
-       │        │         │
-       ▼        ▼         ▼
-    filmes    series    downloads
-       │        │
-       └────┬───┘
-            │
-            ▼
-        ┌─────────┐
-        │ Jellyfin│
-        │  Media  │
-        └─────────┘
-
-
-        ┌──────────────────────┐
-        │      Monitoring      │
-        │                      │
-        │ Prometheus + Grafana │
-        └──────────┬───────────┘
-                   │
-                   ▼
-              Métricas
-                   │
-       ┌───────────┼───────────┐
-       ▼           ▼           ▼
-     Docker      Sistema     Serviços
-
-
-        ┌──────────────────────┐
-        │    AdGuard Home      │
-        │   DNS / Bloqueio     │
-        └──────────┬───────────┘
-                   │
-                   ▼
-                Rede LAN
-
-
-        ┌──────────────────────┐
-        │       Tailscale      │
-        │    Acesso remoto     │
-        └──────────────────────┘
-
-
-        ┌──────────────────────┐
-        │        Dozzle        │
-        │    Docker Logs       │
-        └──────────────────────┘
-```
-
-O **Jellyseerr** funciona como interface de solicitação para filmes e séries.
-
-O **Radarr** gerencia filmes e o **Sonarr** gerencia séries.
-
-O **Prowlarr** centraliza os indexadores utilizados pelo Radarr e Sonarr.
-
-O **qBittorrent** funciona como cliente de download.
-
-O **Jellyfin** disponibiliza a mídia organizada para reprodução.
-
-O monitoramento é realizado através do **Prometheus + Grafana**, enquanto o **Scrutiny** é utilizado para monitoramento S.M.A.R.T. dos discos.
-
-O acesso remoto entre dispositivos é realizado através do **Tailscale**, evitando a necessidade de expor diretamente os serviços administrativos na internet.
-
----
 
 ## Serviços
 
