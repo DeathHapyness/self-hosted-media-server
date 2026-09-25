@@ -1,4 +1,7 @@
+import logging
 import sys
+
+logger = logging.getLogger(__name__)
 
 
 class Color:
@@ -36,6 +39,7 @@ def print_ok(text: str) -> None:
 
 def print_fail(text: str) -> None:
     print(f"{_c('[✗]', Color.RED)} {text}")
+    logger.error(text)
 
 
 def print_warn(text: str) -> None:

@@ -18,13 +18,18 @@ Requisitos:
 """
 
 import argparse
+import logging
 import sys
 
 from installer import state
 from installer.checks import check_privileges
 from installer.flows import main_menu
-from installer.output import print_fail, print_warn
+from installer.history import HISTORY_FILE, finalizar_execucao, iniciar_execucao, registrar
+from installer.log import LOG_FILE, setup_logging
+from installer.output import print_fail, print_info, print_warn
 from installer.utils import InstallError
+
+logger = logging.getLogger(__name__)
 
 ASCII_ART = r"""  ___           _        _           _              ____       _  __       _   _           _           _
  |_ _|_ __  ___| |_ __ _| | __ _  __| | ___  _ __  / ___|  ___| |/ _|     | | | | ___  ___| |_ ___  __| |
@@ -55,13 +60,29 @@ def main() -> int:
         print_fail(str(e))
         return 1
 
+    setup_logging()
+    logger.info("Instalador iniciado (dry_run=%s)", state.DRY_RUN)
+    iniciar_execucao()
+
     try:
         main_menu()
     except KeyboardInterrupt:
         print("\n")
         print_warn("Encerrado pelo usuário.")
+        logger.warning("Encerrado pelo usuário (Ctrl+C)")
+        finalizar_execucao("cancelada (Ctrl+C)")
         return 130
+    except Exception as e:
+        logger.exception("Erro inesperado")
+        registrar("erro_inesperado", erro=repr(e))
+        finalizar_execucao("erro")
+        print_fail(f"Erro inesperado. Detalhes em {LOG_FILE}")
+        return 1
 
+    logger.info("Instalador finalizado")
+    finalizar_execucao("finalizada")
+    print_info(f"Log desta execução: {LOG_FILE}")
+    print_info(f"Histórico: {HISTORY_FILE}")
     return 0
 
 

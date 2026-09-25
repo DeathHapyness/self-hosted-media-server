@@ -1,30 +1,36 @@
+import shlex
 from pathlib import Path
 from typing import List, Tuple
 
 from . import state
 from .checks import check_media_mount
 from .config import MEDIA_DIR
+from .history import registrar
 from .output import Color, _c, print_fail, print_header, print_info, print_ok, print_section, print_warn
 from .utils import confirm_dangerous, press_enter_to_continue, run
 
 
 def list_unmounted_block_devices() -> List[Tuple[str, str]]:
-    result = run(["lsblk", "-rno", "NAME,SIZE,TYPE,MOUNTPOINT"])
+    # -P gera KEY="valor", então colunas vazias (ex: MOUNTPOINT) não desalinham o resto.
+    result = run(["lsblk", "-Pno", "NAME,SIZE,TYPE,MOUNTPOINT,PKNAME"])
     if result.returncode != 0:
         return []
 
-    devices = []
+    rows = []
     for line in result.stdout.splitlines():
-        parts = line.split()
-        if len(parts) < 3:
+        rows.append(dict(item.split("=", 1) for item in shlex.split(line)))
+
+    # Um disco com partições (ou uma partição com LVM/cripto dentro) nunca é "livre",
+    # mesmo sem mountpoint próprio: pode ser o disco do sistema.
+    has_children = {row["PKNAME"] for row in rows if row.get("PKNAME")}
+
+    devices = []
+    for row in rows:
+        if row.get("TYPE") not in ("part", "disk"):
             continue
-        name, size, dev_type = parts[0], parts[1], parts[2]
-        mountpoint = parts[3] if len(parts) > 3 else ""
-        if dev_type not in ("part", "disk"):
+        if row.get("MOUNTPOINT") or row["NAME"] in has_children:
             continue
-        if mountpoint:
-            continue
-        devices.append((f"/dev/{name}", size))
+        devices.append((f"/dev/{row['NAME']}", row.get("SIZE", "?")))
     return devices
 
 
@@ -57,10 +63,12 @@ def mount_real_device_menu() -> None:
     )
     if not confirm_dangerous(aviso, palavra=device_path):
         print_info("Operação cancelada — nada foi alterado.")
+        registrar("formatar_disco", dispositivo=device_path, resultado="cancelado")
         return
 
     if state.DRY_RUN:
         print_ok(f"[dry-run] formataria {device_path} como ext4 e montaria em {MEDIA_DIR}")
+        registrar("formatar_disco", dispositivo=device_path, resultado="dry-run")
         return
 
     MEDIA_DIR.mkdir(parents=True, exist_ok=True)
@@ -70,6 +78,7 @@ def mount_real_device_menu() -> None:
     if result.returncode != 0:
         print_fail("Falha ao formatar:")
         print_info(result.stderr.strip())
+        registrar("formatar_disco", dispositivo=device_path, resultado="falha ao formatar", erro=result.stderr.strip())
         return
     print_ok("Formatado com sucesso")
 
@@ -77,8 +86,10 @@ def mount_real_device_menu() -> None:
     if result.returncode != 0:
         print_fail("Falha ao montar:")
         print_info(result.stderr.strip())
+        registrar("formatar_disco", dispositivo=device_path, resultado="falha ao montar", erro=result.stderr.strip())
         return
     print_ok(f"{device_path} montado em {MEDIA_DIR}")
+    registrar("formatar_disco", dispositivo=device_path, resultado=f"montado em {MEDIA_DIR}")
 
     _adicionar_fstab(f"{device_path} {MEDIA_DIR} ext4 defaults 0 2")
 
@@ -104,10 +115,12 @@ def create_virtual_disk_menu() -> None:
     )
     if not confirm_dangerous(aviso):
         print_info("Operação cancelada — nada foi alterado.")
+        registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="cancelado")
         return
 
     if state.DRY_RUN:
         print_ok(f"[dry-run] criaria {img_path} ({tamanho_gb}GB) e montaria em {MEDIA_DIR}")
+        registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="dry-run")
         return
 
     MEDIA_DIR.mkdir(parents=True, exist_ok=True)
@@ -119,6 +132,8 @@ def create_virtual_disk_menu() -> None:
         if result.returncode != 0:
             print_fail("Falha ao criar o arquivo de disco virtual:")
             print_info(result.stderr.strip())
+            registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="falha ao criar arquivo",
+                      erro=result.stderr.strip())
             return
     print_ok(f"Arquivo criado ({tamanho_gb}GB)")
 
@@ -126,6 +141,7 @@ def create_virtual_disk_menu() -> None:
     if result.returncode != 0:
         print_fail("Falha ao formatar:")
         print_info(result.stderr.strip())
+        registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="falha ao formatar", erro=result.stderr.strip())
         return
     print_ok("Formatado como ext4")
 
@@ -133,8 +149,10 @@ def create_virtual_disk_menu() -> None:
     if result.returncode != 0:
         print_fail("Falha ao montar:")
         print_info(result.stderr.strip())
+        registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="falha ao montar", erro=result.stderr.strip())
         return
     print_ok(f"Montado em {MEDIA_DIR}")
+    registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado=f"montado em {MEDIA_DIR}")
 
     _adicionar_fstab(f"{img_path} {MEDIA_DIR} ext4 loop 0 0")
 
@@ -148,10 +166,12 @@ def _adicionar_fstab(linha: str) -> None:
     resposta = input("\nAdicionar entrada em /etc/fstab para sobreviver a um reboot? [s/N]: ").strip().lower()
     if resposta != "s":
         print_info("Pulado — o mount não sobrevive a um reboot até você adicionar manualmente.")
+        registrar("fstab", linha=linha, resultado="pulado")
         return
     with fstab.open("a") as f:
         f.write(f"\n{linha}\n")
     print_ok("/etc/fstab atualizado")
+    registrar("fstab", linha=linha, resultado="adicionada")
 
 
 def media_mount_menu() -> None:
