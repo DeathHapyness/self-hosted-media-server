@@ -4,6 +4,10 @@
 
   <img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="900" height="350" style="border-radius: 20px;">
 
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Podman](https://img.shields.io/badge/Podman-892CA0?style=for-the-badge&logo=podman&logoColor=white)
 </div>
 
 <div align="center">
@@ -32,17 +36,6 @@ O projeto reúne serviços para gerenciamento, organização, monitoramento e re
 * Histórico de velocidade da internet
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
-
----
-
-## Recomendações
-
-### [PortWatch](https://github.com/DeathHapyness/PortWatch)
-
-O **PortWatch** é uma ferramenta para monitorar portas, containers e serviços Docker por meio de uma interface web moderna. É uma ótima adição para visualizar e organizar os serviços executados em um servidor self-hosted.
-
-Confira o projeto e as instruções de instalação no [repositório oficial do PortWatch](https://github.com/DeathHapyness/PortWatch).
-
 
 ---
 
