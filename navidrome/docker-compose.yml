@@ -14,8 +14,8 @@ services:
       TZ: America/Sao_Paulo
 
     volumes:
-      - ./data:/data
-      - /mnt/media/musicas:/music:ro  
+      - ${DATA_DIR:-/opt/media-server}/navidrome/data:/data
+      - ${MEDIA_DIR:-/mnt/media}/musicas:/music:ro  
     labels:
       - homepage.group=Mídia
       - homepage.name=Navidrome

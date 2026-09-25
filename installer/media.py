@@ -1,27 +1,25 @@
 import shlex
+import logging
 from pathlib import Path
 from typing import List, Tuple
 
 from . import state
 from .checks import check_media_mount
-from .config import MEDIA_DIR
 from .history import registrar
 from .output import Color, _c, print_fail, print_header, print_info, print_ok, print_section, print_warn
 from .utils import confirm_dangerous, press_enter_to_continue, run
 
+logger = logging.getLogger(__name__)
 
 def list_unmounted_block_devices() -> List[Tuple[str, str]]:
-    # -P gera KEY="valor", então colunas vazias (ex: MOUNTPOINT) não desalinham o resto.
     result = run(["lsblk", "-Pno", "NAME,SIZE,TYPE,MOUNTPOINT,PKNAME"])
+    logger.info(f"lsblk output: {result.stdout}")
     if result.returncode != 0:
         return []
 
     rows = []
     for line in result.stdout.splitlines():
         rows.append(dict(item.split("=", 1) for item in shlex.split(line)))
-
-    # Um disco com partições (ou uma partição com LVM/cripto dentro) nunca é "livre",
-    # mesmo sem mountpoint próprio: pode ser o disco do sistema.
     has_children = {row["PKNAME"] for row in rows if row.get("PKNAME")}
 
     devices = []
@@ -67,11 +65,11 @@ def mount_real_device_menu() -> None:
         return
 
     if state.DRY_RUN:
-        print_ok(f"[dry-run] formataria {device_path} como ext4 e montaria em {MEDIA_DIR}")
+        print_ok(f"[dry-run] formataria {device_path} como ext4 e montaria em {state.MEDIA_DIR}")
         registrar("formatar_disco", dispositivo=device_path, resultado="dry-run")
         return
 
-    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+    state.MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 
     print_section(f"Formatando {device_path}...")
     result = run(["mkfs.ext4", "-F", device_path])
@@ -82,20 +80,20 @@ def mount_real_device_menu() -> None:
         return
     print_ok("Formatado com sucesso")
 
-    result = run(["mount", device_path, str(MEDIA_DIR)])
+    result = run(["mount", device_path, str(state.MEDIA_DIR)])
     if result.returncode != 0:
         print_fail("Falha ao montar:")
         print_info(result.stderr.strip())
         registrar("formatar_disco", dispositivo=device_path, resultado="falha ao montar", erro=result.stderr.strip())
         return
-    print_ok(f"{device_path} montado em {MEDIA_DIR}")
-    registrar("formatar_disco", dispositivo=device_path, resultado=f"montado em {MEDIA_DIR}")
+    print_ok(f"{device_path} montado em {state.MEDIA_DIR}")
+    registrar("formatar_disco", dispositivo=device_path, resultado=f"montado em {state.MEDIA_DIR}")
 
-    _adicionar_fstab(f"{device_path} {MEDIA_DIR} ext4 defaults 0 2")
+    _adicionar_fstab(f"{device_path} {state.MEDIA_DIR} ext4 defaults 0 2")
 
 
 def create_virtual_disk_menu() -> None:
-    print_section("Criar disco virtual (arquivo de imagem) para /mnt/media")
+    print_section(f"Criar disco virtual (arquivo de imagem) para {state.MEDIA_DIR}")
     print_info("Isso ocupa espaço no disco atual — só recomendado para testes ou quando")
     print_info("não há disco físico disponível. Para produção, prefira um disco real.")
 
@@ -110,7 +108,7 @@ def create_virtual_disk_menu() -> None:
 
     img_path = Path("/var/media-disk.img")
     aviso = (
-        f"Será criado um arquivo de {tamanho_gb}GB em {img_path} e montado em {MEDIA_DIR}.\n"
+        f"Será criado um arquivo de {tamanho_gb}GB em {img_path} e montado em {state.MEDIA_DIR}.\n"
         f"    Se já existir um disco virtual anterior nesse caminho, ele será sobrescrito."
     )
     if not confirm_dangerous(aviso):
@@ -119,11 +117,11 @@ def create_virtual_disk_menu() -> None:
         return
 
     if state.DRY_RUN:
-        print_ok(f"[dry-run] criaria {img_path} ({tamanho_gb}GB) e montaria em {MEDIA_DIR}")
+        print_ok(f"[dry-run] criaria {img_path} ({tamanho_gb}GB) e montaria em {state.MEDIA_DIR}")
         registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="dry-run")
         return
 
-    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+    state.MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 
     print_section("Criando arquivo de disco virtual...")
     result = run(["fallocate", "-l", f"{tamanho_gb}G", str(img_path)])
@@ -145,16 +143,16 @@ def create_virtual_disk_menu() -> None:
         return
     print_ok("Formatado como ext4")
 
-    result = run(["mount", "-o", "loop", str(img_path), str(MEDIA_DIR)])
+    result = run(["mount", "-o", "loop", str(img_path), str(state.MEDIA_DIR)])
     if result.returncode != 0:
         print_fail("Falha ao montar:")
         print_info(result.stderr.strip())
         registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado="falha ao montar", erro=result.stderr.strip())
         return
-    print_ok(f"Montado em {MEDIA_DIR}")
-    registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado=f"montado em {MEDIA_DIR}")
+    print_ok(f"Montado em {state.MEDIA_DIR}")
+    registrar("criar_disco_virtual", tamanho_gb=tamanho_gb, resultado=f"montado em {state.MEDIA_DIR}")
 
-    _adicionar_fstab(f"{img_path} {MEDIA_DIR} ext4 loop 0 0")
+    _adicionar_fstab(f"{img_path} {state.MEDIA_DIR} ext4 loop 0 0")
 
 
 def _adicionar_fstab(linha: str) -> None:
@@ -168,6 +166,7 @@ def _adicionar_fstab(linha: str) -> None:
         print_info("Pulado — o mount não sobrevive a um reboot até você adicionar manualmente.")
         registrar("fstab", linha=linha, resultado="pulado")
         return
+    logger.warning("Adicionando entrada em /etc/fstab: %s", linha)
     with fstab.open("a") as f:
         f.write(f"\n{linha}\n")
     print_ok("/etc/fstab atualizado")
@@ -179,7 +178,7 @@ def media_mount_menu() -> None:
         print_header("GESTÃO DO DISCO DE MÍDIA")
         montado = check_media_mount(raise_on_fail=False)
         status = _c("montado", Color.GREEN) if montado else _c("NÃO montado", Color.RED)
-        print(f"Status atual de {MEDIA_DIR}: {status}\n")
+        print(f"Status atual de {state.MEDIA_DIR}: {status}\n")
 
         print_info("1) Já montei manualmente — só verificar")
         print_info("2) Usar um disco/partição existente (formata e monta — APAGA DADOS do disco escolhido)")

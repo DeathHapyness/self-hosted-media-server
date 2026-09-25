@@ -16,8 +16,8 @@ services:
       - "6881:6881/udp"
 
     volumes:
-      - ./config:/config
-      - /mnt/media:/downloads
+      - ${DATA_DIR:-/opt/media-server}/qbittorrent/config:/config
+      - ${MEDIA_DIR:-/mnt/media}:/downloads
 
     labels:
       - homepage.group=Mídia

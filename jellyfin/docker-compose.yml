@@ -8,9 +8,9 @@ services:
       - "8096:8096"
 
     volumes:
-      - ./config:/config
-      - ./cache:/cache
-      - /mnt/media:/media
+      - ${DATA_DIR:-/opt/media-server}/jellyfin/config:/config
+      - ${DATA_DIR:-/opt/media-server}/jellyfin/cache:/cache
+      - ${MEDIA_DIR:-/mnt/media}:/media
 
     environment:
       - TZ=America/Sao_Paulo

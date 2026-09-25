@@ -4,7 +4,7 @@ services:
     container_name: ntopng-redis
     restart: unless-stopped
     volumes:
-      - ./redis-data:/data
+      - ${DATA_DIR:-/opt/media-server}/ntopng/redis-data:/data
     command: redis-server --appendonly yes
 
   ntopng:
@@ -19,7 +19,7 @@ services:
     ports:
       - "3100:3000"
     volumes:
-      - ./ntopng-data:/var/lib/ntopng
+      - ${DATA_DIR:-/opt/media-server}/ntopng/ntopng-data:/var/lib/ntopng
 
     labels:
       - homepage.group=Monitoramento

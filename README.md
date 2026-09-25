@@ -10,15 +10,39 @@
 
 Servidor de mídia **self-hosted** executado em Linux utilizando Docker e Docker Compose.
 
+O projeto reúne serviços para gerenciamento, organização, monitoramento e reprodução de:
 
+* Filmes
+* Séries
+* Música
+* Downloads
+* Indexadores
+* Solicitações de filmes e séries
+* DNS / Bloqueio de anúncios
+* Acesso remoto
+* Monitoramento e métricas
+* Dashboards
+* Logs dos containers
+* Gerenciamento de arquivos
+* Monitoramento de discos
+* Dashboard dos serviços
+* Mat2 Web
+* N8n
+* Monitoramento de tráfego de rede
+* Histórico de velocidade da internet
 
+O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Podman](https://img.shields.io/badge/Podman-892CA0?style=for-the-badge&logo=podman&logoColor=white)
+---
 
-</div>
+## Recomendações
+
+### [PortWatch](https://github.com/DeathHapyness/PortWatch)
+
+O **PortWatch** é uma ferramenta para monitorar portas, containers e serviços Docker por meio de uma interface web moderna. É uma ótima adição para visualizar e organizar os serviços executados em um servidor self-hosted.
+
+Confira o projeto e as instruções de instalação no [repositório oficial do PortWatch](https://github.com/DeathHapyness/PortWatch).
+
 
 ---
 

@@ -17,7 +17,7 @@ services:
       - forgejo
 
     volumes:
-      - ./forgejo:/data
+      - ${DATA_DIR:-/opt/media-server}/forgejo/data:/data
       - /etc/localtime:/etc/localtime:ro
 
     ports:

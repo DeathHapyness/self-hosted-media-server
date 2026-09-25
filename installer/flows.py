@@ -3,14 +3,20 @@ import shutil
 
 from . import state
 from .checks import check_disk_space, check_os, check_ports, resolve_media_mount_interactive
-from .compose import escolher_servicos, find_compose_files, start_services, stop_services, validate_compose
-from .config import BASE_DIR, MEDIA_DIR, REPO_SERVICE_DIRS
-from .directories import configure_permissions, create_directories, ensure_env_file
+from .compose import (
+    collect_data_dirs,
+    escolher_servicos,
+    find_compose_files,
+    start_services,
+    stop_services,
+    validate_compose,
+)
+from .directories import configure_permissions, create_directories, load_env_into_state, setup_env
 from .engine import check_compose_plugin, check_engine_binary, check_engine_daemon, check_optional, choose_engine
 from .history import registrar
 from .media import media_mount_menu
-from .output import Color, _c, print_fail, print_header, print_info, print_ok, print_warn
-from .utils import InstallError, confirm_dangerous, press_enter_to_continue
+from .output import Color, _c, print_fail, print_header, print_info, print_ok, print_section, print_warn
+from .utils import InstallError, confirm_dangerous, press_enter_to_continue, tamanho_legivel
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +50,10 @@ def fluxo_instalar() -> None:
                 _interromper_instalacao(f"verificação de {label} falhou")
                 return
 
+        setup_env()
+
         if not resolve_media_mount_interactive():
-            _interromper_instalacao(f"usuário não quis continuar sem {MEDIA_DIR} montado")
+            _interromper_instalacao(f"usuário não quis continuar sem {state.MEDIA_DIR} montado")
             return
 
         check_disk_space()
@@ -53,20 +61,14 @@ def fluxo_instalar() -> None:
         todos_compose = find_compose_files()
         if not todos_compose:
             raise InstallError(
-                "Nenhum arquivo docker-compose.yml/yaml encontrado dentro das pastas de "
-                f"serviço ({', '.join(REPO_SERVICE_DIRS)})."
+                "Nenhum arquivo docker-compose.yml/yaml encontrado nas pastas do repositório."
             )
-        faltando = [name for name in REPO_SERVICE_DIRS if name not in todos_compose]
-        if faltando:
-            print_warn(f"Sem compose encontrado para: {', '.join(faltando)} (pulando esses serviços)")
-            logger.warning("Compose não encontrado para: %s", ", ".join(faltando))
         compose_files = escolher_servicos(todos_compose)
         registrar("servicos_escolhidos", servicos=list(compose_files))
         check_ports(compose_files)
 
         create_directories()
         configure_permissions()
-        ensure_env_file()
 
         compose_files = validate_compose(compose_files)
         start_services(compose_files)
@@ -84,6 +86,7 @@ def fluxo_instalar() -> None:
 def fluxo_desinstalar() -> None:
     print_header("DESINSTALAÇÃO")
 
+    load_env_into_state()
     state.CONTAINER_ENGINE = choose_engine()
     registrar("desinstalacao", resultado="iniciada", engine=state.CONTAINER_ENGINE)
 
@@ -91,10 +94,21 @@ def fluxo_desinstalar() -> None:
     stop_services(compose_files)
     registrar("containers_parados", servicos=list(compose_files))
 
-    print_info(f"\n{MEDIA_DIR} NUNCA é tocado por esta opção — seus arquivos de mídia estão seguros.")
+    print_info(f"\n{state.MEDIA_DIR} NUNCA é tocado por esta opção — seus arquivos de mídia estão seguros.")
+
+    alvos = collect_data_dirs(compose_files)
+    if not alvos:
+        print_info("Nenhuma pasta de dados de serviço encontrada no disco.")
+        print_info("Apenas os containers foram parados.")
+        registrar("desinstalacao", resultado="concluida", configs="nenhuma pasta encontrada")
+        return
+
+    print_section("Pastas de dados encontradas no disco:")
+    for alvo in alvos:
+        print_info(f"{alvo}  ({tamanho_legivel(alvo)})")
 
     resposta = input(
-        f"\nTambém remover as pastas de configuração em {BASE_DIR}? "
+        "\nTambém remover as pastas listadas acima? "
         "Isso apaga bancos de dados e configs dos serviços. [s/N]: "
     ).strip().lower()
 
@@ -104,9 +118,9 @@ def fluxo_desinstalar() -> None:
         return
 
     aviso = (
-        f"Isso vai apagar PERMANENTEMENTE tudo dentro de {BASE_DIR}: configs, "
+        "Isso vai apagar PERMANENTEMENTE as pastas listadas acima: configs, "
         f"bancos de dados (File Browser, Navidrome, etc.) e caches.\n"
-        f"    {MEDIA_DIR} continua intocado."
+        f"    {state.MEDIA_DIR} continua intocado."
     )
     if not confirm_dangerous(aviso):
         print_info("Operação cancelada — configurações mantidas.")
@@ -114,17 +128,26 @@ def fluxo_desinstalar() -> None:
         return
 
     if state.DRY_RUN:
-        print_info(f"[dry-run] removeria {BASE_DIR}")
-        registrar("desinstalacao", resultado="concluida", configs=f"[dry-run] removeria {BASE_DIR}")
+        for alvo in alvos:
+            print_info(f"[dry-run] removeria {alvo}")
+        registrar("desinstalacao", resultado="concluida",
+                  configs=f"[dry-run] removeria {len(alvos)} pasta(s)")
         return
 
-    logger.warning("Removendo %s", BASE_DIR)
-    shutil.rmtree(BASE_DIR, ignore_errors=True)
-    print_ok(f"{BASE_DIR} removido")
-    registrar("desinstalacao", resultado="concluida", configs=f"{BASE_DIR} removido")
+    removidas = []
+    for alvo in alvos:
+        logger.warning("Removendo %s", alvo)
+        shutil.rmtree(alvo, ignore_errors=True)
+        if alvo.exists():
+            print_warn(f"{alvo} não pôde ser removido por completo")
+        else:
+            print_ok(f"{alvo} removido")
+            removidas.append(str(alvo))
+    registrar("desinstalacao", resultado="concluida", configs_removidas=removidas)
 
 
 def main_menu() -> None:
+    load_env_into_state()
     while True:
         print_header("MEDIA SERVER INSTALLER")
         if state.DRY_RUN:
@@ -132,7 +155,7 @@ def main_menu() -> None:
 
         print_info("1) Instalar / atualizar serviços")
         print_info("2) Desinstalar serviços")
-        print_info("3) Gerenciar disco de mídia (/mnt/media)")
+        print_info(f"3) Gerenciar disco de mídia ({state.MEDIA_DIR})")
         print_info("4) Sair")
 
         try:

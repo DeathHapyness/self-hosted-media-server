@@ -15,7 +15,7 @@ services:
       - /dev/sdd:/dev/sdd
 
     volumes:
-      - ./config:/opt/scrutiny/config
+      - ${DATA_DIR:-/opt/media-server}/scrutiny/config:/opt/scrutiny/config
       - /run/udev:/run/udev:ro
 
     ports:

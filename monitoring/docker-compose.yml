@@ -4,7 +4,7 @@ services:
     container_name: prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus-data:/prometheus
+      - ${DATA_DIR:-/opt/media-server}/monitoring/prometheus-data:/prometheus
     ports:
       - "9090:9090"
     restart: unless-stopped
@@ -59,7 +59,7 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     volumes:
-      - ./grafana-data:/var/lib/grafana
+      - ${DATA_DIR:-/opt/media-server}/monitoring/grafana-data:/var/lib/grafana
     ports:
       - "3000:3000"
     restart: unless-stopped

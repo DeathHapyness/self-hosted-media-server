@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import socket
@@ -5,14 +6,18 @@ import sys
 from pathlib import Path
 from typing import Dict
 
+from . import state
 from .compose import extract_ports_from_compose
-from .config import BASE_DIR, DEFAULT_EXPECTED_PORTS, MEDIA_DIR, MIN_DISK_SPACE_MEDIA_GB, MIN_DISK_SPACE_OPT_GB
+from .config import DEFAULT_EXPECTED_PORTS, MIN_DISK_SPACE_DATA_GB, MIN_DISK_SPACE_MEDIA_GB
 from .output import print_fail, print_info, print_ok, print_warn
 from .utils import InstallError
+
+logger = logging.getLogger(__name__)
 
 
 def check_os() -> None:
     if sys.platform.startswith("linux"):
+        logger.info("Sistema operacional: %s", sys.platform)
         print_ok("Linux detected")
     else:
         raise InstallError(f"Sistema operacional não suportado: {sys.platform}. Este instalador requer Linux.")
@@ -28,49 +33,57 @@ def check_privileges() -> None:
 
 
 def check_media_mount(raise_on_fail: bool = True) -> bool:
-    if not MEDIA_DIR.exists():
+    if not state.MEDIA_DIR.exists():
         if raise_on_fail:
             raise InstallError(
-                f"{MEDIA_DIR} não existe. Use a opção 'Gerenciar disco de mídia' no "
+                f"{state.MEDIA_DIR} não existe. Use a opção 'Gerenciar disco de mídia' no "
                 "menu principal para criar/montar, ou monte manualmente antes de continuar."
             )
         return False
-    if not os.path.ismount(MEDIA_DIR):
+    if not os.path.ismount(state.MEDIA_DIR):
         if raise_on_fail:
             raise InstallError(
-                f"{MEDIA_DIR} existe, mas NÃO está montado como filesystem separado. "
+                f"{state.MEDIA_DIR} existe, mas NÃO está montado como filesystem separado. "
                 "Isso é intencional: instalar sem o mount ativo poderia criar arquivos "
                 "no disco raiz. Use a opção 'Gerenciar disco de mídia' no menu principal, "
                 "ou monte manualmente (ex: via /etc/fstab)."
             )
         return False
-    print_ok(f"{MEDIA_DIR} mounted")
+    print_ok(f"{state.MEDIA_DIR} mounted")
     return True
 
 
 def resolve_media_mount_interactive() -> bool:
-    """Monta em /mnt/media não é mais obrigatório: fica a critério do usuário."""
+    """Um disco dedicado para a mídia é opcional: fica a critério do usuário."""
     if check_media_mount(raise_on_fail=False):
         return True
     print_warn(
-        f"{MEDIA_DIR} não existe ou não é um mount separado. Ter um disco dedicado "
+        f"{state.MEDIA_DIR} não existe ou não é um mount separado. Ter um disco dedicado "
         "é opcional — você pode seguir usando esse caminho como uma pasta comum no disco raiz."
     )
     resposta = input("Continuar mesmo assim? [s/N]: ").strip().lower()
     return resposta == "s"
 
 
+def _primeiro_existente(path: Path) -> Path:
+    while not path.exists() and path != path.parent:
+        path = path.parent
+    return path
+
+
 def check_disk_space() -> None:
-    opt_check_path = BASE_DIR if BASE_DIR.exists() else BASE_DIR.parent
-    opt_free_gb = shutil.disk_usage(opt_check_path).free / (1024 ** 3)
-    if opt_free_gb < MIN_DISK_SPACE_OPT_GB:
+    data_check_path = _primeiro_existente(state.BASE_DIR)
+    data_free_gb = shutil.disk_usage(data_check_path).free / (1024 ** 3)
+    if data_free_gb < MIN_DISK_SPACE_DATA_GB:
         raise InstallError(
-            f"Espaço insuficiente em {opt_check_path}: {opt_free_gb:.1f}GB livres, "
-            f"mínimo exigido {MIN_DISK_SPACE_OPT_GB}GB."
+            f"Espaço insuficiente em {data_check_path}: {data_free_gb:.1f}GB livres, "
+            f"mínimo exigido {MIN_DISK_SPACE_DATA_GB}GB."
         )
 
-    media_check_path = MEDIA_DIR if MEDIA_DIR.exists() else MEDIA_DIR.parent
+    logger.info("Espaco livre em %s: %.1fGB", data_check_path, data_free_gb)
+    media_check_path = _primeiro_existente(state.MEDIA_DIR)
     media_free_gb = shutil.disk_usage(media_check_path).free / (1024 ** 3)
+    logger.info("Espaco livre em %s: %.1fGB", media_check_path, media_free_gb)
     if media_free_gb < MIN_DISK_SPACE_MEDIA_GB:
         print_warn(
             f"Pouco espaço livre em {media_check_path}: {media_free_gb:.1f}GB "
@@ -100,6 +113,7 @@ def check_ports(compose_files: Dict[str, Path]) -> None:
             busy.append((port, service))
 
     if busy:
+        logger.warning("Portas ocupadas: %s", ", ".join(f"{p} ({s})" for p, s in busy))
         print_fail("Portas em uso detectadas:")
         for port, service in busy:
             print_info(f"porta {port} ({service}) já está em uso")

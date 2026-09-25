@@ -25,9 +25,9 @@ services:
       - --server-password=${KOPIA_SERVER_PASSWORD}
 
     volumes:
-      - ./config:/app/config
-      - ./cache:/app/cache
-      - ./logs:/app/logs
+      - ${DATA_DIR:-/opt/media-server}/kopia/config:/app/config
+      - ${DATA_DIR:-/opt/media-server}/kopia/cache:/app/cache
+      - ${DATA_DIR:-/opt/media-server}/kopia/logs:/app/logs
 
       # Destino do backup
       - /mnt/backup/kopia-repository:/repository
@@ -35,6 +35,6 @@ services:
       # Origens disponíveis somente para leitura
       - /home/rique:/data/home:ro
       - /var/lib/docker/volumes/n8n_n8n_data/_data:/data/n8n:ro
-      - /mnt/media:/data/media:ro
+      - ${MEDIA_DIR:-/mnt/media}:/data/media:ro
 
 

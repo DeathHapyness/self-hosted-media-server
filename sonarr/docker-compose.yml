@@ -7,7 +7,7 @@ services:
       - PGID=1000
       - TZ=America/Sao_Paulo
     volumes:
-      - ./config:/config
+      - ${DATA_DIR:-/opt/media-server}/sonarr/config:/config
       - /caminho/para/tv:/tv
       - /caminho/para/downloads:/downloads
     ports:

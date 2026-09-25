@@ -15,7 +15,7 @@ services:
       - SPEEDTEST_SCHEDULE=*/30 * * * *
 
     volumes:
-      - ./config:/config
+      - ${DATA_DIR:-/opt/media-server}/speedtest-tracker/config:/config
 
     ports:
       - "8765:80"

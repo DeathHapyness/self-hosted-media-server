@@ -7,7 +7,7 @@ services:
       - PGID=1000
       - TZ=America/Sao_Paulo
     volumes:
-      - ./config:/config
+      - ${DATA_DIR:-/opt/media-server}/prowlarr/config:/config
     ports:
       - "9696:9696"
     restart: unless-stopped

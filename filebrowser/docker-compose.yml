@@ -8,9 +8,9 @@ services:
       - "8082:80"
 
     volumes:
-      - /mnt/media:/srv
-      - ./database:/database
-      - ./config:/config
+      - ${MEDIA_DIR:-/mnt/media}:/srv
+      - ${DATA_DIR:-/opt/media-server}/filebrowser/database:/database
+      - ${DATA_DIR:-/opt/media-server}/filebrowser/config:/config
 
 
     labels:

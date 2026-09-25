@@ -10,8 +10,8 @@ services:
       - TZ=America/Sao_Paulo
 
     volumes:
-      - /mnt/media:/media
-      - ./config:/config
+      - ${MEDIA_DIR:-/mnt/media}:/media
+      - ${DATA_DIR:-/opt/media-server}/radarr/config:/config
 
     ports:
       - "7878:7878"

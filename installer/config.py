@@ -1,77 +1,45 @@
 from pathlib import Path
+from typing import Dict, List
 
-BASE_DIR = Path("/opt/media-server")
-MEDIA_DIR = Path("/mnt/media")
+from . import state
 
-MIN_DISK_SPACE_OPT_GB = 2
+MIN_DISK_SPACE_DATA_GB = 2
 MIN_DISK_SPACE_MEDIA_GB = 5
 
-SERVICE_DIRS = {
-    "AdGuard Home": [
-        BASE_DIR / "adguard" / "work",
-        BASE_DIR / "adguard" / "conf",
-    ],
-    "Dozzle": [
-        BASE_DIR / "dozzle",
-    ],
-    "File Browser": [
-        BASE_DIR / "filebrowser" / "config",
-        BASE_DIR / "filebrowser" / "database",
-    ],
-    "Forgejo": [
-        BASE_DIR / "forgejo" / "data",
-    ],
-    "glances": [
-        BASE_DIR / "glances" / "config",
-    ],
-    "Jellyfin": [
-        BASE_DIR / "jellyfin" / "config",
-        BASE_DIR / "jellyfin" / "cache",
-    ],
-    "Jellyseerr": [
-        BASE_DIR / "jellyseerr" / "config",
-    ],
-    "Navidrome": [
-        BASE_DIR / "navidrome" / "data",
-    ],
-    "qBittorrent": [
-        BASE_DIR / "qbittorrent" / "config",
-    ],
-    "Homepage": [
-        BASE_DIR / "homepage" / "config",
-    ],
-    "immich-app": [
-        BASE_DIR / "immich-app" / "config",
-    ],
-    "Prowlarr": [
-        BASE_DIR / "prowlarr" / "config",
-    ],
-    "Radarr": [
-        BASE_DIR / "radarr" / "config",
-    ],
-    "Sonarr": [
-        BASE_DIR / "sonarr" / "config",
-    ],
-    "Scrutiny": [
-        BASE_DIR / "scrutiny" / "config",
-    ],
-    "Monitoring": [
-        BASE_DIR / "monitoring" / "prometheus-data",
-        BASE_DIR / "monitoring" / "grafana-data",
-    ],
-    "ntopng": [
-        BASE_DIR / "ntopng" / "redis-data",
-        BASE_DIR / "ntopng" / "ntopng-data",
-    ],
-    "Speedtest Tracker": [
-        BASE_DIR / "speedtest-tracker" / "config",
-    ],
+SERVICE_SUBDIRS = {
+    "AdGuard Home": ["adguard/conf", "adguard/work"],
+    "File Browser": ["filebrowser/config", "filebrowser/database"],
+    "Forgejo": ["forgejo/data"],
+    "Jellyfin": ["jellyfin/config", "jellyfin/cache"],
+    "Jellyseerr": ["jellyseerr/config"],
+    "kopia": ["kopia/config", "kopia/cache", "kopia/logs"],
+    "librespeed": ["librespeed/config"],
+    "Monitoring": ["monitoring/prometheus-data", "monitoring/grafana-data"],
+    "Navidrome": ["navidrome/data"],
+    "ntopng": ["ntopng/redis-data", "ntopng/ntopng-data"],
+    "Prowlarr": ["prowlarr/config"],
+    "qBittorrent": ["qbittorrent/config"],
+    "Radarr": ["radarr/config"],
+    "Scrutiny": ["scrutiny/config"],
+    "Sonarr": ["sonarr/config"],
+    "Speedtest Tracker": ["speedtest-tracker/config"],
 }
 
 MEDIA_SUBDIRS = ["filmes", "series", "musicas", "fotos", "downloads", "inbox"]
 
-WRITABLE_DIRS = [d for dirs in SERVICE_DIRS.values() for d in dirs]
 WRITABLE_MODE = 0o770
+
+
+def service_dirs() -> Dict[str, List[Path]]:
+    return {
+        nome: [state.BASE_DIR / sub for sub in subs]
+        for nome, subs in SERVICE_SUBDIRS.items()
+    }
+
+
+def writable_dirs() -> List[Path]:
+    return [d for dirs in service_dirs().values() for d in dirs]
+
 
 DEFAULT_EXPECTED_PORTS = {
     53: "AdGuard Home (DNS)",
@@ -104,27 +72,16 @@ DEFAULT_EXPECTED_PORTS = {
 
 COMPOSE_CANDIDATES = ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"]
 
-REPO_SERVICE_DIRS = [
-    "adguard",
-    "dozzle",
-    "filebrowser",
-    "forgejo",
-    "homepage",
-    "immich-app",
-    "jellyfin",
-    "jellyseerr",
-    "juice-shop",
-    "kopia",
-    "librespeed",
-    "mat2-web",
-    "monitoring",
-    "n8n",
-    "navidrome",
-    "ntopng",
-    "prowlarr",
-    "qbittorrent",
-    "radarr",
-    "scrutiny",
-    "sonarr",
-    "speedtest-tracker",
-]
+NON_SERVICE_DIRS = {
+    "assets",
+    "docs",
+    "installer",
+    "PortWatch",
+    "__pycache__",
+}
+
+PROTECTED_REPO_DIRS = {
+    "homepage/config",
+    "mat2-web/nginx",
+    "monitoring/prometheus.yml",
+}

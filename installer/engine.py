@@ -1,9 +1,12 @@
+import logging
 import shutil
 from typing import List
 
 from . import state
 from .output import print_fail, print_info, print_ok, print_section, print_warn
 from .utils import InstallError, run
+
+logger = logging.getLogger(__name__)
 
 
 def choose_engine() -> str:
@@ -40,6 +43,7 @@ def check_engine_binary() -> None:
     result = run([binary, "--version"])
     if result.returncode != 0:
         raise InstallError(f"{binary} está instalado, mas '{binary} --version' falhou.")
+    logger.info("Engine %s: %s", binary, result.stdout.strip())
     print_ok(f"{binary.capitalize()} installed ({result.stdout.strip()})")
 
 
@@ -90,6 +94,7 @@ def check_optional(check_fn, label: str) -> bool:
         print_fail(str(e))
         resposta = input(f"\nContinuar mesmo assim, pulando a verificação de {label}? [s/N]: ").strip().lower()
         if resposta == "s":
+            logger.warning("Usuario optou por pular a verificacao de %s apos falha: %s", label, e)
             print_warn(f"Continuando sem validar {label} — por sua conta e risco.")
             return True
         return False
