@@ -29,6 +29,7 @@
 16. Imprime um resumo claro de cada etapa, com `[✓]`/`[✗]`/`[!]`, e retorna
     código de saída `0` (sucesso), `1` (erro crítico) ou `130` (cancelado
     pelo usuário com Ctrl+C).
+17. Cria um arquivo json dentro de [`installer/json`](self-hosted-media-server/installer/json),para auditoria do instalador.
 
 ## ❌ O que ele deliberadamente NÃO faz
 
