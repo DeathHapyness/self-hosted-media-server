@@ -13,10 +13,3 @@ services:
     ports:
       - "8989:8989"
     restart: unless-stopped
-
-    labels:
-      - homepage.group=Media
-      - homepage.name=Sonarr
-      - homepage.icon=sonarr.png
-      - homepage.href=IP SONARR
-      - homepage.description=Gerenciador de séries

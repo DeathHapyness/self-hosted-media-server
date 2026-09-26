@@ -16,10 +16,3 @@ networks:
   default:
     name: media_network
     external: true
-
-    labels:
-      - homepage.group=Mídia
-      - homepage.name=Jellyseerr
-      - homepage.icon=jellyseerr.png
-      - homepage.href=IP JELLYSEERR
-      - homepage.description=Requisições de filmes e séries

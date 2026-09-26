@@ -12,9 +12,3 @@ services:
       - "9696:9696"
     restart: unless-stopped
     
-    labels:
-      - homepage.group=Media
-      - homepage.name=Prowlarr
-      - homepage.icon=prowlarr.png
-      - homepage.href=IP PROWLARR
-      - homepage.description=Gerenciador de indexadores

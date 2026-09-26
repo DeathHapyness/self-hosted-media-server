@@ -20,9 +20,3 @@ services:
     ports:
       - "8765:80"
 
-    labels:
-      - homepage.group=Monitoramento
-      - homepage.name=Speedtest Tracker
-      - homepage.icon=speedtest-tracker.png
-      - homepage.href=http://IP_DO_SERVIDOR:8765
-      - homepage.description=Historico de testes de velocidade

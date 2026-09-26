@@ -13,9 +13,3 @@ services:
       - ${DATA_DIR:-/opt/media-server}/filebrowser/config:/config
 
 
-    labels:
-      - homepage.group=Administração
-      - homepage.name=File Browser
-      - homepage.icon=filebrowser.png
-      - homepage.href= IP DO SEU FILEBROWSER AQUI
-      - homepage.description=Gerenciador de arquivos

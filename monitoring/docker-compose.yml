@@ -8,12 +8,6 @@ services:
     ports:
       - "9090:9090"
     restart: unless-stopped
-    labels:
-      - homepage.group=Monitoramento
-      - homepage.name=Prometheus
-      - homepage.icon=prometheus.png
-      - homepage.href=IP PROMETHEUS
-      - homepage.description=Coletor de métricas
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -29,12 +23,6 @@ services:
     ports:
       - "9100:9100"
     restart: unless-stopped
-    labels:
-      - homepage.group=Monitoramento
-      - homepage.name=Node Exporter
-      - homepage.icon=prometheus.png
-      - homepage.href=IP PROMETHEUS
-      - homepage.description=Métricas do host
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
@@ -48,12 +36,6 @@ services:
     ports:
       - "8085:8080"
     restart: unless-stopped
-    labels:
-      - homepage.group=Monitoramento
-      - homepage.name=cAdvisor
-      - homepage.icon=cadvisor.png
-      - homepage.href=IP CADAVISOR
-      - homepage.description=Métricas por container
 
   grafana:
     image: grafana/grafana:latest
@@ -63,12 +45,6 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
-    labels:
-      - homepage.group=Monitoramento
-      - homepage.name=Grafana
-      - homepage.icon=grafana.png
-      - homepage.href= IP DO HOMEPAGE
-      - homepage.description=Dashboards e visualização
 
 networks:
   default:

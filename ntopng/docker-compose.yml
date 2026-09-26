@@ -21,9 +21,3 @@ services:
     volumes:
       - ${DATA_DIR:-/opt/media-server}/ntopng/ntopng-data:/var/lib/ntopng
 
-    labels:
-      - homepage.group=Monitoramento
-      - homepage.name=ntopng
-      - homepage.icon=ntopng.png
-      - homepage.href=http://IP_DO_SERVIDOR:3100
-      - homepage.description=Monitoramento de trafego de rede

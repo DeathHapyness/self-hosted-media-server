@@ -16,9 +16,3 @@ services:
     ports:
       - "7878:7878"
 
-    labels:
-      - homepage.group=Media
-      - homepage.name=Radarr
-      - homepage.icon=radarr.png
-      - homepage.href=http://192.168.15.118:7878
-      - homepage.description=Gerenciador de filmes
