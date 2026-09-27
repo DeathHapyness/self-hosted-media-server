@@ -27,6 +27,8 @@ O acesso à interface web do Kopia é protegido por usuário e senha, definidos 
 cd kopia
 ```
 
+Exemplo em: [`kopia/env-example.env`](kopia/env-example.env)
+
 Crie o arquivo `.env` com o seguinte conteúdo, substituindo pelos valores desejados:
 
 ```env
