@@ -82,6 +82,7 @@ Para entender exatamente o que o instalador faz e o que ele deliberadamente não
 | Kopia        | Backup com deduplicação e criptografia|     `51515` | [docs/kopia.md](docs/kopia.md)                              |
 | Forgejo      | Servidor Git self-hosted              | `3044 / 222` | [docs/forgejo.md](docs/forgejo.md)                          |
 | Glances      | Monitoramento de sistema em tempo real|     `61208` | [docs/glances.md](docs/glances.md)                          |
+| Immich       | Backup e galeria de fotos e vídeos    |      `2283` | [docs/immich.md](docs/immich.md)                            |
 
 > **Nota:** algumas portas acima podem entrar em conflito dependendo da configuração dos containers.
 
@@ -176,6 +177,7 @@ Guia completo de instalação do Docker:
 * [Filebrowser](docs/filebrowser.md)
 * [Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
 * [Forgejo](docs/forgejo.md)
+* [Immich](docs/immich.md)
 
 ### Ferramentas
 
@@ -212,6 +214,7 @@ LibreSpeed    → 8111
 Kopia         → 51515
 Forgejo       → 3044 / 222
 Glances       → 61208
+Immich        → 2283
 ```
 
 devem preferencialmente ser acessados através de:
