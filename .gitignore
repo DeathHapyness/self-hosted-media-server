@@ -1,8 +1,6 @@
-# Python (cache do install.py)
 __pycache__/
 *.pyc
 
-# Ambiente / segredos
 .env
 *.env
 *.key
@@ -16,9 +14,7 @@ data/
 cache/
 work/
 
-# Exceção: homepage/config guarda a configuração do dashboard (não são
-# dados gerados pelo container), então deve ser versionada. O .env
-# continua ignorado pelas regras de segredo acima.
+# execao para o hompepage
 !homepage/config/
 !homepage/config/*.yaml
 !homepage/config/*.css
@@ -49,5 +45,9 @@ tailscale/
 .DS_Store
 Thumbs.db
 
-# Ferramentas externas clonadas manualmente dentro do repo (ex.: PortWatch)
-PortWatch/
+
+immich-app/*
+!immich-app/env-example.env
+
+kopia/*
+!kopia/env-example.env
