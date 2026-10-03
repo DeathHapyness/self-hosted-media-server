@@ -30,10 +30,15 @@ O projeto reúne serviços para gerenciamento, organização, monitoramento e re
 * Gerenciamento de arquivos
 * Monitoramento de discos
 * Dashboard dos serviços
-* Mat2 Web
-* N8n
+* Remoção de metadados de imagens e vídeos
+* Automação de workflows
 * Monitoramento de tráfego de rede
 * Histórico de velocidade da internet
+* Backup e galeria de fotos e vídeos
+* Backup com deduplicação e criptografia
+* Servidor Git
+* Agregador de feeds RSS
+* Laboratório de segurança web
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
 
@@ -56,24 +61,26 @@ Para entender exatamente o que o instalador faz e o que ele deliberadamente não
 
 | Serviço      | Função                                |       Porta | Documentação                                               |
 | ------------ | ------------------------------------- | ----------: | ---------------------------------------------------------- |
-| Jellyfin     | Filmes e séries                       |      `8096` | [docs/jellyfin.md](docs/jellyfin.md)                       |
+| Jellyfin     | Filmes e séries                       |      `8096` | [docs/Jellyfin.md](docs/Jellyfin.md)                       |
 | Navidrome    | Servidor de música                    |      `4533` | [docs/navidrome.md](docs/navidrome.md)                     |
 | qBittorrent  | Gerenciamento de downloads            |      `8080` | [docs/qbittorrent.md](docs/qbittorrent.md)                 |
-| Radarr       | Gerenciamento automático de filmes    |      `7878` | [docs/radarr.md](docs/radarr.md)                           |
+| Radarr       | Gerenciamento automático de filmes    |      `7878` | [docs/raddar.md](docs/raddar.md)                           |
 | Sonarr       | Gerenciamento automático de séries    |      `8989` | [docs/sonarr.md](docs/sonarr.md)                           |
 | Prowlarr     | Gerenciamento de indexadores          |      `9696` | [docs/prowlarr.md](docs/prowlarr.md)                       |
 | Jellyseerr   | Catálogo e solicitações               |      `5055` | [docs/jellyseerr.md](docs/jellyseerr.md)                   |
 | Prometheus   | Coleta e armazenamento de métricas    |      `9090` | [docs/monitoring.md](docs/monitoring.md)                   |
 | Grafana      | Dashboards e visualização de métricas |      `3000` | [docs/monitoring.md](docs/monitoring.md)                   |
-| Scrutiny     | Monitoramento S.M.A.R.T. dos discos   |      `8081` | [docs/scrutiny.md](docs/scrutiny.md)                       |
-| AdGuard Home | DNS e bloqueio de anúncios            | `53 / 3000` | [docs/adguard.md](docs/adguard.md)                         |
-| Dozzle       | Visualização de logs dos containers   |      `9999` | [docs/dozzle.md](docs/dozzle.md)                           |
-| Filebrowser  | Gerenciamento de arquivos             |      `8081` | [docs/filebrowser.md](docs/filebrowser.md)                 |
+| Node Exporter | Métricas do host para o Prometheus   |      `9100` | [docs/monitoring.md](docs/monitoring.md)                   |
+| cAdvisor     | Métricas dos containers               |      `8085` | [docs/monitoring.md](docs/monitoring.md)                   |
+| Scrutiny     | Monitoramento S.M.A.R.T. dos discos   |      `8090` | [docs/scrutiny.md](docs/scrutiny.md)                       |
+| AdGuard Home | DNS e bloqueio de anúncios            | `53 / 8181` | [docs/adguard.md](docs/adguard.md)                         |
+| Dozzle       | Visualização de logs dos containers   |      `9999` | [docs/Dozzle.md](docs/Dozzle.md)                           |
+| Filebrowser  | Gerenciamento de arquivos             |      `8082` | [docs/filebrowser.md](docs/filebrowser.md)                 |
 | Homepage     | Dashboard dos serviços                |      `3001` | [docs/homepage.md](docs/homepage.md)                       |
 | Tailscale    | VPN e acesso remoto privado           |           — | [docs/tailscale.md](docs/tailscale.md)                     |
 | Gluetun      | VPN para o qBittorrent                |           — | [docs/gluetun-qbittorrent.md](docs/gluetun-qbittorrent.md) |
 | spotDL       | Download manual de músicas            |         CLI | [docs/navidrome.md](docs/navidrome.md)                     |
-| Mat2 Web     | Remocao de meta dados de imagens e videos|    `8282` | [docs/mat2-web](docs/mat2-web)                            |
+| Mat2 Web     | Remoção de metadados de imagens e vídeos |  `8282` | [docs/MAT2 Web.md](docs/MAT2%20Web.md)                    |
 | n8n          | Automação de workflows                |      `5678` | [docs/n8n.md](docs/n8n.md)                                  |
 | Juice Shop   | Laboratório de segurança web (OWASP)  |      `3050` | [docs/juice-shop.md](docs/juice-shop.md)                    |
 | ntopng       | Monitoramento de tráfego de rede      |      `3100` | [docs/ntopng.md](docs/ntopng.md)                            |
@@ -83,12 +90,11 @@ Para entender exatamente o que o instalador faz e o que ele deliberadamente não
 | Forgejo      | Servidor Git self-hosted              | `3044 / 222` | [docs/forgejo.md](docs/forgejo.md)                          |
 | Glances      | Monitoramento de sistema em tempo real|     `61208` | [docs/glances.md](docs/glances.md)                          |
 | Immich       | Backup e galeria de fotos e vídeos    |      `2283` | [docs/immich.md](docs/immich.md)                            |
+| FreshRSS     | Agregador de feeds RSS                |      `8083` | [docs/freshrss.md](docs/freshrss.md)                        |
 
-> **Nota:** algumas portas acima podem entrar em conflito dependendo da configuração dos containers.
+> **Nota:** as portas acima são as portas externas definidas nos arquivos `docker-compose.yml` deste repositório. Nenhuma delas se repete entre os serviços.
 
-> O **Grafana** normalmente utiliza `3000`, enquanto o **AdGuard Home** também pode utilizar `3000` para sua interface web.
-
-> O **Scrutiny** e o **Filebrowser** também não devem utilizar a mesma porta externa do host.
+> Vários serviços usam a mesma porta **interna** (por exemplo `3000` ou `8080`), por isso cada um foi mapeado para uma porta externa diferente. Ao adicionar um serviço novo, confira se a porta externa escolhida já não está em uso.
 
 > Caso exista conflito, altere a porta externa no `docker-compose.yml`. A porta interna do container pode permanecer inalterada.
 
@@ -151,8 +157,8 @@ Guia completo de instalação do Docker:
 
 ### Mídia
 
-* [Jellyfin](docs/jellyfin.md)
-* [Radarr](docs/radarr.md)
+* [Jellyfin](docs/Jellyfin.md)
+* [Radarr](docs/raddar.md)
 * [Sonarr](docs/sonarr.md)
 * [Prowlarr](docs/prowlarr.md)
 * [Jellyseerr](docs/jellyseerr.md)
@@ -173,16 +179,17 @@ Guia completo de instalação do Docker:
 * [Homepage](docs/homepage.md)
 * [Homepage — referência da pasta config/](docs/homepage-config.md)
 * [AdGuard Home](docs/adguard.md)
-* [Dozzle](docs/dozzle.md)
+* [Dozzle](docs/Dozzle.md)
 * [Filebrowser](docs/filebrowser.md)
 * [Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
 * [Forgejo](docs/forgejo.md)
 * [Immich](docs/immich.md)
+* [FreshRSS](docs/freshrss.md)
 
 ### Ferramentas
 
-* [mat2-web](docs/mat2-web.md)
-* [N8n](docs/n8n.md)
+* [Mat2 Web](docs/MAT2%20Web.md)
+* [n8n](docs/n8n.md)
 * [Juice Shop](docs/juice-shop.md)
 * [Kopia](docs/kopia.md)
 
@@ -195,26 +202,31 @@ Evite expor diretamente serviços administrativos para a internet.
 Serviços como:
 
 ```text
-qBittorrent   → 8080
-AdGuard Home  → 3000
-Dozzle        → 9999
-Filebrowser   → porta configurada
-Radarr        → 7878
-Sonarr        → 8989
-Prowlarr      → 9696
-Jellyseerr    → 5055
-Prometheus    → 9090
-Grafana       → 3000
-Scrutiny      → porta configurada
-n8n           → 5678
-Juice Shop    → 3050
-ntopng        → 3100
+qBittorrent       → 8080
+AdGuard Home      → 8181
+Dozzle            → 9999
+Filebrowser       → 8082
+Homepage          → 3001
+Radarr            → 7878
+Sonarr            → 8989
+Prowlarr          → 9696
+Jellyseerr        → 5055
+Prometheus        → 9090
+Grafana           → 3000
+Node Exporter     → 9100
+cAdvisor          → 8085
+Scrutiny          → 8090
+Mat2 Web          → 8282
+n8n               → 5678
+Juice Shop        → 3050
+ntopng            → 3100
 Speedtest Tracker → 8765
-LibreSpeed    → 8111
-Kopia         → 51515
-Forgejo       → 3044 / 222
-Glances       → 61208
-Immich        → 2283
+LibreSpeed        → 8111
+Kopia             → 51515
+Forgejo           → 3044 / 222
+Glances           → 61208
+Immich            → 2283
+FreshRSS          → 8083
 ```
 
 devem preferencialmente ser acessados através de:
