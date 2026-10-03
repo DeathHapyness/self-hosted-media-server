@@ -126,3 +126,8 @@ Uma estrutura possível:
 ```
 
 Apenas os arquivos de configuração que não contenham informações sensíveis devem ser versionados no repositório.
+
+## Referências
+
+* [Repositório oficial do Homepage](https://github.com/gethomepage/homepage)
+* [Documentação oficial](https://gethomepage.dev/)

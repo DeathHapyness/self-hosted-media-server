@@ -343,3 +343,9 @@ O Prowlarr utiliza a porta `9696`.
 Host:      9696
 Container: 9696
 ```
+
+## Referências
+
+* [Repositório oficial do Prowlarr](https://github.com/Prowlarr/Prowlarr)
+* [Wiki oficial (Servarr)](https://wiki.servarr.com/prowlarr)
+* [Imagem Docker (LinuxServer.io)](https://docs.linuxserver.io/images/docker-prowlarr/)

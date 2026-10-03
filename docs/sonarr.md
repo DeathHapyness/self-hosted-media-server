@@ -518,3 +518,9 @@ O Sonarr utiliza a porta `8989`.
 Host:      8989
 Container: 8989
 ```
+
+## Referências
+
+* [Repositório oficial do Sonarr](https://github.com/Sonarr/Sonarr)
+* [Wiki oficial (Servarr)](https://wiki.servarr.com/sonarr)
+* [Imagem Docker (LinuxServer.io)](https://docs.linuxserver.io/images/docker-sonarr/)

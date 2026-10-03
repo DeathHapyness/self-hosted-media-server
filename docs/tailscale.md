@@ -119,3 +119,9 @@ Basta instalar o Tailscale em cada dispositivo e entrar na mesma conta.
 * 🖥️ Possibilidade de acessar o servidor via SSH remotamente
 
 > O Tailscale é utilizado neste projeto como camada de acesso remoto à infraestrutura, mantendo os serviços internos sem exposição direta à internet.
+
+## Referências
+
+* [Site oficial do Tailscale](https://tailscale.com/)
+* [Documentação oficial](https://tailscale.com/kb)
+* [Instalação no Linux](https://tailscale.com/kb/1031/install-linux)

@@ -93,3 +93,9 @@ Dozzle
 ```
 
 O Dozzle é especialmente útil para identificar erros, acompanhar inicializações e monitorar o funcionamento dos serviços sem precisar executar `docker logs` manualmente.
+
+## Referências
+
+* [Repositório oficial do Dozzle](https://github.com/amir20/dozzle)
+* [Documentação oficial](https://dozzle.dev/guide/what-is-dozzle)
+* [Imagem Docker oficial](https://hub.docker.com/r/amir20/dozzle)

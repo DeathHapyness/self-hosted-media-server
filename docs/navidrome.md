@@ -184,3 +184,9 @@ ND_SCANSCHEDULE: 1h
         Feishin   iOS    Android
           PC
 ```
+
+## Referências
+
+* [Repositório oficial do Navidrome](https://github.com/navidrome/navidrome)
+* [Documentação oficial](https://www.navidrome.org/docs/)
+* [Repositório oficial do spotDL](https://github.com/spotDL/spotify-downloader)

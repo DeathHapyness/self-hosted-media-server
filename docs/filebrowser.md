@@ -104,3 +104,9 @@ Exemplo:
 ```
 
 O Filebrowser é especialmente útil para visualizar, mover, renomear e fazer upload/download de arquivos direto pelo navegador, sem precisar de acesso SSH ou compartilhamento de rede para tarefas simples.
+
+## Referências
+
+* [Repositório oficial do Filebrowser](https://github.com/filebrowser/filebrowser)
+* [Documentação oficial](https://filebrowser.org/)
+* [Imagem Docker oficial](https://hub.docker.com/r/filebrowser/filebrowser)

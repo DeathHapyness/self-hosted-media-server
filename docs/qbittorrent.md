@@ -62,3 +62,9 @@ Container Jellyfin:
 ```
 
 Isso permite que os arquivos baixados pelo qBittorrent sejam posteriormente encontrados pelo Jellyfin.
+
+## Referências
+
+* [Repositório oficial do qBittorrent](https://github.com/qbittorrent/qBittorrent)
+* [Wiki oficial](https://github.com/qbittorrent/qBittorrent/wiki)
+* [Imagem Docker (LinuxServer.io)](https://docs.linuxserver.io/images/docker-qbittorrent/)

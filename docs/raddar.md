@@ -192,3 +192,9 @@ O Radarr utiliza a porta `7878`.
 Host:      7878
 Container: 7878
 ```
+
+## Referências
+
+* [Repositório oficial do Radarr](https://github.com/Radarr/Radarr)
+* [Wiki oficial (Servarr)](https://wiki.servarr.com/radarr)
+* [Imagem Docker (LinuxServer.io)](https://docs.linuxserver.io/images/docker-radarr/)

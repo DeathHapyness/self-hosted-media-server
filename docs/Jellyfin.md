@@ -53,3 +53,9 @@ Acesse:
 ```text
 http://IP_DO_SERVIDOR:8096
 ```
+
+## Referências
+
+* [Repositório oficial do Jellyfin](https://github.com/jellyfin/jellyfin)
+* [Documentação oficial](https://jellyfin.org/docs/)
+* [Instalação via Docker](https://jellyfin.org/docs/general/installation/container)

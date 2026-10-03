@@ -58,3 +58,9 @@ Depois de configurado, aponte o DNS do seu roteador (ou dos dispositivos individ
 * `conf/AdGuardHome.yaml` — contém o hash da senha do administrador e a lista de clientes/dispositivos da rede
 
 Apenas o `docker-compose.yml` (sem dados sensíveis) é versionado no repositório.
+
+## Referências
+
+* [Repositório oficial do AdGuard Home](https://github.com/AdguardTeam/AdGuardHome)
+* [Documentação oficial (wiki)](https://github.com/AdguardTeam/AdGuardHome/wiki)
+* [Imagem Docker oficial](https://hub.docker.com/r/adguard/adguardhome)

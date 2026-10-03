@@ -197,3 +197,8 @@ volumes:
 ```
 
 Sem esse acesso, o Scrutiny pode iniciar normalmente, mas não conseguir detectar ou coletar informações dos discos.
+
+## Referências
+
+* [Repositório oficial do Scrutiny](https://github.com/AnalogJ/scrutiny)
+* [Troubleshooting do Docker](https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_DOCKER.md)

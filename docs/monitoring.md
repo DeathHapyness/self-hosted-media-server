@@ -446,3 +446,10 @@ prometheus/data/
 ```
 
 Esses diretórios podem conter bancos de dados, dashboards, credenciais, métricas e outras informações persistentes.
+
+## Referências
+
+* [Documentação oficial do Prometheus](https://prometheus.io/docs/)
+* [Repositório oficial do Prometheus](https://github.com/prometheus/prometheus)
+* [Documentação oficial do Grafana](https://grafana.com/docs/grafana/latest/)
+* [Repositório oficial do Grafana](https://github.com/grafana/grafana)

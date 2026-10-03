@@ -199,3 +199,9 @@ docker compose start
 docker compose restart
 docker compose logs -f
 ```
+
+## Referências
+
+* [Repositório oficial do n8n](https://github.com/n8n-io/n8n)
+* [Documentação oficial](https://docs.n8n.io/)
+* [Instalação via Docker](https://docs.n8n.io/hosting/installation/docker/)

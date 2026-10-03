@@ -463,3 +463,8 @@ O Jellyseerr utiliza a porta `5055`.
 Host:      5055
 Container: 5055
 ```
+
+## Referências
+
+* [Repositório oficial do Jellyseerr](https://github.com/Fallenbagel/jellyseerr)
+* [Documentação oficial](https://docs.jellyseerr.dev/)

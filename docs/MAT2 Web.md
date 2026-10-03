@@ -315,3 +315,8 @@ docker compose down
 docker compose build --no-cache
 docker compose up -d
 ```
+
+## Referências
+
+* [Repositório oficial do mat2-web](https://0xacab.org/jvoisin/mat2-web)
+* [Repositório oficial do mat2](https://0xacab.org/jvoisin/mat2)
