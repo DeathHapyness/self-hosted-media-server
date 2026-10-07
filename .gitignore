@@ -6,6 +6,7 @@ __pycache__/
 *.key
 *.pem
 *.token
+.go.mod
 
 # Diretórios de configuração/dados gerados pelos containers
 # (cobre config/, config/logs/, config/database.db etc. de qualquer serviço)
@@ -29,6 +30,7 @@ ntopng/ntopng-data/
 jellyfin/cache/
 jellyfin/media/
 navidrome/music/
+installer/json
 
 # Tailscale
 tailscale/
