@@ -20,8 +20,6 @@ def _c(text: str, color: str) -> str:
     if not USE_COLOR:
         return text
     return f"{color}{text}{Color.RESET}"
-
-
 def print_header(text: str) -> None:
     line = "=" * 40
     print(f"\n{_c(line, Color.CYAN)}")

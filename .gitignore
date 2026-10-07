@@ -8,6 +8,7 @@ __pycache__/
 *.token
 .go.mod
 
+
 # Diretórios de configuração/dados gerados pelos containers
 # (cobre config/, config/logs/, config/database.db etc. de qualquer serviço)
 config/
@@ -53,3 +54,13 @@ immich-app/*
 
 kopia/*
 !kopia/env-example.env
+
+# Editor (GoLand/IntelliJ)
+.idea/
+
+# Binários gerados pelo go build
+self-hosted-media-server
+.self-hosted-media-server
+.*self-hosted-media-server.iml
+*.exe
+/bin/
