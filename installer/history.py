@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from . import state
+from .python import state
 
 HISTORY_FILE = Path(__file__).resolve().parent / "json" / "media-server-history.json"
 MAX_EXECUCOES = 10000  

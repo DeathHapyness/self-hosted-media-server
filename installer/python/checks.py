@@ -1,16 +1,18 @@
+# ja passado para go
+
 import logging
 import os
 import shutil
 import socket
 import sys
-from pathlib import Pathr
+from pathlib import Path
 from typing import Dict
 
-from . import state
-from .compose import extract_ports_from_compose
-from .config import DEFAULT_EXPECTED_PORTS, MIN_DISK_SPACE_DATA_GB, MIN_DISK_SPACE_MEDIA_GB
-from .output import print_fail, print_info, print_ok, print_warn
-from .utils import InstallError
+from installer.python import state
+from installer.compose import extract_ports_from_compose
+from installer.python.config import DEFAULT_EXPECTED_PORTS, MIN_DISK_SPACE_DATA_GB, MIN_DISK_SPACE_MEDIA_GB
+from installer.output import print_fail, print_info, print_ok, print_warn
+from installer.utils import InstallError
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +93,6 @@ def check_disk_space() -> None:
         )
     else:
         print_ok(f"Storage available ({media_free_gb:.1f}GB free on {media_check_path})")
-
 
 def check_ports(compose_files: Dict[str, Path]) -> None:
     expected: Dict[int, str] = {}

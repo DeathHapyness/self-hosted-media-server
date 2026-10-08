@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"net"
 	"os"
 	"runtime"
+	"strings"
 	"syscall"
+	"time"
 )
 
 func CheckOS() error {
@@ -64,5 +67,22 @@ func check_disk_space(caminho string) error {
 		fmt.Print("Pouco espaço livre.\n" +
 			"Recomendamos 30/40GB.")
 	}
+	return nil
+}
+
+func checkPorts(portas map[int]string) error {
+	var ocupadas []string
+
+	for porta, servico := range portas {
+		conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", porta), 500*time.Millisecond)
+		if err == nil {
+			conn.Close()
+			ocupadas = append(ocupadas, fmt.Sprintf("%d (%s)", porta, servico))
+		}
+	}
+	if len(ocupadas) > 0 {
+		return fmt.Errorf("Portas em uso: %s", strings.Join(ocupadas, ","))
+	}
+	fmt.Println("Portas necessarias disponiveis")
 	return nil
 }

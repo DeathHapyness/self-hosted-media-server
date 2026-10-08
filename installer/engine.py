@@ -2,7 +2,7 @@ import logging
 import shutil
 from typing import List
 
-from . import state
+from .python import state
 from .output import print_fail, print_info, print_ok, print_section, print_warn
 from .utils import InstallError, run
 

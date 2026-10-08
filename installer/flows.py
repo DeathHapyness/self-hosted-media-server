@@ -1,8 +1,8 @@
 import logging
 import shutil
 
-from . import state
-from .checks import check_disk_space, check_os, check_ports, resolve_media_mount_interactive
+from .python import state
+from installer.python.checks import check_disk_space, check_os, check_ports, resolve_media_mount_interactive
 from .compose import (
     collect_data_dirs,
     escolher_servicos,

@@ -3,8 +3,8 @@ import logging
 from pathlib import Path
 from typing import List, Tuple
 
-from . import state
-from .checks import check_media_mount
+from .python import state
+from installer.python.checks import check_media_mount
 from .history import registrar
 from .output import Color, _c, print_fail, print_header, print_info, print_ok, print_section, print_warn
 from .utils import confirm_dangerous, press_enter_to_continue, run
