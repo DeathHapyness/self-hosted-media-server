@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Dict, List
 
-from . import state
+from installer.python import state
 
 MIN_DISK_SPACE_DATA_GB = 2
 MIN_DISK_SPACE_MEDIA_GB = 5
