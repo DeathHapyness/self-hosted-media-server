@@ -63,7 +63,7 @@ def resolve_media_mount_interactive() -> bool:
     )
     resposta = input("Continuar mesmo assim? [s/N]: ").strip().lower()
     return resposta == "s"
-
+h
 
 def _primeiro_existente(path: Path) -> Path:
     while not path.exists() and path != path.parent:
