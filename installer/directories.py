@@ -5,8 +5,8 @@ import re
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-from . import state
-from .config import MEDIA_SUBDIRS, WRITABLE_MODE, service_dirs, writable_dirs
+from .python import state
+from installer.python.config import MEDIA_SUBDIRS, WRITABLE_MODE, service_dirs, writable_dirs
 from .history import registrar
 from .output import print_info, print_ok, print_section, print_warn
 

@@ -4,8 +4,8 @@ import re
 from pathlib import Path
 from typing import Dict, List
 
-from . import state
-from .config import COMPOSE_CANDIDATES, NON_SERVICE_DIRS, PROTECTED_REPO_DIRS
+from .python import state
+from installer.python.config import COMPOSE_CANDIDATES, NON_SERVICE_DIRS, PROTECTED_REPO_DIRS
 from .engine import compose_base_cmd
 from .output import print_fail, print_info, print_ok, print_section, print_warn
 from .utils import InstallError, run

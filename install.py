@@ -21,8 +21,8 @@ import argparse
 import logging
 import sys
 
-from installer import state
-from installer.checks import check_privileges
+from installer.python import state
+from installer.python.checks import check_privileges
 from installer.flows import main_menu
 from installer.history import HISTORY_FILE, finalizar_execucao, iniciar_execucao, registrar
 from installer.log import LOG_FILE, setup_logging
