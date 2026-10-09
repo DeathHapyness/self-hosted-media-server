@@ -24,11 +24,22 @@ func main() {
 		fmt.Println("Erro:", err)
 		os.Exit(1)
 	}
-
 	err = installer.CheckPrivileges()
 	if err != nil {
 		fmt.Println("Erro:", err)
 		os.Exit(1)
+	}
+
+	devices, err := installer.ListUnmountedBlockDevices()
+	if err != nil {
+		fmt.Println("Erro:", err)
+		os.Exit(1)
+	}
+	if len(devices) == 0 {
+		fmt.Println("Nenhum disco disponível para montar.")
+	}
+	for _, d := range devices {
+		fmt.Println("/dev/"+d.Name, d.Size)
 	}
 }
 
