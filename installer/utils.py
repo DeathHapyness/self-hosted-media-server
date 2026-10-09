@@ -3,7 +3,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from .output import print_danger, print_info
+from installer.python.output import print_danger, print_info
 
 logger = logging.getLogger(__name__)
 

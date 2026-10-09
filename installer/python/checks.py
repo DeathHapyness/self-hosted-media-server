@@ -11,7 +11,7 @@ from typing import Dict
 from installer.python import state
 from installer.compose import extract_ports_from_compose
 from installer.python.config import DEFAULT_EXPECTED_PORTS, MIN_DISK_SPACE_DATA_GB, MIN_DISK_SPACE_MEDIA_GB
-from installer.output import print_fail, print_info, print_ok, print_warn
+from installer.python.output import print_fail, print_info, print_ok, print_warn
 from installer.utils import InstallError
 
 logger = logging.getLogger(__name__)

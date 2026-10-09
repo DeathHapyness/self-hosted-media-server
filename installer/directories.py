@@ -8,7 +8,7 @@ from typing import Dict, Optional, Tuple
 from .python import state
 from installer.python.config import MEDIA_SUBDIRS, WRITABLE_MODE, service_dirs, writable_dirs
 from .history import registrar
-from .output import print_info, print_ok, print_section, print_warn
+from installer.python.output import print_info, print_ok, print_section, print_warn
 
 logger = logging.getLogger(__name__)
 

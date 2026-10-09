@@ -26,7 +26,7 @@ from installer.python.checks import check_privileges
 from installer.flows import main_menu
 from installer.history import HISTORY_FILE, finalizar_execucao, iniciar_execucao, registrar
 from installer.log import LOG_FILE, setup_logging
-from installer.output import print_fail, print_info, print_warn
+from installer.python.output import print_fail, print_info, print_warn
 from installer.utils import InstallError
 
 logger = logging.getLogger(__name__)

@@ -14,8 +14,8 @@ from .compose import (
 from .directories import configure_permissions, create_directories, load_env_into_state, setup_env
 from .engine import check_compose_plugin, check_engine_binary, check_engine_daemon, check_optional, choose_engine
 from .history import registrar
-from .media import media_mount_menu
-from .output import Color, _c, print_fail, print_header, print_info, print_ok, print_section, print_warn
+from installer.python.media import media_mount_menu
+from installer.python.output import Color, _c, print_fail, print_header, print_info, print_ok, print_section, print_warn
 from .utils import InstallError, confirm_dangerous, press_enter_to_continue, tamanho_legivel
 
 logger = logging.getLogger(__name__)
