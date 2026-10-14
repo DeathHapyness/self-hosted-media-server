@@ -64,3 +64,9 @@ self-hosted-media-server
 .*self-hosted-media-server.iml
 *.exe
 /bin/
+
+# binarios do instalador (publicados em Releases, nao no repositorio)
+dist/
+/instalador
+/instalador-*
+/self-hosted-media-server
