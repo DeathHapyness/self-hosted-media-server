@@ -48,6 +48,7 @@ func readLine(prompt string) string {
 	if err != nil && linha == "" {
 		fmt.Println()
 		slog.Warn("Entrada encerrada; saindo", "erro", err)
+		FinalizarExecucao("cancelada (entrada encerrada)")
 		os.Exit(1)
 	}
 	return strings.TrimSpace(linha)

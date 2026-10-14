@@ -148,13 +148,13 @@ func MountRealDeviceMenu() {
 		devicePath, device.Size, devicePath)
 	if !confirmDangerous(aviso, devicePath) {
 		PrintInfo("Operação cancelada — nada foi alterado.")
-		registrar("formatar_disco", "dispositivo", devicePath, "resultado", "cancelado")
+		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "cancelado")
 		return
 	}
 
 	if DRY_RUN {
 		PrintOk(fmt.Sprintf("[dry-run] formataria %s como ext4 e montaria em %s", devicePath, MEDIA_DIR))
-		registrar("formatar_disco", "dispositivo", devicePath, "resultado", "dry-run")
+		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "dry-run")
 		return
 	}
 
@@ -167,7 +167,7 @@ func MountRealDeviceMenu() {
 	if _, stderr, err := run("mkfs.ext4", "-F", devicePath); err != nil {
 		PrintFail("Falha ao formatar:")
 		PrintInfo(stderr)
-		registrar("formatar_disco", "dispositivo", devicePath, "resultado", "falha ao formatar", "erro", stderr)
+		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "falha ao formatar", "erro", stderr)
 		return
 	}
 	PrintOk("Formatado com sucesso")
@@ -175,11 +175,11 @@ func MountRealDeviceMenu() {
 	if _, stderr, err := run("mount", devicePath, MEDIA_DIR); err != nil {
 		PrintFail("Falha ao montar:")
 		PrintInfo(stderr)
-		registrar("formatar_disco", "dispositivo", devicePath, "resultado", "falha ao montar", "erro", stderr)
+		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "falha ao montar", "erro", stderr)
 		return
 	}
 	PrintOk(fmt.Sprintf("%s montado em %s", devicePath, MEDIA_DIR))
-	registrar("formatar_disco", "dispositivo", devicePath, "resultado", "montado em "+MEDIA_DIR)
+	Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "montado em "+MEDIA_DIR)
 
 	adicionarFstab(fmt.Sprintf("%s %s ext4 defaults 0 2", devicePath, MEDIA_DIR))
 }
@@ -205,13 +205,13 @@ func CreateVirtualDiskMenu() {
 		tamanhoGB, virtualDiskPath, MEDIA_DIR)
 	if !confirmDangerous(aviso, "CONFIRMO") {
 		PrintInfo("Operação cancelada — nada foi alterado.")
-		registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "cancelado")
+		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "cancelado")
 		return
 	}
 
 	if DRY_RUN {
 		PrintOk(fmt.Sprintf("[dry-run] criaria %s (%dGB) e montaria em %s", virtualDiskPath, tamanhoGB, MEDIA_DIR))
-		registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "dry-run")
+		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "dry-run")
 		return
 	}
 
@@ -227,7 +227,7 @@ func CreateVirtualDiskMenu() {
 		if err != nil {
 			PrintFail("Falha ao criar o arquivo de disco virtual:")
 			PrintInfo(stderr)
-			registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao criar arquivo", "erro", stderr)
+			Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao criar arquivo", "erro", stderr)
 			return
 		}
 	}
@@ -236,7 +236,7 @@ func CreateVirtualDiskMenu() {
 	if _, stderr, err := run("mkfs.ext4", "-F", virtualDiskPath); err != nil {
 		PrintFail("Falha ao formatar:")
 		PrintInfo(stderr)
-		registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao formatar", "erro", stderr)
+		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao formatar", "erro", stderr)
 		return
 	}
 	PrintOk("Formatado como ext4")
@@ -244,11 +244,11 @@ func CreateVirtualDiskMenu() {
 	if _, stderr, err := run("mount", "-o", "loop", virtualDiskPath, MEDIA_DIR); err != nil {
 		PrintFail("Falha ao montar:")
 		PrintInfo(stderr)
-		registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao montar", "erro", stderr)
+		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao montar", "erro", stderr)
 		return
 	}
 	PrintOk(fmt.Sprintf("Montado em %s", MEDIA_DIR))
-	registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "montado em "+MEDIA_DIR)
+	Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "montado em "+MEDIA_DIR)
 
 	adicionarFstab(fmt.Sprintf("%s %s ext4 loop 0 0", virtualDiskPath, MEDIA_DIR))
 }
@@ -269,7 +269,7 @@ func adicionarFstab(linha string) {
 	resposta := strings.ToLower(readLine("\nAdicionar entrada em /etc/fstab para sobreviver a um reboot? [s/N]: "))
 	if resposta != "s" {
 		PrintInfo("Pulado — o mount não sobrevive a um reboot até você adicionar manualmente.")
-		registrar("fstab", "linha", linha, "resultado", "pulado")
+		Registrar("fstab", "linha", linha, "resultado", "pulado")
 		return
 	}
 
@@ -285,7 +285,7 @@ func adicionarFstab(linha string) {
 		return
 	}
 	PrintOk("/etc/fstab atualizado")
-	registrar("fstab", "linha", linha, "resultado", "adicionada")
+	Registrar("fstab", "linha", linha, "resultado", "adicionada")
 }
 
 func MediaMountMenu() {

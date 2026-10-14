@@ -2,7 +2,7 @@ package installer
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"strings"
 	"unicode/utf8"
@@ -55,7 +55,7 @@ func PrintOk(text string) {
 
 func PrintFail(text string) {
 	fmt.Printf("%s %s\n", ColorText("[✗]", RED), text)
-	log.Print(text)
+	slog.Error(text)
 }
 
 func PrintWarning(text string) {

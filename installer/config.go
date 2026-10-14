@@ -1,8 +1,12 @@
 package installer
 
 import (
+	"os"
 	"path/filepath"
 )
+
+const MIN_DISK_SPACE_DATA_GB = 2
+const MIN_DISK_SPACE_MEDIA_GB = 5
 
 var SERVICE_SUBDIRS = map[string][]string{
 	"AdGuard Home":      {"adguard/conf", "adguard/work"},
@@ -32,13 +36,13 @@ var MEDIA_SUBDIRS = []string{
 	"inbox",
 }
 
-var WRITABLE_MODE int = 0o770
+var WRITABLE_MODE os.FileMode = 0o770
 
 func ServiceDirs() map[string][]string {
 	resultado := make(map[string][]string)
 	for nome, subs := range SERVICE_SUBDIRS {
 		for _, sub := range subs {
-			resultado[nome] = append(resultado[nome], filepath.Join(DefaultBaseDir, sub))
+			resultado[nome] = append(resultado[nome], filepath.Join(BASE_DIR, sub))
 		}
 	}
 	return resultado
@@ -92,4 +96,12 @@ var PROTECTED_REPO_DIRS = []string{
 	"homepage/config",
 	"mat2-web/nginx",
 	"monitoring/prometheus.yml",
+}
+
+var NON_SERVICE_DIRS = map[string]bool{
+	"assets":      true,
+	"docs":        true,
+	"installer":   true,
+	"PortWatch":   true,
+	"__pycache__": true,
 }

@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -32,11 +33,9 @@ type Historico struct {
 var historico = Historico{Execucoes: []*Execucao{}}
 var atual *Execucao // equivale ao Optional[dict] = None
 
-var HistoryFile = filepath.Join(BASE_DIR, "json", "media-server-history.json")
+var HistoryFile = filepath.Join(repoRoot(), "installer", "json", "media-server-history.json")
 
-func registrar(acao string, detalhes ...any) {
-	slog.Info("historico", append([]any{"acao", acao}, detalhes...)...)
-}
+var historicoMu sync.Mutex
 
 func _agora() string {
 	return time.Now().Format("2006-01-02 15:04:05")
@@ -87,6 +86,8 @@ func salvar() {
 }
 
 func IniciarExecucao() {
+	historicoMu.Lock()
+	defer historicoMu.Unlock()
 	historico = carregar()
 	atual = &Execucao{
 		Inicio:  _agora(),
@@ -103,6 +104,8 @@ func IniciarExecucao() {
 }
 
 func Registrar(acao string, detalhes ...any) {
+	historicoMu.Lock()
+	defer historicoMu.Unlock()
 	if atual == nil {
 		return
 	}
@@ -128,6 +131,8 @@ func Registrar(acao string, detalhes ...any) {
 }
 
 func FinalizarExecucao(status string) {
+	historicoMu.Lock()
+	defer historicoMu.Unlock()
 	if atual == nil {
 		return
 	}
