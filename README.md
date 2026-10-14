@@ -47,7 +47,7 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 ## INSTALADOR
 
 O instalador é um único executável. Baixe a versão mais recente em
-[Releases](https://codeberg.org/DeathHapyness/self-hosted-media-server/releases),
+[Releases](https://github.com/DeathHapyness/self-hosted-media-server/releases),
 coloque na raiz do repositório clonado e rode com `sudo`:
 
 ```bash

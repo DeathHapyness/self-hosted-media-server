@@ -29,15 +29,15 @@ encontra os `docker-compose.yml` de cada serviço.
 **Opção 1: binário pronto (recomendado)**
 
 Baixe o arquivo da sua arquitetura na página de
-[Releases](https://codeberg.org/DeathHapyness/self-hosted-media-server/releases)
+[Releases](https://github.com/DeathHapyness/self-hosted-media-server/releases)
 e coloque na raiz do repositório:
 
 ```bash
-git clone https://codeberg.org/DeathHapyness/self-hosted-media-server.git
+git clone https://github.com/DeathHapyness/self-hosted-media-server.git
 cd self-hosted-media-server
 
-# troque v1.0.0 pela versão mais recente e amd64 por arm64 se for ARM
-wget https://codeberg.org/DeathHapyness/self-hosted-media-server/releases/download/v1.0.0/instalador-linux-amd64
+# baixa sempre a versão mais recente; troque amd64 por arm64 se for ARM
+wget https://github.com/DeathHapyness/self-hosted-media-server/releases/latest/download/instalador-linux-amd64
 chmod +x instalador-linux-amd64
 sudo ./instalador-linux-amd64
 ```
@@ -45,10 +45,10 @@ sudo ./instalador-linux-amd64
 Para saber a arquitetura da máquina, use `uname -m`: `x86_64` usa `amd64`,
 `aarch64` usa `arm64`.
 
-Para conferir se o download não veio corrompido, baixe também o `SHA256SUMS`
-da mesma release e rode:
+Para conferir se o download não veio corrompido:
 
 ```bash
+wget https://github.com/DeathHapyness/self-hosted-media-server/releases/latest/download/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
 ```
 
@@ -57,7 +57,7 @@ sha256sum -c SHA256SUMS --ignore-missing
 Requer Go instalado (veja a versão em `go.mod`):
 
 ```bash
-git clone https://codeberg.org/DeathHapyness/self-hosted-media-server.git
+git clone https://github.com/DeathHapyness/self-hosted-media-server.git
 cd self-hosted-media-server
 go build -o instalador .
 sudo ./instalador
