@@ -5,7 +5,7 @@
   <img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="900" height="350" style="border-radius: 20px;">
 
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Podman](https://img.shields.io/badge/Podman-892CA0?style=for-the-badge&logo=podman&logoColor=white)
 </div>
@@ -45,6 +45,14 @@ O objetivo é construir uma infraestrutura de mídia pessoal utilizando **contai
 ---
 
 ## INSTALADOR
+
+O instalador é um único executável. Baixe a versão mais recente em
+[Releases](https://codeberg.org/DeathHapyness/self-hosted-media-server/releases),
+coloque na raiz do repositório clonado e rode com `sudo`:
+
+```bash
+sudo ./instalador-linux-amd64
+```
 
 Antes de usar, leia:
 
