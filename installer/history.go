@@ -26,24 +26,13 @@ type Execucao struct {
 }
 
 type Historico struct {
-	Execucoes []Execucao `json:"execucoes"`
+	Execucoes []*Execucao `json:"execucoes"`
 }
 
-var historico = Historico{Execucoes: []Execucao{}}
+var historico = Historico{Execucoes: []*Execucao{}}
 var atual *Execucao // equivale ao Optional[dict] = None
 
 var HistoryFile = filepath.Join(BASE_DIR, "json", "media-server-history.json")
-
-func historyPath() string {
-	exe, err := os.Executable()
-	if err != nil {
-		return filepath.Join("json", "media-server-history.json")
-	}
-	if real, err := filepath.EvalSymlinks(exe); err == nil {
-		exe = real
-	}
-	return filepath.Join(filepath.Dir(exe), "json", "media-server-history.json")
-}
 
 func registrar(acao string, detalhes ...any) {
 	slog.Info("historico", append([]any{"acao", acao}, detalhes...)...)
@@ -54,10 +43,10 @@ func _agora() string {
 }
 
 func carregar() Historico {
-	vazio := Historico{Execucoes: []Execucao{}}
+	vazio := Historico{Execucoes: []*Execucao{}}
 	dados, err := os.ReadFile(HistoryFile)
 	if err != nil {
-		return Historico{Execucoes: []Execucao{}}
+		return vazio
 	}
 	var h Historico
 	if err := json.Unmarshal(dados, &h); err == nil && h.Execucoes != nil {
@@ -72,6 +61,78 @@ func carregar() Historico {
 	return vazio
 }
 
-func salvar() string {
-	tmp := HistoryFile.TrimSuffix(".json.tmp")
+func salvar() {
+	tmp := HistoryFile + ".tmp"
+
+	if err := os.MkdirAll(filepath.Dir(HistoryFile), 0o755); err != nil {
+		slog.Error("não foi possível gravar o histórico", "arquivo", HistoryFile, "erro", err)
+		return
+	}
+
+	dados, err := json.MarshalIndent(historico, "", "  ")
+	if err != nil {
+		slog.Error("não foi possível serializar o histórico", "erro", err)
+		return
+	}
+
+	if err := os.WriteFile(tmp, dados, 0o644); err != nil {
+		slog.Error("não foi possível gravar o histórico", "arquivo", HistoryFile, "erro", err)
+		return
+	}
+
+	if err := os.Rename(tmp, HistoryFile); err != nil {
+		slog.Error("não foi possível gravar o histórico", "arquivo", HistoryFile, "erro", err)
+		return
+	}
+}
+
+func IniciarExecucao() {
+	historico = carregar()
+	atual = &Execucao{
+		Inicio:  _agora(),
+		Status:  "em andamento",
+		DryRun:  DRY_RUN,
+		Eventos: []Evento{},
+	}
+	historico.Execucoes = append(historico.Execucoes, atual)
+	if len(historico.Execucoes) > MaxExecucoes {
+		historico.Execucoes = historico.Execucoes[len(historico.Execucoes)-MaxExecucoes:]
+	}
+	salvar()
+	slog.Info("Histórico", "arquivo", HistoryFile)
+}
+
+func Registrar(acao string, detalhes ...any) {
+	if atual == nil {
+		return
+	}
+
+	var mapa map[string]any
+	if len(detalhes) > 0 {
+		mapa = make(map[string]any)
+		for i := 0; i+1 < len(detalhes); i += 2 {
+			chave, ok := detalhes[i].(string)
+			if !ok {
+				continue
+			}
+			mapa[chave] = detalhes[i+1]
+		}
+	}
+
+	atual.Eventos = append(atual.Eventos, Evento{
+		Hora:     _agora(),
+		Acao:     acao,
+		Detalhes: mapa,
+	})
+	salvar()
+}
+
+func FinalizarExecucao(status string) {
+	if atual == nil {
+		return
+	}
+	fim := _agora()
+	atual.Fim = &fim
+	atual.Status = status
+	salvar()
 }
