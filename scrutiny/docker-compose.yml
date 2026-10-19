@@ -25,5 +25,5 @@ services:
       - homepage.group=Administração
       - homepage.name=Scrutiny
       - homepage.icon=scrutiny.png
-      - homepage.href=http://192.168.15.118:8090
+      - homepage.href=http://IP DO SEU SERVER:8090
       - homepage.description=Saúde dos discos
