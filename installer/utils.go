@@ -18,9 +18,6 @@ func run(name string, args ...string) (stdout, stderr string, err error) {
 	return runEnv(nil, name, args...)
 }
 
-// runEnv é o run(cmd, env=...) do Python: env substitui o ambiente inteiro do
-// comando (use append(os.Environ(), "CHAVE=valor") para herdar o atual).
-// env nil herda o ambiente do processo.
 func runEnv(env []string, name string, args ...string) (stdout, stderr string, err error) {
 	comando := name + " " + strings.Join(args, " ")
 	slog.Info("Executando", "comando", comando)
