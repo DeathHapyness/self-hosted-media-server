@@ -1,8 +1,8 @@
 package installer
 
 import (
+	"bufio"
 	"fmt"
-	"log/slog"
 	"os"
 	"strings"
 	"unicode/utf8"
@@ -21,6 +21,8 @@ const (
 
 var UseColor = term.IsTerminal(int(os.Stdout.Fd()))
 
+var stdin = bufio.NewReader(os.Stdin)
+
 // func para posicionar frases no terminal.
 func ncenter(width int, s string) string {
 	n := (width - utf8.RuneCountInString(s)) / 2
@@ -37,7 +39,9 @@ func ColorText(text string, color string) string {
 	return color + text + RESET
 }
 
-func PrintHeader(text string) {
+type Terminal struct{}
+
+func (Terminal) Cabecalho(text string) {
 	line := strings.Repeat("=", 40)
 
 	fmt.Printf("\n%s\n", ColorText(line, CYAN))
@@ -45,27 +49,40 @@ func PrintHeader(text string) {
 	fmt.Printf("%s\n\n", ColorText(line, CYAN))
 }
 
-func PrintSection(text string) {
+func (Terminal) Secao(text string) {
 	fmt.Printf("\n%s\n", ColorText(text, BOLD))
 }
 
-func PrintOk(text string) {
+func (Terminal) Ok(text string) {
 	fmt.Printf("%s %s\n", ColorText("[✓]", GREEN), text)
 }
 
-func PrintFail(text string) {
+func (Terminal) Falha(text string) {
 	fmt.Printf("%s %s\n", ColorText("[✗]", RED), text)
-	slog.Error(text)
 }
 
-func PrintWarning(text string) {
+func (Terminal) Aviso(text string) {
 	fmt.Printf("%s %s\n", ColorText("[!]", YELLOW), text)
 }
 
-func PrintInfo(text string) {
+func (Terminal) Info(text string) {
 	fmt.Printf("    %s\n", text)
 }
 
-func PrintDanger(text string) {
+func (Terminal) Perigo(text string) {
 	fmt.Printf("%s %s\n", ColorText("[PERIGO]", RED+BOLD), text)
+}
+
+func (Terminal) Texto(text string) {
+	fmt.Print(text)
+}
+
+func (Terminal) Perguntar(prompt string) (string, error) {
+	fmt.Print(prompt)
+	linha, err := stdin.ReadString('\n')
+	if err != nil && linha == "" {
+		fmt.Println()
+		return "", err
+	}
+	return strings.TrimSpace(linha), nil
 }

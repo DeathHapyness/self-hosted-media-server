@@ -13,11 +13,11 @@ import (
 const virtualDiskPath = "/var/media-disk.img"
 
 type BlockDevice struct {
-	Name       string // NAME: ex. "sda1"
-	Size       string // SIZE: ex. "500G"
-	Type       string // TYPE: "disk", "part", "loop"...
-	MountPoint string // MOUNTPOINT: vazio se não estiver montado
-	Parent     string // PKNAME: disco pai da partição; vazio se for um disco
+	Name       string
+	Size       string
+	Type       string
+	MountPoint string
+	Parent     string
 }
 
 func (d BlockDevice) Path() string {
@@ -295,7 +295,7 @@ func MediaMountMenu() {
 		if CheckMediaMount(MEDIA_DIR) {
 			status = ColorText("montado", GREEN)
 		}
-		fmt.Printf("Status atual de %s: %s\n\n", MEDIA_DIR, status)
+		PrintText(fmt.Sprintf("Status atual de %s: %s\n\n", MEDIA_DIR, status))
 
 		PrintInfo("1) Já montei manualmente — só verificar")
 		PrintInfo("2) Usar um disco/partição existente (formata e monta — APAGA DADOS do disco escolhido)")

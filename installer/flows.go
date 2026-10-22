@@ -11,7 +11,7 @@ import (
 var opcoesMenu = map[string]string{"1": "instalar", "2": "desinstalar", "3": "disco de mídia", "4": "sair"}
 
 func interromperInstalacao(motivo string) {
-	fmt.Printf("\n%s\n\n", ColorText("Instalação interrompida.", RED+BOLD))
+	PrintText(fmt.Sprintf("\n%s\n\n", ColorText("Instalação interrompida.", RED+BOLD)))
 	slog.Warn("Instalação interrompida", "motivo", motivo)
 	Registrar("instalacao", "resultado", "interrompida", "motivo", motivo)
 }

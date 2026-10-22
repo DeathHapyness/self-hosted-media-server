@@ -1,7 +1,6 @@
 package installer
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io/fs"
@@ -11,8 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 )
-
-var stdin = bufio.NewReader(os.Stdin)
 
 func run(name string, args ...string) (stdout, stderr string, err error) {
 	return runEnv(nil, name, args...)
@@ -37,18 +34,6 @@ func runEnv(env []string, name string, args ...string) (stdout, stderr string, e
 		slog.Debug("stdout", "comando", comando, "saida", s)
 	}
 	return stdout, stderr, err
-}
-
-func readLine(prompt string) string {
-	fmt.Print(prompt)
-	linha, err := stdin.ReadString('\n')
-	if err != nil && linha == "" {
-		fmt.Println()
-		slog.Warn("Entrada encerrada; saindo", "erro", err)
-		FinalizarExecucao("cancelada (entrada encerrada)")
-		os.Exit(1)
-	}
-	return strings.TrimSpace(linha)
 }
 
 func confirmDangerous(explicacao, palavra string) bool {
