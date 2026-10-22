@@ -71,7 +71,17 @@ func run() (codigo int) {
 		}
 	}()
 
-	installer.MainMenu()
+	switch installer.EscolherModo() {
+	case installer.MODO_WEB:
+		// TODO: subir o mini servidor web que conduz a instalação e se
+		// encerra sozinho ao final.
+		installer.PrintWarning("O modo web ainda não está disponível. Use o modo terminal por enquanto.")
+		slog.Warn("Modo web escolhido, mas ainda não implementado")
+		installer.FinalizarExecucao("modo web indisponível")
+		return 1
+	default:
+		installer.MainMenu()
+	}
 
 	slog.Info("Instalador finalizado")
 	installer.FinalizarExecucao("finalizada")

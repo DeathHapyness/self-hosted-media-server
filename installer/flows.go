@@ -202,3 +202,32 @@ func MainMenu() {
 		}
 	}
 }
+
+const (
+	MODO_CLI = "cli"
+	MODO_WEB = "web"
+)
+
+// EscolherModo pergunta se o usuário quer seguir pelo terminal ou pela
+// interface web. Enter sem nada escolhe o terminal.
+func EscolherModo() string {
+	for {
+		PrintHeader("MODO DE INSTALAÇÃO")
+		PrintInfo("1) Terminal (CLI) (padrão)")
+		PrintInfo("2) Navegador (Web)")
+
+		escolha := readLine("\nComo deseja usar o instalador? [1]: ")
+		switch escolha {
+		case "", "1":
+			slog.Info("Modo escolhido", "modo", MODO_CLI)
+			Registrar("modo", "modo", MODO_CLI)
+			return MODO_CLI
+		case "2":
+			slog.Info("Modo escolhido", "modo", MODO_WEB)
+			Registrar("modo", "modo", MODO_WEB)
+			return MODO_WEB
+		default:
+			PrintFail("Opção inválida.")
+		}
+	}
+}
