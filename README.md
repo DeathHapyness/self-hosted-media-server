@@ -62,6 +62,10 @@ Para entender exatamente o que o instalador faz e o que ele deliberadamente não
 
 [`docs/installer-actions.md`](docs/installer-actions.md)
 
+O instalador também pode ser usado pelo navegador (modo web), útil em
+servidores sem monitor. **O modo web não usa HTTPS**: use-o só na rede de casa.
+Detalhes em [`docs/modo-web.md`](docs/modo-web.md).
+
 ---
 
 

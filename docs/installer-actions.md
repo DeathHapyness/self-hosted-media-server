@@ -30,13 +30,22 @@
 16. Imprime um resumo claro de cada etapa, com `[✓]`/`[✗]`/`[!]`, e retorna
     código de saída `0` (sucesso), `1` (erro crítico) ou `130` (cancelado
     pelo usuário com Ctrl+C).
-17. Grava um histórico em JSON dentro de [`installer/json`](../installer/json),
+17. Se a validação ou a subida de um serviço falhar, analisa o erro e, para
+    causas conhecidas (como `.env` do serviço ausente), explica o problema e
+    **pergunta** se pode corrigir. Só corrige com sua confirmação e, depois,
+    tenta de novo. Detalhes em [`readme-instalador.md`](readme-instalador.md).
+18. Opcionalmente, roda em modo web: abre um servidor HTTP local, mostra um
+    link de uso único (expira em 15 minutos) e encerra o servidor ao sair.
+    Detalhes em [`modo-web.md`](modo-web.md).
+19. Grava um histórico em JSON dentro de [`installer/json`](../installer/json),
     para auditoria do instalador, e um log em `/var/log/media-server-installer.log`.
 
 ## O que ele deliberadamente NÃO faz
 
-- **Não cria ou edita o `docker-compose.yml`** — apenas valida o que já
-  existe no repositório.
+- **Não edita o `docker-compose.yml` por conta própria** — no modo terminal,
+  apenas valida o que já existe no repositório. No modo web, o arquivo só é
+  alterado quando você mesmo o edita e clica em Salvar; antes de gravar, o
+  conteúdo é validado e o original é copiado para `docker-compose.yml.bak`.
 - **Não apaga nem sobrescreve** diretórios, configurações ou bancos de
   dados existentes durante a instalação. Só cria o que está faltando.
   A opção de desinstalar só apaga pastas de dados depois de uma confirmação
@@ -55,6 +64,12 @@
   presente e funcionando; se não estiver, informa como resolver.
 - **Não faz downgrade/upgrade de versões de containers** — quem controla
   isso é o `docker-compose.yml` do repositório.
-- **Não continua a execução após um erro crítico** — qualquer falha em uma
-  verificação interrompe o script imediatamente, sem tentar "seguir em
-  frente" ou aplicar workarounds automáticos.
+- **Não aplica correções sem perguntar** — quando reconhece a causa de uma
+  falha do Compose, o instalador explica o problema e oferece uma correção,
+  mas só a aplica se você responder `s`. Se a correção for recusada ou não
+  resolver, a instalação é interrompida.
+- **Não continua a execução após um erro crítico** — qualquer falha que não
+  foi corrigida interrompe o script, sem tentar "seguir em frente".
+- **Não usa HTTPS no modo web** — a interface web é HTTP puro, sem
+  criptografia. Use-a apenas em uma rede confiável e não exponha a porta para
+  a internet. Veja [`modo-web.md`](modo-web.md).
