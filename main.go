@@ -27,6 +27,7 @@ func main() {
 func run() (codigo int) {
 	flag.BoolVar(&installer.DRY_RUN, "dry-run", false,
 		"Simula todas as ações sem executar nada de fato (nenhum arquivo criado, nenhum comando destrutivo rodado).")
+	portaWeb := flag.Int("web-porta", 8787, "Porta da interface web (modo navegador). 0 escolhe uma porta livre.")
 	mostrarVersao := flag.Bool("version", false, "Mostra a versão do instalador e sai.")
 	flag.Parse()
 
@@ -73,12 +74,11 @@ func run() (codigo int) {
 
 	switch installer.EscolherModo() {
 	case installer.MODO_WEB:
-		// TODO: subir o mini servidor web que conduz a instalação e se
-		// encerra sozinho ao final.
-		installer.PrintWarning("O modo web ainda não está disponível. Use o modo terminal por enquanto.")
-		slog.Warn("Modo web escolhido, mas ainda não implementado")
-		installer.FinalizarExecucao("modo web indisponível")
-		return 1
+		if err := installer.ModoWeb(*portaWeb); err != nil {
+			installer.PrintFail(err.Error())
+			installer.FinalizarExecucao("erro")
+			return 1
+		}
 	default:
 		installer.MainMenu()
 	}

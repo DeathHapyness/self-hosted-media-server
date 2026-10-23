@@ -250,6 +250,11 @@ func validateCompose(composeFiles map[string]string) error {
 		}
 	}
 
+	falhas = tentarCorrigir(falhas, composeFiles, func(nome string) (string, error) {
+		_, stderr, err := runCompose("-f", composeFiles[nome], "config")
+		return stderr, err
+	})
+
 	if len(falhas) > 0 {
 		for _, f := range falhas {
 			PrintFail(f.nome + ": configuração inválida")
@@ -280,6 +285,11 @@ func startServices(composeFiles map[string]string) error {
 			PrintOk(nome + " container(s) started")
 		}
 	}
+
+	falhas = tentarCorrigir(falhas, composeFiles, func(nome string) (string, error) {
+		_, stderr, err := runCompose("-f", composeFiles[nome], "-p", nome, "up", "-d")
+		return stderr, err
+	})
 
 	if len(falhas) > 0 {
 		for _, f := range falhas {
