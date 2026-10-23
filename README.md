@@ -12,6 +12,8 @@
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Podman](https://img.shields.io/badge/Podman-892CA0?style=for-the-badge&logo=podman&logoColor=white)
+
+<a href="https://buymeacoffee.com/rique.dev"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee"></a>
 </div>
 
 <div align="center">
@@ -314,6 +316,14 @@ A utilização deste projeto é de **inteira responsabilidade do usuário**.
 
 Ao utilizar este projeto, o usuário reconhece que possui conhecimento suficiente para administrar seu próprio sistema e assume os riscos relacionados às alterações realizadas na máquina.
 
+
+---
+
+## ☕ Apoie o projeto
+
+Este projeto é gratuito e open source. Se ele te ajudou a montar seu servidor ou te poupou algumas horas de configuração, considere me pagar um café. O apoio ajuda a manter o projeto ativo e a dedicar mais tempo a novos serviços e melhorias.
+
+<a href="https://buymeacoffee.com/rique.dev"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" width="200"></a>
 
 ---
 
