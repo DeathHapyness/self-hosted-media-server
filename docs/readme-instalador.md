@@ -72,6 +72,7 @@ e ajusta permissões de pastas usadas pelos containers.
 |---|---|
 | `--dry-run` | Simula tudo sem criar arquivos nem rodar comandos destrutivos |
 | `--version` | Mostra a versão do instalador |
+| `--web-porta N` | Porta da interface web (padrão `8787`; `0` escolhe uma livre) |
 
 Exemplo: `sudo ./instalador-linux-amd64 --dry-run`
 
