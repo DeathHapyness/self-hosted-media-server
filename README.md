@@ -2,7 +2,11 @@
 
 <div align="center">
 
-  <img src="assets/self-hosted-media-server-banner.png" alt="Self-Hosted Media Server" width="900" height="350" style="border-radius: 20px;">
+  <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/banner-verde-agua.png">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-claro.png">
+  <img src="assets/banner-verde-agua.png" alt="Self-Hosted Media Server" width="900">
+</picture>
 
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
