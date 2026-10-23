@@ -8,13 +8,51 @@
 <script src="/estatico/app.js" defer></script>
 </head>
 <body>
-<main><div id="log"></div></main>
-<form id="form">
-  <div id="rotulo">Conectando…</div>
-  <div class="linha">
-    <input id="campo" autocomplete="off" disabled>
-    <button disabled>Enviar</button>
+<header class="topo">
+  <span class="marca">Self-Hosted Media Server</span>
+  <div class="acoes-topo">
+    <button id="abrir-editor" class="link" type="button">editar compose</button>
+    <span id="conexao" class="pilula">Conectando…</span>
   </div>
-</form>
+</header>
+
+<div class="pagina">
+<main>
+  <nav id="etapas" class="etapas" hidden><ol></ol></nav>
+
+  <section id="cartao" class="cartao">
+    <p id="fluxo" class="sobretitulo"></p>
+    <h1 id="titulo">Conectando ao instalador…</h1>
+    <div id="contexto" class="contexto"></div>
+    <form id="controles" class="controles"></form>
+  </section>
+</main>
+
+<aside class="atividade">
+  <h2>Log</h2>
+  <div id="log" class="log" aria-live="polite"></div>
+</aside>
+</div>
+
+<dialog id="editor" class="editor">
+  <form method="dialog" class="editor-topo">
+    <label>
+      <span class="sobretitulo">docker-compose de</span>
+      <select id="editor-servico"></select>
+    </label>
+    <button class="fechar" aria-label="Fechar">✕</button>
+  </form>
+  <div class="codigo">
+    <pre id="editor-destaque" aria-hidden="true"></pre>
+    <textarea id="editor-texto" spellcheck="false" autocomplete="off" wrap="off"></textarea>
+  </div>
+  <p id="editor-status" class="editor-status"></p>
+  <div class="editor-rodape">
+    <button id="editor-desfazer" class="botao secundario" type="button">Desfazer</button>
+    <span class="espaco"></span>
+    <button id="editor-validar" class="botao secundario" type="button">Validar</button>
+    <button id="editor-salvar" class="botao" type="button">Salvar</button>
+  </div>
+</dialog>
 </body>
 </html>

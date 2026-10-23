@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 //go:embed web
@@ -29,6 +30,7 @@ type mensagem struct {
 	ID    int    `json:"id"`
 	Tipo  string `json:"tipo"`
 	Texto string `json:"texto"`
+	Hora  string `json:"hora"`
 }
 
 type Web struct {
@@ -61,6 +63,7 @@ func (w *Web) emitir(tipo, texto string) {
 		ID:    len(w.mensagens),
 		Tipo:  tipo,
 		Texto: codigosANSI.ReplaceAllString(texto, ""),
+		Hora:  time.Now().Format("15:04:05"),
 	})
 	close(w.novidade)
 	w.novidade = make(chan struct{})
@@ -131,6 +134,10 @@ func (w *Web) rotas() http.Handler {
 	mux.Handle("GET /estatico/", w.exigirSessao(http.FileServerFS(estaticos)))
 	mux.HandleFunc("GET /eventos", w.eventos)
 	mux.HandleFunc("POST /responder", w.responder)
+	mux.Handle("GET /api/compose", w.exigirSessao(http.HandlerFunc(w.listarCompose)))
+	mux.Handle("GET /api/compose/{nome}", w.exigirSessao(http.HandlerFunc(w.lerCompose)))
+	mux.Handle("POST /api/compose/{nome}/validar", w.exigirSessao(http.HandlerFunc(w.validarCompose)))
+	mux.Handle("PUT /api/compose/{nome}", w.exigirSessao(http.HandlerFunc(w.salvarCompose)))
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		h := rw.Header()
