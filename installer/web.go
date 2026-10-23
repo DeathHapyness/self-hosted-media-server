@@ -3,10 +3,11 @@ package installer
 import (
 	"crypto/rand"
 	"crypto/subtle"
-	_ "embed"
+	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"regexp"
@@ -15,8 +16,8 @@ import (
 	"sync"
 )
 
-//go:embed web/index.html
-var paginaWeb []byte
+//go:embed web
+var arquivosWeb embed.FS
 
 const cookieSessao = "instalador_sessao"
 
@@ -112,9 +113,22 @@ func (w *Web) autorizado(r *http.Request) bool {
 	return err == nil && iguais(cookie.Value, w.sessao)
 }
 
+func (w *Web) exigirSessao(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		if !w.autorizado(r) {
+			http.Error(rw, "Acesso negado.", http.StatusForbidden)
+			return
+		}
+		h.ServeHTTP(rw, r)
+	})
+}
+
 func (w *Web) rotas() http.Handler {
+	estaticos, _ := fs.Sub(arquivosWeb, "web")
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", w.pagina)
+	mux.Handle("GET /estatico/", w.exigirSessao(http.FileServerFS(estaticos)))
 	mux.HandleFunc("GET /eventos", w.eventos)
 	mux.HandleFunc("POST /responder", w.responder)
 
@@ -125,7 +139,7 @@ func (w *Web) rotas() http.Handler {
 		h.Set("X-Content-Type-Options", "nosniff")
 		h.Set("X-Frame-Options", "DENY")
 		h.Set("Content-Security-Policy",
-			"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'")
+			"default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'")
 		mux.ServeHTTP(rw, r)
 	})
 }
@@ -161,8 +175,7 @@ func (w *Web) pagina(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "Acesso negado. Use o link exibido no terminal.", http.StatusForbidden)
 		return
 	}
-	rw.Header().Set("Content-Type", "text/html; charset=utf-8")
-	rw.Write(paginaWeb)
+	http.ServeFileFS(rw, r, arquivosWeb, "web/index.html")
 }
 
 func escreverEventos(rw http.ResponseWriter, msgs []mensagem) int {
