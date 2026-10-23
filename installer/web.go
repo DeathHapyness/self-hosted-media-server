@@ -1,11 +1,24 @@
 package installer
 
 import (
+	"crypto/rand"
+	"crypto/subtle"
+	_ "embed"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"log/slog"
+	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 )
+
+//go:embed web/index.html
+var paginaWeb []byte
+
+const cookieSessao = "instalador_sessao"
 
 var codigosANSI = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
@@ -22,6 +35,8 @@ type Web struct {
 	mensagens  []mensagem
 	novidade   chan struct{}
 	aguardando bool
+	token      string
+	sessao     string
 
 	respostas chan string
 	encerrada chan struct{}
@@ -31,6 +46,8 @@ type Web struct {
 func novaWeb() *Web {
 	return &Web{
 		novidade:  make(chan struct{}),
+		token:     rand.Text(),
+		sessao:    rand.Text(),
 		respostas: make(chan string, 1),
 		encerrada: make(chan struct{}),
 	}
@@ -85,3 +102,137 @@ func (w *Web) Perguntar(prompt string) (string, error) {
 }
 
 var _ Interface = (*Web)(nil)
+
+func iguais(a, b string) bool {
+	return a != "" && subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
+}
+
+func (w *Web) autorizado(r *http.Request) bool {
+	cookie, err := r.Cookie(cookieSessao)
+	return err == nil && iguais(cookie.Value, w.sessao)
+}
+
+func (w *Web) rotas() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /{$}", w.pagina)
+	mux.HandleFunc("GET /eventos", w.eventos)
+	mux.HandleFunc("POST /responder", w.responder)
+
+	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		h := rw.Header()
+		h.Set("Cache-Control", "no-store")
+		h.Set("Referrer-Policy", "no-referrer")
+		h.Set("X-Content-Type-Options", "nosniff")
+		h.Set("X-Frame-Options", "DENY")
+		h.Set("Content-Security-Policy",
+			"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'")
+		mux.ServeHTTP(rw, r)
+	})
+}
+
+func (w *Web) pagina(rw http.ResponseWriter, r *http.Request) {
+	if token := r.URL.Query().Get("token"); token != "" {
+		w.mu.Lock()
+		valido := iguais(token, w.token)
+		if valido {
+			w.token = ""
+		}
+		w.mu.Unlock()
+
+		if !valido {
+			slog.Warn("Tentativa de acesso web com token inválido ou já usado", "origem", r.RemoteAddr)
+			http.Error(rw, "Link inválido ou já utilizado.", http.StatusForbidden)
+			return
+		}
+		slog.Info("Token web consumido", "origem", r.RemoteAddr)
+		Registrar("modo_web", "acesso", r.RemoteAddr)
+		http.SetCookie(rw, &http.Cookie{
+			Name:     cookieSessao,
+			Value:    w.sessao,
+			Path:     "/",
+			HttpOnly: true,
+			SameSite: http.SameSiteStrictMode,
+		})
+		http.Redirect(rw, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	if !w.autorizado(r) {
+		http.Error(rw, "Acesso negado. Use o link exibido no terminal.", http.StatusForbidden)
+		return
+	}
+	rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+	rw.Write(paginaWeb)
+}
+
+func escreverEventos(rw http.ResponseWriter, msgs []mensagem) int {
+	ultimo := -1
+	for _, m := range msgs {
+		dados, _ := json.Marshal(m)
+		fmt.Fprintf(rw, "id: %d\ndata: %s\n\n", m.ID, dados)
+		ultimo = m.ID
+	}
+	return ultimo
+}
+
+func (w *Web) eventos(rw http.ResponseWriter, r *http.Request) {
+	if !w.autorizado(r) {
+		http.Error(rw, "Acesso negado.", http.StatusForbidden)
+		return
+	}
+	rw.Header().Set("Content-Type", "text/event-stream")
+	controle := http.NewResponseController(rw)
+
+	proximo := 0
+	if ultimo, err := strconv.Atoi(r.Header.Get("Last-Event-ID")); err == nil {
+		proximo = ultimo + 1
+	}
+
+	for {
+		msgs, novidade := w.desde(proximo)
+		if ultimo := escreverEventos(rw, msgs); ultimo >= 0 {
+			proximo = ultimo + 1
+		}
+		if controle.Flush() != nil {
+			return
+		}
+
+		select {
+		case <-novidade:
+		case <-r.Context().Done():
+			return
+		case <-w.encerrada:
+			msgs, _ = w.desde(proximo)
+			escreverEventos(rw, msgs)
+			controle.Flush()
+			return
+		}
+	}
+}
+
+func (w *Web) responder(rw http.ResponseWriter, r *http.Request) {
+	if !w.autorizado(r) {
+		http.Error(rw, "Acesso negado.", http.StatusForbidden)
+		return
+	}
+	var corpo struct {
+		Resposta string `json:"resposta"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(rw, r.Body, 4096)).Decode(&corpo); err != nil {
+		http.Error(rw, "Requisição inválida.", http.StatusBadRequest)
+		return
+	}
+
+	w.mu.Lock()
+	aguardando := w.aguardando
+	w.aguardando = false
+	w.mu.Unlock()
+	if !aguardando {
+		http.Error(rw, "Nenhuma pergunta aguardando resposta.", http.StatusConflict)
+		return
+	}
+
+	w.emitir("resposta", corpo.Resposta)
+	w.respostas <- corpo.Resposta
+	rw.WriteHeader(http.StatusNoContent)
+}
