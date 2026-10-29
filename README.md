@@ -108,6 +108,7 @@ Detalhes em [`docs/modo-web.md`](docs/modo-web.md).
 | Forgejo      | Servidor Git self-hosted              | `3044 / 222` | [docs/forgejo.md](docs/forgejo.md)                          |
 | Glances      | Monitoramento de sistema em tempo real|     `61208` | [docs/glances.md](docs/glances.md)                          |
 | Immich       | Backup e galeria de fotos e vídeos    |      `2283` | [docs/immich.md](docs/immich.md)                            |
+| Links Hub    | Página minimalista com seus sites favoritos |  `5000` | [docs/links-hub.md](docs/links-hub.md)                      |
 | FreshRSS     | Agregador de feeds RSS                |      `8083` | [docs/freshrss.md](docs/freshrss.md)                        |
 
 > **Nota:** as portas acima são as portas externas definidas nos arquivos `docker-compose.yml` deste repositório. Nenhuma delas se repete entre os serviços.
@@ -203,6 +204,7 @@ Guia completo de instalação do Docker:
 * [Forgejo](docs/forgejo.md)
 * [Immich](docs/immich.md)
 * [FreshRSS](docs/freshrss.md)
+* [Links Hub](docs/links-hub.md)
 
 ### Ferramentas
 
@@ -245,6 +247,7 @@ Forgejo           → 3044 / 222
 Glances           → 61208
 Immich            → 2283
 FreshRSS          → 8083
+Links Hub         → 5000
 ```
 
 devem preferencialmente ser acessados através de:
