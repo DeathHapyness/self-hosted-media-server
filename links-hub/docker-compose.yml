@@ -1,0 +1,11 @@
+services:
+  links-hub:
+    image: ghcr.io/deathhapyness/links-hub:latest
+    container_name: links-hub
+    restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
+    volumes:
+      - ${DATA_DIR:-/opt/media-server}/links-hub/data:/app/data
