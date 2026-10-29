@@ -28,7 +28,10 @@ type regraDiagnostico struct {
 var regrasDiagnostico = []regraDiagnostico{
 	{"env_ausente", regexp.MustCompile(`env file (\S+) not found`), diagnosticarEnvAusente},
 	{"variavel_ausente", regexp.MustCompile(`The \\?"(\w+)\\?" variable is not set`), diagnosticarVariavelAusente},
+	{"servico_indefinido", regexp.MustCompile(`service \\?"([\w.-]+)\\?" depends on undefined service \\?"([\w.-]+)\\?"`), diagnosticarServicoIndefinido},
 }
+
+const maxRodadasCorrecao = 3
 
 var exemplosEnv = []string{"env-example.env", ".env.example", "env.example", ".env.sample"}
 
@@ -41,55 +44,73 @@ func Diagnosticar(servico, composePath, saida string) []Diagnostico {
 	var achados []Diagnostico
 	vistos := map[string]bool{}
 	for _, r := range regrasDiagnostico {
-		m := r.padrao.FindStringSubmatch(saida)
-		if m == nil {
-			continue
+		for _, m := range r.padrao.FindAllStringSubmatch(saida, -1) {
+			d := r.diagnosticar(servico, composePath, m)
+			if vistos[d.chave] {
+				continue
+			}
+			vistos[d.chave] = true
+			slog.Info("Diagnóstico encontrado", "servico", servico, "regra", r.nome)
+			achados = append(achados, d)
 		}
-		d := r.diagnosticar(servico, composePath, m)
-		if vistos[d.chave] {
-			continue
-		}
-		vistos[d.chave] = true
-		slog.Info("Diagnóstico encontrado", "servico", servico, "regra", r.nome)
-		achados = append(achados, d)
 	}
 	return achados
 }
 
+// Repete diagnóstico + correção enquanto houver progresso: corrigir uma coisa
+// (ex.: criar o .env) costuma revelar o próximo erro (ex.: variável faltando).
 func tentarCorrigir(falhas []falhaServico, composeFiles map[string]string, repetir func(nome string) (string, error)) []falhaServico {
 	var restantes []falhaServico
 	for _, f := range falhas {
-		corrigiu := false
-		for _, d := range Diagnosticar(f.nome, composeFiles[f.nome], f.erro) {
-			PrintWarning(fmt.Sprintf("%s: %s.", d.Servico, d.Problema))
-			if d.corrigir == nil {
-				continue
+		corrigiuAlgo, resolvido := false, false
+		for rodada := 0; rodada < maxRodadasCorrecao; rodada++ {
+			if !aplicarCorrecoes(f.nome, composeFiles[f.nome], f.erro) {
+				break
 			}
-			if strings.ToLower(readLine(fmt.Sprintf("Posso %s? [s/N]: ", d.Correcao))) != "s" {
-				Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "recusada")
-				continue
+			corrigiuAlgo = true
+			stderr, err := repetir(f.nome)
+			if err == nil {
+				resolvido = true
+				break
 			}
-			if err := d.corrigir(); err != nil {
-				PrintFail(fmt.Sprintf("%s: não foi possível corrigir: %v", d.Servico, err))
-				Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "falhou", "erro", err.Error())
-				continue
-			}
-			Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "aplicada")
-			corrigiu = true
+			f.erro = stderr
 		}
 
-		if !corrigiu {
-			restantes = append(restantes, f)
+		if resolvido {
+			PrintOk(f.nome + " corrigido")
 			continue
 		}
-		stderr, err := repetir(f.nome)
-		if err != nil {
-			restantes = append(restantes, falhaServico{f.nome, stderr})
-			continue
+		if corrigiuAlgo {
+			PrintWarning(fmt.Sprintf("%s: as correções foram aplicadas, mas ainda há um erro que não é do .env (veja abaixo).", f.nome))
 		}
-		PrintOk(f.nome + " corrigido")
+		restantes = append(restantes, f)
 	}
 	return restantes
+}
+
+func aplicarCorrecoes(servico, composePath, saida string) bool {
+	corrigiu := false
+	for _, d := range Diagnosticar(servico, composePath, saida) {
+		PrintWarning(fmt.Sprintf("%s: %s.", d.Servico, d.Problema))
+		if d.corrigir == nil {
+			continue
+		}
+		if strings.ToLower(readLine(fmt.Sprintf("Posso %s? [s/N]: ", d.Correcao))) != "s" {
+			Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "recusada")
+			continue
+		}
+		if err := d.corrigir(); err != nil {
+			PrintFail(fmt.Sprintf("%s: não foi possível corrigir: %v", d.Servico, err))
+			Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "falhou", "erro", err.Error())
+			continue
+		}
+		Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "aplicada")
+		// em dry-run nada foi escrito, então repetir o comando só daria o mesmo erro
+		if !DRY_RUN {
+			corrigiu = true
+		}
+	}
+	return corrigiu
 }
 
 func encontrarExemploEnv(dir string) string {
@@ -129,11 +150,83 @@ func diagnosticarVariavelAusente(servico, composePath string, achado []string) D
 	if !existe(alvo) {
 		return diagnosticarEnvAusente(servico, composePath, []string{"", alvo})
 	}
+	chave := achado[1]
+	exemplo := encontrarExemploEnv(filepath.Dir(composePath))
 	return Diagnostico{
 		Servico:  servico,
-		chave:    "variavel:" + achado[1],
-		Problema: fmt.Sprintf("a variável %s não está definida em %s", achado[1], alvo),
+		chave:    "variavel:" + chave,
+		Problema: fmt.Sprintf("a variável %s não está definida em %s", chave, alvo),
+		Correcao: fmt.Sprintf("adicionar %s ao %s", chave, filepath.Base(alvo)),
+		corrigir: func() error { return adicionarVariavel(alvo, chave, servico, exemplo) },
 	}
+}
+
+func diagnosticarServicoIndefinido(servico, composePath string, achado []string) Diagnostico {
+	return Diagnostico{
+		Servico: servico,
+		chave:   "servico:" + achado[2],
+		Problema: fmt.Sprintf("o serviço %s depende de %s, que não existe em %s — o arquivo parece incompleto, compare com o compose oficial",
+			achado[1], achado[2], composePath),
+	}
+}
+
+// Valor já preenchido no exemplo (não placeholder) para a chave, se houver.
+func valorNoExemplo(exemplo, chave string) (string, bool) {
+	if exemplo == "" {
+		return "", false
+	}
+	dados, err := os.ReadFile(exemplo)
+	if err != nil {
+		return "", false
+	}
+	for _, linha := range strings.Split(string(dados), "\n") {
+		k, v, ok := strings.Cut(linha, "=")
+		if !ok || strings.TrimSpace(k) != chave {
+			continue
+		}
+		v = strings.TrimSpace(v)
+		if v != "" && !rePlaceholder.MatchString(v) {
+			return v, true
+		}
+	}
+	return "", false
+}
+
+func adicionarVariavel(alvo, chave, servico, exemplo string) error {
+	valor, ok := valorNoExemplo(exemplo, chave)
+	gerado := false
+	if !ok {
+		valor, gerado = valorParaChave(chave, servico)
+	}
+
+	if DRY_RUN {
+		PrintInfo(fmt.Sprintf("[dry-run] adicionaria %s ao %s", chave, alvo))
+		return nil
+	}
+
+	atual, err := os.ReadFile(alvo)
+	if err != nil {
+		return err
+	}
+	linha := chave + "=" + valor + "\n"
+	if len(atual) > 0 && !strings.HasSuffix(string(atual), "\n") {
+		linha = "\n" + linha
+	}
+	arq, err := os.OpenFile(alvo, os.O_APPEND|os.O_WRONLY, 0)
+	if err != nil {
+		return err
+	}
+	defer arq.Close()
+	if _, err := arq.WriteString(linha); err != nil {
+		return err
+	}
+	slog.Info("Variável adicionada ao .env", "servico", servico, "arquivo", alvo, "chave", chave, "gerada", gerado)
+
+	PrintOk(fmt.Sprintf("%s adicionada a %s", chave, alvo))
+	if gerado {
+		PrintInfo(fmt.Sprintf("%s gerada automaticamente. Consulte o valor em %s.", chave, alvo))
+	}
+	return nil
 }
 
 func valorParaChave(chave, servico string) (valor string, gerado bool) {
@@ -183,7 +276,16 @@ func criarEnvDeExemplo(exemplo, alvo, servico string) error {
 		return nil
 	}
 
-	if err := os.WriteFile(alvo, []byte(strings.Join(linhas, "\n")), 0o600); err != nil {
+	// O_EXCL: nunca sobrescreve um .env que o usuário já tenha criado nesse meio-tempo
+	arq, err := os.OpenFile(alvo, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return err
+	}
+	_, err = arq.WriteString(strings.Join(linhas, "\n"))
+	if fechar := arq.Close(); err == nil {
+		err = fechar
+	}
+	if err != nil {
 		return err
 	}
 	if owner := detectRealUser(); owner != nil {

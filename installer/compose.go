@@ -246,6 +246,8 @@ func validateCompose(composeFiles map[string]string) error {
 		if err != nil {
 			falhas = append(falhas, falhaServico{nome, stderr})
 		} else {
+			// variável não definida é só aviso no compose, mas sobe o container com valor vazio
+			aplicarCorrecoes(nome, composeFiles[nome], stderr)
 			PrintOk(nome + " compose válido")
 		}
 	}
