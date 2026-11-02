@@ -106,6 +106,10 @@ para a internet. Detalhes, recomendações de segurança e solução de problema
   Compose e, se reconhecer a causa, explica o problema e oferece uma correção
   (veja "Diagnóstico e correção automática" abaixo).
 - Sobe os serviços com `docker compose up -d`.
+- Instala o [Loger](loger.md) (auditoria do servidor) por padrão, direto no
+  host como serviço do systemd. Ele não aparece na lista de serviços: depois
+  dela, o instalador pergunta `Manter o Loger ativado? [S/n]`. Enter mantém;
+  `n` desativa.
 - Grava um log em `/var/log/media-server-installer.log` e um histórico em
   `installer/json/media-server-history.json`.
 - Permite escolher entre Docker e Podman.

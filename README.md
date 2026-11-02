@@ -45,6 +45,7 @@ O projeto reúne serviços para gerenciamento, organização, monitoramento e re
 * Servidor Git
 * Agregador de feeds RSS
 * Laboratório de segurança web
+* Auditoria do servidor (logins, comandos, sudo)
 
 O objetivo é construir uma infraestrutura de mídia pessoal utilizando **containers, volumes persistentes, organização de arquivos, automação, monitoramento, acesso remoto e serviços independentes**.
 
@@ -110,6 +111,7 @@ Detalhes em [`docs/modo-web.md`](docs/modo-web.md).
 | Immich       | Backup e galeria de fotos e vídeos    |      `2283` | [docs/immich.md](docs/immich.md)                            |
 | Links Hub    | Página minimalista com seus sites favoritos |  `5000` | [docs/links-hub.md](docs/links-hub.md)                      |
 | FreshRSS     | Agregador de feeds RSS                |      `8083` | [docs/freshrss.md](docs/freshrss.md)                        |
+| Loger        | Auditoria do servidor (nativo, ativado por padrão) |   — | [docs/loger.md](docs/loger.md)                              |
 
 > **Nota:** as portas acima são as portas externas definidas nos arquivos `docker-compose.yml` deste repositório. Nenhuma delas se repete entre os serviços.
 
@@ -192,6 +194,7 @@ Guia completo de instalação do Docker:
 * [Speedtest Tracker](docs/speedtest-tracker.md)
 * [LibreSpeed](docs/librespeed.md)
 * [Glances](docs/glances.md)
+* [Loger — auditoria do servidor](docs/loger.md)
 
 ### Serviços
 

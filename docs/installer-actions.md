@@ -37,7 +37,11 @@
 18. Opcionalmente, roda em modo web: abre um servidor HTTP local, mostra um
     link de uso único (expira em 15 minutos) e encerra o servidor ao sair.
     Detalhes em [`modo-web.md`](modo-web.md).
-19. Grava um histórico em JSON dentro de [`installer/json`](../installer/json),
+19. Instala por padrão o [Loger](loger.md) (auditoria do servidor) direto no
+    host, como serviço do systemd (não é container). Ele fica fora da lista
+    numerada de serviços e o instalador pergunta `Manter o Loger ativado? [S/n]`;
+    basta responder `n` para não instalá-lo.
+20. Grava um histórico em JSON dentro de [`installer/json`](../installer/json),
     para auditoria do instalador, e um log em `/var/log/media-server-installer.log`.
 
 ## O que ele deliberadamente NÃO faz
@@ -70,6 +74,9 @@
   resolver, a instalação é interrompida.
 - **Não continua a execução após um erro crítico** — qualquer falha que não
   foi corrigida interrompe o script, sem tentar "seguir em frente".
+- **Não apaga os logs do Loger** — ao desinstalar o Loger, o serviço e o
+  binário são removidos, mas os logs em `/var/log/loger` (append-only) ficam.
+  Veja [`loger.md`](loger.md).
 - **Não usa HTTPS no modo web** — a interface web é HTTP puro, sem
   criptografia. Use-a apenas em uma rede confiável e não exponha a porta para
   a internet. Veja [`modo-web.md`](modo-web.md).
