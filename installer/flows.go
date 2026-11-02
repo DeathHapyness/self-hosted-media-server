@@ -55,6 +55,7 @@ func etapasInstalacao() (map[string]string, error) {
 	}
 	composeFiles := escolherServicos(todosCompose)
 	Registrar("servicos_escolhidos", "servicos", nomesOrdenados(composeFiles))
+	ativarLoger := perguntarLoger()
 	if err := checkPorts(composeFiles); err != nil {
 		return nil, err
 	}
@@ -69,6 +70,9 @@ func etapasInstalacao() (map[string]string, error) {
 	}
 	if err := startServices(composeFiles); err != nil {
 		return nil, err
+	}
+	if ativarLoger {
+		instalarLoger()
 	}
 	return composeFiles, nil
 }
@@ -107,6 +111,7 @@ func fluxoDesinstalar() {
 	composeFiles := findComposeFiles()
 	stopServices(composeFiles)
 	Registrar("containers_parados", "servicos", nomesOrdenados(composeFiles))
+	desinstalarLoger()
 
 	PrintInfo(fmt.Sprintf("\n%s NUNCA é tocado por esta opção — seus arquivos de mídia estão seguros.", MEDIA_DIR))
 

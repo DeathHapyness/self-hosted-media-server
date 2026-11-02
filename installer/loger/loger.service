@@ -1,0 +1,17 @@
+[Unit]
+Description=Loger - auditoria do servidor
+After=local-fs.target
+DefaultDependencies=no
+Before=sshd.service ssh.service
+
+[Service]
+ExecStart=/usr/local/bin/loger daemon
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=2
+Nice=-5
+OOMScoreAdjust=-900
+MemoryMax=64M
+
+[Install]
+WantedBy=multi-user.target
