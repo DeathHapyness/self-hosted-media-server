@@ -2,6 +2,8 @@
 
 <div align="center">
 
+🇧🇷 **Português** | [🇺🇸 English](README.en.md)
+
   <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner-verde-agua.png">
   <source media="(prefers-color-scheme: light)" srcset="assets/banner-claro.png">
