@@ -96,6 +96,7 @@ Detalhes em [`docs/modo-web.md`](docs/modo-web.md).
 | Scrutiny     | Monitoramento S.M.A.R.T. dos discos   |      `8090` | [docs/scrutiny.md](docs/scrutiny.md)                       |
 | AdGuard Home | DNS e bloqueio de anúncios            | `53 / 8181` | [docs/adguard.md](docs/adguard.md)                         |
 | Dozzle       | Visualização de logs dos containers   |      `9999` | [docs/Dozzle.md](docs/Dozzle.md)                           |
+| Dockge       | Gerenciamento de stacks Docker Compose|      `5557` | [docs/dockge.md](docs/dockge.md)                           |
 | Filebrowser  | Gerenciamento de arquivos             |      `8082` | [docs/filebrowser.md](docs/filebrowser.md)                 |
 | Homepage     | Dashboard dos serviços                |      `3001` | [docs/homepage.md](docs/homepage.md)                       |
 | Tailscale    | VPN e acesso remoto privado           |           — | [docs/tailscale.md](docs/tailscale.md)                     |
@@ -204,6 +205,7 @@ Guia completo de instalação do Docker:
 * [Homepage — referência da pasta config/](docs/homepage-config.md)
 * [AdGuard Home](docs/adguard.md)
 * [Dozzle](docs/Dozzle.md)
+* [Dockge](docs/dockge.md)
 * [Filebrowser](docs/filebrowser.md)
 * [Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
 * [Forgejo](docs/forgejo.md)
@@ -230,6 +232,7 @@ Serviços como:
 qBittorrent       → 8080
 AdGuard Home      → 8181
 Dozzle            → 9999
+Dockge            → 5557
 Filebrowser       → 8082
 Homepage          → 3001
 Radarr            → 7878

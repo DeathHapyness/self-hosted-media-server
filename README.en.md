@@ -100,6 +100,7 @@ Details in [`docs/modo-web.md`](docs/modo-web.md) (Portuguese).
 | Scrutiny     | Disk S.M.A.R.T. monitoring            |      `8090` | [docs/scrutiny.md](docs/scrutiny.md)                       |
 | AdGuard Home | DNS and ad blocking                   | `53 / 8181` | [docs/adguard.md](docs/adguard.md)                         |
 | Dozzle       | Container log viewer                  |      `9999` | [docs/Dozzle.md](docs/Dozzle.md)                           |
+| Dockge       | Docker Compose stack management       |      `5557` | [docs/dockge.md](docs/dockge.md)                           |
 | Filebrowser  | File management                       |      `8082` | [docs/filebrowser.md](docs/filebrowser.md)                 |
 | Homepage     | Service dashboard                     |      `3001` | [docs/homepage.md](docs/homepage.md)                       |
 | Tailscale    | VPN and private remote access         |           — | [docs/tailscale.md](docs/tailscale.md)                     |
@@ -210,6 +211,7 @@ All documents below are in Portuguese.
 * [Homepage — config/ folder reference](docs/homepage-config.md)
 * [AdGuard Home](docs/adguard.md)
 * [Dozzle](docs/Dozzle.md)
+* [Dockge](docs/dockge.md)
 * [Filebrowser](docs/filebrowser.md)
 * [Gluetun + qBittorrent](docs/gluetun-qbittorrent.md)
 * [Forgejo](docs/forgejo.md)
@@ -236,6 +238,7 @@ Services such as:
 qBittorrent       → 8080
 AdGuard Home      → 8181
 Dozzle            → 9999
+Dockge            → 5557
 Filebrowser       → 8082
 Homepage          → 3001
 Radarr            → 7878
