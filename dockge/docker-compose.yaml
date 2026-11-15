@@ -1,22 +1,25 @@
 services:
   dockge:
     image: louislam/dockge:1
+    container_name: dockge
     restart: unless-stopped
+
     ports:
-      # Host Port : Container Port
-      - 5557:5001
+      # Porta do host : Porta do container
+      - "5557:5001"
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data:/app/data
+      - ${DATA_DIR:-/opt/media-server}/dockge/data:/app/data
 
-      # If you want to use private registries, you need to share the auth file with Dockge:
+      # Para usar registries privados, compartilhe o arquivo de autenticação com o Dockge:
       # - /root/.docker/:/root/.docker
 
-      # Stacks Directory
-      # ⚠️ READ IT CAREFULLY. If you did it wrong, your data could end up writing into a WRONG PATH.
-      # ⚠️ 1. FULL path only. No relative path (MUST)
-      # ⚠️ 2. Left Stacks Path === Right Stacks Path (MUST)
-      - /opt/stacks:/opt/stacks
+      # Pasta das stacks
+      # ⚠️ O caminho precisa ser ABSOLUTO e IGUAL dos dois lados (host === container),
+      # senão o Dockge grava os arquivos no caminho errado.
+      - ${DATA_DIR:-/opt/media-server}/dockge/stacks:${DATA_DIR:-/opt/media-server}/dockge/stacks
+
     environment:
-      # Tell Dockge where is your stacks directory
-      - DOCKGE_STACKS_DIR=/opt/stacks
+      # Diz ao Dockge onde fica a pasta das stacks (mesmo caminho do volume acima)
+      - DOCKGE_STACKS_DIR=${DATA_DIR:-/opt/media-server}/dockge/stacks
