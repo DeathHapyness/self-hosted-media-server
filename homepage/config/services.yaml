@@ -4,7 +4,7 @@
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8096"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8096"
         server: local
-        container: jellyfin  
+        container: jellyfin
         description: Servidor de filmes e séries
 
     - Jellyseerr:
@@ -12,7 +12,7 @@
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5055"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5055"
         server: local
-        container: jellyseerr 
+        container: jellyseerr
         description: Catálogo e pedidos de filmes e séries
 
     - Navidrome:
@@ -20,7 +20,7 @@
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:4533"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:4533"
         server: local
-        container: navidrome 
+        container: navidrome
         description: Servidor de música
 
     - Immich:
@@ -46,7 +46,7 @@
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9696"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9696"
         server: local
-        container: prowlarr  
+        container: prowlarr
         description: Gerenciador de indexadores
 
     - Radarr:
@@ -54,13 +54,13 @@
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:7878"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:7878"
         server: local
-        container: radarr 
+        container: radarr
         description: Gerenciador de filmes
 
     - Sonarr:
         icon: sonarr.png
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8989"
-        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8989" 
+        siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8989"
         server: local
         container: sonarr
         description: Gerenciador de séries
@@ -87,14 +87,14 @@
         icon: dozzle.png
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9999"
         server: local
-        container: dozzle  
+        container: dozzle
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:9999"
         description: Logs dos containers
 
     - File Browser:
         icon: filebrowser.png
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8082"
-        container: filebrowser   
+        container: filebrowser
         server: local
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8082"
         description: Gerenciador de arquivos
@@ -128,7 +128,7 @@
         icon: adguard-home.png
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8181"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8181"
-        server: local 
+        server: local
         container: adguardhome
         description: DNS e bloqueio de anúncios
 
@@ -183,6 +183,13 @@
             - down
             - uptime
             - incident
+
+    - Dockge:
+        icon: dockge.png
+        href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:5557"
+        server: local
+        container: dockge
+        description: Monitoramento de vida e disponibilidade de container
 
 
     - PortWatch:
@@ -247,7 +254,7 @@
         icon: cadvisor.png
         href: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8085"
         siteMonitor: "http://{{HOMEPAGE_VAR_INTERNAL_IP}}:8085"
-        server: local 
+        server: local
         container: cadvisor
         description: Métricas individuais dos containers
 
