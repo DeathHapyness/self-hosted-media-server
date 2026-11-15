@@ -10,6 +10,7 @@ const MIN_DISK_SPACE_MEDIA_GB = 5
 
 var SERVICE_SUBDIRS = map[string][]string{
 	"AdGuard Home":      {"adguard/conf", "adguard/work"},
+	"Dockge":            {"dockge/data", "dockge/stacks"},
 	"File Browser":      {"filebrowser/config", "filebrowser/database"},
 	"Forgejo":           {"forgejo/data"},
 	"Jellyfin":          {"jellyfin/config", "jellyfin/cache"},
@@ -68,6 +69,7 @@ var DEFAULT_EXPECTED_PORTS = map[int]string{
 	4533:  "Navidrome",
 	5000:  "Links Hub",
 	5055:  "Jellyseerr",
+	5557:  "Dockge",
 	5678:  "n8n",
 	7878:  "Radarr",
 	8080:  "qBittorrent",
