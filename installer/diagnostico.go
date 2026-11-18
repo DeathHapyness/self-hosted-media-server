@@ -26,9 +26,9 @@ type regraDiagnostico struct {
 }
 
 var regrasDiagnostico = []regraDiagnostico{
-	{"env_ausente", regexp.MustCompile(`env file (\S+) not found`), diagnosticarEnvAusente},
-	{"variavel_ausente", regexp.MustCompile(`The \\?"(\w+)\\?" variable is not set`), diagnosticarVariavelAusente},
-	{"servico_indefinido", regexp.MustCompile(`service \\?"([\w.-]+)\\?" depends on undefined service \\?"([\w.-]+)\\?"`), diagnosticarServicoIndefinido},
+	{"missing_env_file", regexp.MustCompile(`env file (\S+) not found`), diagnosticarEnvAusente},
+	{"missing_variable", regexp.MustCompile(`The \\?"(\w+)\\?" variable is not set`), diagnosticarVariavelAusente},
+	{"undefined_service", regexp.MustCompile(`service \\?"([\w.-]+)\\?" depends on undefined service \\?"([\w.-]+)\\?"`), diagnosticarServicoIndefinido},
 }
 
 const maxRodadasCorrecao = 3
@@ -50,7 +50,7 @@ func Diagnosticar(servico, composePath, saida string) []Diagnostico {
 				continue
 			}
 			vistos[d.chave] = true
-			slog.Info("Diagnóstico encontrado", "servico", servico, "regra", r.nome)
+			slog.Info("Diagnosis found", "service", servico, "rule", r.nome)
 			achados = append(achados, d)
 		}
 	}
@@ -77,11 +77,12 @@ func tentarCorrigir(falhas []falhaServico, composeFiles map[string]string, repet
 		}
 
 		if resolvido {
-			PrintOk(f.nome + " corrigido")
+			PrintOk(f.nome + Tr(" corrigido", " fixed"))
 			continue
 		}
 		if corrigiuAlgo {
-			PrintWarning(fmt.Sprintf("%s: as correções foram aplicadas, mas ainda há um erro que não é do .env (veja abaixo).", f.nome))
+			PrintWarning(fmt.Sprintf(Tr("%s: as correções foram aplicadas, mas ainda há um erro que não é do .env (veja abaixo).",
+				"%s: the fixes were applied, but there is still an error unrelated to the .env (see below)."), f.nome))
 		}
 		restantes = append(restantes, f)
 	}
@@ -95,16 +96,16 @@ func aplicarCorrecoes(servico, composePath, saida string) bool {
 		if d.corrigir == nil {
 			continue
 		}
-		if strings.ToLower(readLine(fmt.Sprintf("Posso %s? [s/N]: ", d.Correcao))) != "s" {
-			Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "recusada")
+		if !Confirmou(readLine(fmt.Sprintf(Tr("Posso %s? [s/N]: ", "May I %s? [y/N]: "), d.Correcao)), false) {
+			Registrar("fix", "service", d.Servico, "problem", d.chave, "result", "declined")
 			continue
 		}
 		if err := d.corrigir(); err != nil {
-			PrintFail(fmt.Sprintf("%s: não foi possível corrigir: %v", d.Servico, err))
-			Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "falhou", "erro", err.Error())
+			PrintFail(fmt.Sprintf(Tr("%s: não foi possível corrigir: %v", "%s: could not fix: %v"), d.Servico, err))
+			Registrar("fix", "service", d.Servico, "problem", d.chave, "result", "failed", "error", err.Error())
 			continue
 		}
-		Registrar("correcao", "servico", d.Servico, "problema", d.Problema, "resultado", "aplicada")
+		Registrar("fix", "service", d.Servico, "problem", d.chave, "result", "applied")
 		// em dry-run nada foi escrito, então repetir o comando só daria o mesmo erro
 		if !DRY_RUN {
 			corrigiu = true
@@ -125,9 +126,10 @@ func encontrarExemploEnv(dir string) string {
 func diagnosticarEnvAusente(servico, composePath string, achado []string) Diagnostico {
 	alvo := filepath.Clean(achado[1])
 	d := Diagnostico{
-		Servico:  servico,
-		chave:    "env:" + alvo,
-		Problema: fmt.Sprintf("o arquivo %s não existe, mas o docker-compose depende dele (env_file)", alvo),
+		Servico: servico,
+		chave:   "env:" + alvo,
+		Problema: fmt.Sprintf(Tr("o arquivo %s não existe, mas o docker-compose depende dele (env_file)",
+			"the file %s does not exist, but the docker-compose depends on it (env_file)"), alvo),
 	}
 
 	dir := filepath.Dir(composePath)
@@ -139,7 +141,8 @@ func diagnosticarEnvAusente(servico, composePath string, achado []string) Diagno
 		return d
 	}
 
-	d.Correcao = fmt.Sprintf("criar %s a partir de %s, gerando as senhas e perguntando o resto",
+	d.Correcao = fmt.Sprintf(Tr("criar %s a partir de %s, gerando as senhas e perguntando o resto",
+		"create %s from %s, generating the passwords and asking for the rest"),
 		filepath.Base(alvo), filepath.Base(exemplo))
 	d.corrigir = func() error { return criarEnvDeExemplo(exemplo, alvo, servico) }
 	return d
@@ -154,9 +157,9 @@ func diagnosticarVariavelAusente(servico, composePath string, achado []string) D
 	exemplo := encontrarExemploEnv(filepath.Dir(composePath))
 	return Diagnostico{
 		Servico:  servico,
-		chave:    "variavel:" + chave,
-		Problema: fmt.Sprintf("a variável %s não está definida em %s", chave, alvo),
-		Correcao: fmt.Sprintf("adicionar %s ao %s", chave, filepath.Base(alvo)),
+		chave:    "variable:" + chave,
+		Problema: fmt.Sprintf(Tr("a variável %s não está definida em %s", "the variable %s is not set in %s"), chave, alvo),
+		Correcao: fmt.Sprintf(Tr("adicionar %s ao %s", "add %s to %s"), chave, filepath.Base(alvo)),
 		corrigir: func() error { return adicionarVariavel(alvo, chave, servico, exemplo) },
 	}
 }
@@ -164,8 +167,9 @@ func diagnosticarVariavelAusente(servico, composePath string, achado []string) D
 func diagnosticarServicoIndefinido(servico, composePath string, achado []string) Diagnostico {
 	return Diagnostico{
 		Servico: servico,
-		chave:   "servico:" + achado[2],
-		Problema: fmt.Sprintf("o serviço %s depende de %s, que não existe em %s — o arquivo parece incompleto, compare com o compose oficial",
+		chave:   "service:" + achado[2],
+		Problema: fmt.Sprintf(Tr("o serviço %s depende de %s, que não existe em %s — o arquivo parece incompleto, compare com o compose oficial",
+			"the service %s depends on %s, which does not exist in %s — the file looks incomplete, compare it with the official compose"),
 			achado[1], achado[2], composePath),
 	}
 }
@@ -200,7 +204,7 @@ func adicionarVariavel(alvo, chave, servico, exemplo string) error {
 	}
 
 	if DRY_RUN {
-		PrintInfo(fmt.Sprintf("[dry-run] adicionaria %s ao %s", chave, alvo))
+		PrintInfo(fmt.Sprintf(Tr("[dry-run] adicionaria %s ao %s", "[dry-run] would add %s to %s"), chave, alvo))
 		return nil
 	}
 
@@ -220,11 +224,11 @@ func adicionarVariavel(alvo, chave, servico, exemplo string) error {
 	if _, err := arq.WriteString(linha); err != nil {
 		return err
 	}
-	slog.Info("Variável adicionada ao .env", "servico", servico, "arquivo", alvo, "chave", chave, "gerada", gerado)
+	slog.Info("Variable added to .env", "service", servico, "file", alvo, "key", chave, "generated", gerado)
 
-	PrintOk(fmt.Sprintf("%s adicionada a %s", chave, alvo))
+	PrintOk(fmt.Sprintf(Tr("%s adicionada a %s", "%s added to %s"), chave, alvo))
 	if gerado {
-		PrintInfo(fmt.Sprintf("%s gerada automaticamente. Consulte o valor em %s.", chave, alvo))
+		PrintInfo(fmt.Sprintf(Tr("%s gerada automaticamente. Consulte o valor em %s.", "%s generated automatically. See the value in %s."), chave, alvo))
 	}
 	return nil
 }
@@ -240,7 +244,7 @@ func valorParaChave(chave, servico string) (valor string, gerado bool) {
 	}
 
 	padrao, _, _ := strings.Cut(servico, "-")
-	if resposta := readLine(fmt.Sprintf("Valor para %s (%s) [%s]: ", chave, servico, padrao)); resposta != "" {
+	if resposta := readLine(fmt.Sprintf(Tr("Valor para %s (%s) [%s]: ", "Value for %s (%s) [%s]: "), chave, servico, padrao)); resposta != "" {
 		return resposta, false
 	}
 	return padrao, false
@@ -272,7 +276,7 @@ func criarEnvDeExemplo(exemplo, alvo, servico string) error {
 	}
 
 	if DRY_RUN {
-		PrintInfo(fmt.Sprintf("[dry-run] criaria %s a partir de %s", alvo, filepath.Base(exemplo)))
+		PrintInfo(fmt.Sprintf(Tr("[dry-run] criaria %s a partir de %s", "[dry-run] would create %s from %s"), alvo, filepath.Base(exemplo)))
 		return nil
 	}
 
@@ -291,11 +295,11 @@ func criarEnvDeExemplo(exemplo, alvo, servico string) error {
 	if owner := detectRealUser(); owner != nil {
 		os.Chown(alvo, owner.uid, owner.gid)
 	}
-	slog.Info("Arquivo .env criado a partir do exemplo", "servico", servico, "arquivo", alvo, "gerados", gerados)
+	slog.Info(".env file created from the example", "service", servico, "file", alvo, "generated", gerados)
 
-	PrintOk(alvo + " criado")
+	PrintOk(alvo + Tr(" criado", " created"))
 	if len(gerados) > 0 {
-		PrintInfo(fmt.Sprintf("Gerados automaticamente: %s. Consulte os valores em %s.", strings.Join(gerados, ", "), alvo))
+		PrintInfo(fmt.Sprintf(Tr("Gerados automaticamente: %s. Consulte os valores em %s.", "Generated automatically: %s. See the values in %s."), strings.Join(gerados, ", "), alvo))
 	}
 	return nil
 }

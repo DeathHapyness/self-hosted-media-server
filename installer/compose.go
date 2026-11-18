@@ -65,7 +65,7 @@ func findComposeFiles() map[string]string {
 
 	entradas, err := os.ReadDir(root)
 	if err != nil {
-		slog.Error("Nao foi possivel listar o repositorio", "caminho", root, "erro", err)
+		slog.Error("Could not list the repository", "path", root, "error", err)
 		return encontrados
 	}
 	for _, e := range entradas {
@@ -84,7 +84,7 @@ func findComposeFiles() map[string]string {
 			}
 		}
 	}
-	slog.Info("Servicos descobertos", "total", len(encontrados), "servicos", strings.Join(nomesOrdenados(encontrados), ", "))
+	slog.Info("Services discovered", "total", len(encontrados), "services", strings.Join(nomesOrdenados(encontrados), ", "))
 	return encontrados
 }
 
@@ -108,7 +108,7 @@ func extractPortsFromCompose(composePath string) map[int]string {
 				continue
 			}
 			if servicoAtual == "" {
-				portas[porta] = "desconhecido"
+				portas[porta] = "unknown"
 			} else {
 				portas[porta] = servicoAtual
 			}
@@ -196,19 +196,19 @@ func collectDataDirs(composeFiles map[string]string) []string {
 			unicos = append(unicos, alvo)
 		}
 	}
-	slog.Info("Pastas de dados candidatas a remocao", "total", len(unicos), "pastas", strings.Join(unicos, ", "))
+	slog.Info("Data folders eligible for removal", "total", len(unicos), "folders", strings.Join(unicos, ", "))
 	return unicos
 }
 
 func escolherServicos(composeFiles map[string]string) map[string]string {
 	nomes := nomesOrdenados(composeFiles)
-	PrintSection("Quais serviços instalar?")
-	PrintInfo("0) Todos")
+	PrintSection(Tr("Quais serviços instalar?", "Which services to install?"))
+	PrintInfo(Tr("0) Todos", "0) All"))
 	for i, nome := range nomes {
 		PrintInfo(fmt.Sprintf("%d) %s", i+1, nome))
 	}
 
-	escolha := readLine("\nNúmeros separados por vírgula (vazio = todos): ")
+	escolha := readLine(Tr("\nNúmeros separados por vírgula (vazio = todos): ", "\nComma-separated numbers (empty = all): "))
 	if escolha == "" || escolha == "0" {
 		return composeFiles
 	}
@@ -227,7 +227,7 @@ func escolherServicos(composeFiles map[string]string) map[string]string {
 	}
 
 	if len(selecionados) == 0 {
-		PrintWarning("Nenhum serviço válido selecionado — instalando todos.")
+		PrintWarning(Tr("Nenhum serviço válido selecionado — instalando todos.", "No valid service selected — installing all."))
 		return composeFiles
 	}
 	return selecionados
@@ -239,7 +239,7 @@ type falhaServico struct {
 }
 
 func validateCompose(composeFiles map[string]string) error {
-	PrintSection("Validating compose files...")
+	PrintSection(Tr("Validando compose files...", "Validating compose files..."))
 	var falhas []falhaServico
 	for _, nome := range nomesOrdenados(composeFiles) {
 		_, stderr, err := runCompose("-f", composeFiles[nome], "config")
@@ -248,7 +248,7 @@ func validateCompose(composeFiles map[string]string) error {
 		} else {
 			// variável não definida é só aviso no compose, mas sobe o container com valor vazio
 			aplicarCorrecoes(nome, composeFiles[nome], stderr)
-			PrintOk(nome + " compose válido")
+			PrintOk(nome + Tr(" compose válido", " compose valid"))
 		}
 	}
 
@@ -259,21 +259,22 @@ func validateCompose(composeFiles map[string]string) error {
 
 	if len(falhas) > 0 {
 		for _, f := range falhas {
-			PrintFail(f.nome + ": configuração inválida")
+			PrintFail(f.nome + Tr(": configuração inválida", ": invalid configuration"))
 			PrintInfo(f.erro)
 		}
-		return errors.New("Corrija os compose files acima e execute o instalador novamente.")
+		return errors.New(Tr("Corrija os compose files acima e execute o instalador novamente.",
+			"Fix the compose files above and run the installer again."))
 	}
 	return nil
 }
 
 func startServices(composeFiles map[string]string) error {
-	PrintSection("Starting services...")
+	PrintSection(Tr("Iniciando serviços...", "Starting services..."))
 	cmd := strings.Join(composeBaseCmd(), " ")
 
 	if DRY_RUN {
 		for _, nome := range nomesOrdenados(composeFiles) {
-			PrintInfo(fmt.Sprintf("[dry-run] rodaria: %s -f %s -p %s up -d", cmd, composeFiles[nome], nome))
+			PrintInfo(fmt.Sprintf(Tr("[dry-run] rodaria: %s -f %s -p %s up -d", "[dry-run] would run: %s -f %s -p %s up -d"), cmd, composeFiles[nome], nome))
 		}
 		return nil
 	}
@@ -284,7 +285,7 @@ func startServices(composeFiles map[string]string) error {
 		if err != nil {
 			falhas = append(falhas, falhaServico{nome, stderr})
 		} else {
-			PrintOk(nome + " container(s) started")
+			PrintOk(nome + Tr(": container(s) iniciado(s)", " container(s) started"))
 		}
 	}
 
@@ -295,18 +296,19 @@ func startServices(composeFiles map[string]string) error {
 
 	if len(falhas) > 0 {
 		for _, f := range falhas {
-			PrintFail(f.nome + ": falha ao iniciar")
+			PrintFail(f.nome + Tr(": falha ao iniciar", ": failed to start"))
 			PrintInfo(f.erro)
 		}
-		return fmt.Errorf("Verifique os logs acima e '%s logs' de cada serviço para mais detalhes.", cmd)
+		return fmt.Errorf(Tr("Verifique os logs acima e '%s logs' de cada serviço para mais detalhes.",
+			"Check the logs above and '%s logs' for each service for more details."), cmd)
 	}
 	return nil
 }
 
 func stopServices(composeFiles map[string]string) {
-	PrintSection("Parando serviços...")
+	PrintSection(Tr("Parando serviços...", "Stopping services..."))
 	if len(composeFiles) == 0 {
-		PrintWarning("Nenhum compose encontrado — nada para parar.")
+		PrintWarning(Tr("Nenhum compose encontrado — nada para parar.", "No compose file found — nothing to stop."))
 		return
 	}
 
@@ -314,7 +316,7 @@ func stopServices(composeFiles map[string]string) {
 
 	if DRY_RUN {
 		for _, nome := range nomesOrdenados(composeFiles) {
-			PrintInfo(fmt.Sprintf("[dry-run] rodaria: %s -f %s -p %s down", cmd, composeFiles[nome], nome))
+			PrintInfo(fmt.Sprintf(Tr("[dry-run] rodaria: %s -f %s -p %s down", "[dry-run] would run: %s -f %s -p %s down"), cmd, composeFiles[nome], nome))
 		}
 		return
 	}
@@ -324,7 +326,7 @@ func stopServices(composeFiles map[string]string) {
 		if err != nil {
 			PrintWarning(nome + ": " + stderr)
 		} else {
-			PrintOk(nome + " parado")
+			PrintOk(nome + Tr(" parado", " stopped"))
 		}
 	}
 }

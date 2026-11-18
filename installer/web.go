@@ -1,6 +1,7 @@
 package installer
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/subtle"
 	"embed"
@@ -24,7 +25,7 @@ const cookieSessao = "instalador_sessao"
 
 var codigosANSI = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
-var errWebEncerrada = errors.New("interface web encerrada")
+var errWebEncerrada = errors.New("web interface closed")
 
 type mensagem struct {
 	ID    int    `json:"id"`
@@ -119,7 +120,7 @@ func (w *Web) autorizado(r *http.Request) bool {
 func (w *Web) exigirSessao(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		if !w.autorizado(r) {
-			http.Error(rw, "Acesso negado.", http.StatusForbidden)
+			http.Error(rw, Tr("Acesso negado.", "Access denied."), http.StatusForbidden)
 			return
 		}
 		h.ServeHTTP(rw, r)
@@ -161,12 +162,12 @@ func (w *Web) pagina(rw http.ResponseWriter, r *http.Request) {
 		w.mu.Unlock()
 
 		if !valido {
-			slog.Warn("Tentativa de acesso web com token inválido ou já usado", "origem", r.RemoteAddr)
-			http.Error(rw, "Link inválido ou já utilizado.", http.StatusForbidden)
+			slog.Warn("Web access attempt with an invalid or already used token", "origin", r.RemoteAddr)
+			http.Error(rw, Tr("Link inválido ou já utilizado.", "Invalid or already used link."), http.StatusForbidden)
 			return
 		}
-		slog.Info("Token web consumido", "origem", r.RemoteAddr)
-		Registrar("modo_web", "acesso", r.RemoteAddr)
+		slog.Info("Web token consumed", "origin", r.RemoteAddr)
+		Registrar("web_mode", "access", r.RemoteAddr)
 		http.SetCookie(rw, &http.Cookie{
 			Name:     cookieSessao,
 			Value:    w.sessao,
@@ -179,10 +180,19 @@ func (w *Web) pagina(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	if !w.autorizado(r) {
-		http.Error(rw, "Acesso negado. Use o link exibido no terminal.", http.StatusForbidden)
+		http.Error(rw, Tr("Acesso negado. Use o link exibido no terminal.", "Access denied. Use the link shown in the terminal."), http.StatusForbidden)
 		return
 	}
-	http.ServeFileFS(rw, r, arquivosWeb, "web/index.html")
+	pagina, err := arquivosWeb.ReadFile("web/index.html")
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if IDIOMA == IDIOMA_EN {
+		pagina = bytes.Replace(pagina, []byte(`lang="pt-BR"`), []byte(`lang="en"`), 1)
+	}
+	rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+	rw.Write(pagina)
 }
 
 func escreverEventos(rw http.ResponseWriter, msgs []mensagem) int {
@@ -197,7 +207,7 @@ func escreverEventos(rw http.ResponseWriter, msgs []mensagem) int {
 
 func (w *Web) eventos(rw http.ResponseWriter, r *http.Request) {
 	if !w.autorizado(r) {
-		http.Error(rw, "Acesso negado.", http.StatusForbidden)
+		http.Error(rw, Tr("Acesso negado.", "Access denied."), http.StatusForbidden)
 		return
 	}
 	rw.Header().Set("Content-Type", "text/event-stream")
@@ -232,14 +242,14 @@ func (w *Web) eventos(rw http.ResponseWriter, r *http.Request) {
 
 func (w *Web) responder(rw http.ResponseWriter, r *http.Request) {
 	if !w.autorizado(r) {
-		http.Error(rw, "Acesso negado.", http.StatusForbidden)
+		http.Error(rw, Tr("Acesso negado.", "Access denied."), http.StatusForbidden)
 		return
 	}
 	var corpo struct {
 		Resposta string `json:"resposta"`
 	}
 	if err := json.NewDecoder(http.MaxBytesReader(rw, r.Body, 4096)).Decode(&corpo); err != nil {
-		http.Error(rw, "Requisição inválida.", http.StatusBadRequest)
+		http.Error(rw, Tr("Requisição inválida.", "Invalid request."), http.StatusBadRequest)
 		return
 	}
 
@@ -248,7 +258,7 @@ func (w *Web) responder(rw http.ResponseWriter, r *http.Request) {
 	w.aguardando = false
 	w.mu.Unlock()
 	if !aguardando {
-		http.Error(rw, "Nenhuma pergunta aguardando resposta.", http.StatusConflict)
+		http.Error(rw, Tr("Nenhuma pergunta aguardando resposta.", "No question is waiting for an answer."), http.StatusConflict)
 		return
 	}
 

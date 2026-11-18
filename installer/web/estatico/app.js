@@ -7,33 +7,189 @@ function el(tag, classe, texto) {
   return e;
 }
 
-const FLUXOS = {
-  instalar: {
-    nome: "Instalação",
-    etapas: ["Verificar", "Configurar", "Serviços", "Preparar", "Subir"],
-    regras: [
-      [/^INSTALAÇÃO$/, 0],
-      [/Onde este servidor|\.env already present/, 1],
-      [/Quais serviços instalar/, 2],
-      [/Required ports|Creating directories|Validating compose/, 3],
-      [/Starting services/, 4],
-    ],
-    fim: /^INSTALLATION COMPLETE$/,
+
+const TEXTOS = {
+  pt: {
+    titulo_pagina: "Instalador Self-Hosted",
+    editar_compose: "editar compose",
+    conectando: "Conectando…",
+    conectando_instalador: "Conectando ao instalador…",
+    compose_de: "docker-compose de",
+    fechar: "Fechar",
+    desfazer: "Desfazer",
+    validar: "Validar",
+    salvar: "Salvar",
+    instalador: "Instalador",
+    etapa: (n, total) => `etapa ${n} de ${total}`,
+    concluida: "concluída",
+    interrompida: "interrompida",
+    executando: "Executando…",
+    falha_envio: "Falha ao enviar. Tente novamente.",
+    editar: "editar",
+    todos: "Todos",
+    nenhum: "Nenhum",
+    continuar: "Continuar →",
+    marque_um: "Marque pelo menos um serviço.",
+    padrao: "padrão",
+    cancelar: "Cancelar",
+    sim: "Sim",
+    nao: "Não",
+    resposta_sim: "s",
+    resposta_nao: "n",
+    confirmar: "Confirmar",
+    digite_palavra: (p) => `Digite exatamente "${p}" para confirmar. Qualquer outra coisa cancela.`,
+    vazio_padrao: (p) => `Deixe vazio para usar ${p}.`,
+    voltar_menu: "Voltar ao menu",
+    sessao_encerrada: "Sessão encerrada",
+    tudo_pronto: "Tudo pronto",
+    servidor_encerrado: "Servidor encerrado",
+    conectado: "Conectado",
+    reconectando: "Reconectando…",
+    carregando: "Carregando…",
+    descartar: "Descartar as alterações não salvas?",
+    validando_salvando: "Validando e salvando…",
+    validando: "Validando…",
+    desfeitas: "Alterações desfeitas.",
+    fechar_sem_salvar: "Fechar sem salvar?",
+    fluxos: {
+      instalar: {
+        nome: "Instalação",
+        etapas: ["Verificar", "Configurar", "Serviços", "Preparar", "Subir"],
+        regras: [
+          [/^INSTALAÇÃO$/, 0],
+          [/Onde este servidor|\.env já presente/, 1],
+          [/Quais serviços instalar/, 2],
+          [/Portas necessárias|Criando diretórios|Validando compose/, 3],
+          [/Iniciando serviços/, 4],
+        ],
+        fim: /^INSTALAÇÃO CONCLUÍDA$/,
+      },
+      desinstalar: {
+        nome: "Desinstalação",
+        etapas: ["Parar", "Revisar", "Limpar"],
+        regras: [
+          [/^DESINSTALAÇÃO$/, 0],
+          [/Pastas de dados encontradas/, 1],
+          [/ removido$|\[dry-run\] removeria/, 2],
+        ],
+        fim: null,
+      },
+    },
+    inicio_fluxo: { "INSTALAÇÃO": "instalar", "DESINSTALAÇÃO": "desinstalar" },
+    telas: { "INSTALADOR DO MEDIA SERVER": "Menu principal", "GESTÃO DO DISCO DE MÍDIA": "Disco de mídia" },
+    re: {
+      interrompida: /Instalação interrompida/,
+      digite_exatamente: /Digite exatamente "([^"]+)"/,
+      marca_padrao: /\s*\(padrão\)/,
+      separados_virgula: /separados por vírgula/i,
+      vazio_cancelar: /vazio para cancelar/i,
+      sim_nao: /\[s\/n\]/i,
+      maiuscula_sim: "S",
+      pressione_enter: /Pressione Enter/i,
+      padrao_entre_parenteses: /\(padrão ([^)]+)\)/,
+    },
   },
-  desinstalar: {
-    nome: "Desinstalação",
-    etapas: ["Parar", "Revisar", "Limpar"],
-    regras: [
-      [/^DESINSTALAÇÃO$/, 0],
-      [/Pastas de dados encontradas/, 1],
-      [/ removido$|\[dry-run\] removeria/, 2],
-    ],
-    fim: null,
+  en: {
+    titulo_pagina: "Self-Hosted Installer",
+    editar_compose: "edit compose",
+    conectando: "Connecting…",
+    conectando_instalador: "Connecting to the installer…",
+    compose_de: "docker-compose of",
+    fechar: "Close",
+    desfazer: "Undo",
+    validar: "Validate",
+    salvar: "Save",
+    instalador: "Installer",
+    etapa: (n, total) => `step ${n} of ${total}`,
+    concluida: "completed",
+    interrompida: "aborted",
+    executando: "Running…",
+    falha_envio: "Failed to send. Please try again.",
+    editar: "edit",
+    todos: "All",
+    nenhum: "None",
+    continuar: "Continue →",
+    marque_um: "Select at least one service.",
+    padrao: "default",
+    cancelar: "Cancel",
+    sim: "Yes",
+    nao: "No",
+    resposta_sim: "y",
+    resposta_nao: "n",
+    confirmar: "Confirm",
+    digite_palavra: (p) => `Type exactly "${p}" to confirm. Anything else cancels.`,
+    vazio_padrao: (p) => `Leave empty to use ${p}.`,
+    voltar_menu: "Back to menu",
+    sessao_encerrada: "Session closed",
+    tudo_pronto: "All done",
+    servidor_encerrado: "Server stopped",
+    conectado: "Connected",
+    reconectando: "Reconnecting…",
+    carregando: "Loading…",
+    descartar: "Discard unsaved changes?",
+    validando_salvando: "Validating and saving…",
+    validando: "Validating…",
+    desfeitas: "Changes undone.",
+    fechar_sem_salvar: "Close without saving?",
+    fluxos: {
+      instalar: {
+        nome: "Installation",
+        etapas: ["Check", "Configure", "Services", "Prepare", "Start"],
+        regras: [
+          [/^INSTALLATION$/, 0],
+          [/Where will this server|\.env already present/, 1],
+          [/Which services to install/, 2],
+          [/Required ports|Creating directories|Validating compose/, 3],
+          [/Starting services/, 4],
+        ],
+        fim: /^INSTALLATION COMPLETE$/,
+      },
+      desinstalar: {
+        nome: "Uninstallation",
+        etapas: ["Stop", "Review", "Clean up"],
+        regras: [
+          [/^UNINSTALLATION$/, 0],
+          [/Data folders found/, 1],
+          [/ removed$|\[dry-run\] would remove/, 2],
+        ],
+        fim: null,
+      },
+    },
+    inicio_fluxo: { "INSTALLATION": "instalar", "UNINSTALLATION": "desinstalar" },
+    telas: { "MEDIA SERVER INSTALLER": "Main menu", "MEDIA DISK MANAGEMENT": "Media disk" },
+    re: {
+      interrompida: /Installation aborted/,
+      digite_exatamente: /Type exactly "([^"]+)"/,
+      marca_padrao: /\s*\(default\)/,
+      separados_virgula: /comma-separated/i,
+      vazio_cancelar: /empty to cancel/i,
+      sim_nao: /\[y\/n\]/i,
+      maiuscula_sim: "Y",
+      pressione_enter: /Press Enter/i,
+      padrao_entre_parenteses: /\(default ([^)]+)\)/,
+    },
   },
 };
 
-const INICIO_FLUXO = { "INSTALAÇÃO": "instalar", "DESINSTALAÇÃO": "desinstalar" };
-const TELAS = { "MEDIA SERVER INSTALLER": "Menu principal", "GESTÃO DO DISCO DE MÍDIA": "Disco de mídia" };
+let T, FLUXOS, INICIO_FLUXO, TELAS;
+
+function aplicarIdioma(idioma) {
+  const codigo = idioma === "en" ? "en" : "pt";
+  T = TEXTOS[codigo];
+  FLUXOS = T.fluxos;
+  INICIO_FLUXO = T.inicio_fluxo;
+  TELAS = T.telas;
+  document.documentElement.lang = codigo === "en" ? "en" : "pt-BR";
+  document.title = T.titulo_pagina;
+  for (const e of document.querySelectorAll("[data-t]")) {
+    if (e.id === "conexao" && e.classList.contains("online")) e.textContent = T.conectado;
+    else if (e.id === "conexao" && e.classList.contains("offline")) e.textContent = T.reconectando;
+    else e.textContent = T[e.dataset.t];
+  }
+  for (const e of document.querySelectorAll("[data-t-aria]")) e.setAttribute("aria-label", T[e.dataset.tAria]);
+}
+
+aplicarIdioma(document.documentElement.lang.startsWith("en") ? "en" : "pt");
 
 const estado = {
   fluxo: null,
@@ -105,7 +261,7 @@ function avancarEtapa(texto) {
     if (regra.test(texto)) estado.etapa = Math.max(estado.etapa, indice);
   }
   if (fluxo.fim && fluxo.fim.test(texto)) estado.concluido = true;
-  if (/Instalação interrompida/.test(texto)) estado.erro = true;
+  if (T.re.interrompida.test(texto)) estado.erro = true;
 }
 
 function desenharEtapas() {
@@ -130,11 +286,11 @@ function desenharEtapas() {
 function desenharCabecalho() {
   const fluxo = FLUXOS[estado.fluxo];
   sobretitulo.textContent = fluxo
-    ? `${fluxo.nome} · etapa ${Math.min(estado.etapa + 1, fluxo.etapas.length)} de ${fluxo.etapas.length}`
+    ? `${fluxo.nome} · ${T.etapa(Math.min(estado.etapa + 1, fluxo.etapas.length), fluxo.etapas.length)}`
     : "";
-  if (fluxo && estado.concluido) sobretitulo.textContent = `${fluxo.nome} · concluída`;
-  if (fluxo && estado.erro) sobretitulo.textContent = `${fluxo.nome} · interrompida`;
-  titulo.textContent = estado.titulo || "Instalador";
+  if (fluxo && estado.concluido) sobretitulo.textContent = `${fluxo.nome} · ${T.concluida}`;
+  if (fluxo && estado.erro) sobretitulo.textContent = `${fluxo.nome} · ${T.interrompida}`;
+  titulo.textContent = estado.titulo || T.instalador;
 }
 
 function desenharContexto(linhas) {
@@ -143,7 +299,7 @@ function desenharContexto(linhas) {
 
 function mostrarExecutando(texto) {
   const linha = el("div", "executando");
-  linha.append(el("span", "girando"), el("span", null, texto || "Executando…"));
+  linha.append(el("span", "girando"), el("span", null, texto || T.executando));
   controles.replaceChildren(linha);
 }
 
@@ -158,7 +314,7 @@ async function enviar(resposta) {
     if (!r.ok && r.status !== 409) throw new Error(r.status);
   } catch {
     for (const c of controles.querySelectorAll("button, input")) c.disabled = false;
-    controles.appendChild(el("p", "dica", "Falha ao enviar. Tente novamente."));
+    controles.appendChild(el("p", "dica", T.falha_envio));
   }
 }
 
@@ -181,7 +337,7 @@ function desenharServicos(opcoes) {
     caixa.value = op.valor;
     caixas.push(caixa);
     rotulo.append(caixa, el("span", null, op.rotulo));
-    const editar = el("button", "link", "editar");
+    const editar = el("button", "link", T.editar);
     editar.type = "button";
     editar.addEventListener("click", () => abrirEditor(op.rotulo));
     linha.append(rotulo, editar);
@@ -192,13 +348,13 @@ function desenharServicos(opcoes) {
   const marcar = (v) => caixas.forEach((c) => (c.checked = v));
   const barra = el("div", "barra");
   barra.append(
-    botao("Todos", "secundario", () => marcar(true)),
-    botao("Nenhum", "secundario", () => marcar(false)),
+    botao(T.todos, "secundario", () => marcar(true)),
+    botao(T.nenhum, "secundario", () => marcar(false)),
     el("span", "espaco"),
-    botao("Continuar →", null, () => {
+    botao(T.continuar, null, () => {
       const marcados = caixas.filter((c) => c.checked).map((c) => c.value);
       if (!marcados.length) {
-        dica.textContent = "Marque pelo menos um serviço.";
+        dica.textContent = T.marque_um;
         return;
       }
       enviar(marcados.length === caixas.length ? "" : marcados.join(","));
@@ -213,19 +369,19 @@ function desenharOpcoes(opcoes, padrao, cancelavel) {
     const b = el("button", op.valor === padrao ? "opcao padrao" : "opcao");
     b.type = "button";
     const texto = el("span", null, op.rotulo);
-    if (op.valor === padrao) texto.prepend(el("span", "etiqueta", "padrão"));
+    if (op.valor === padrao) texto.prepend(el("span", "etiqueta", T.padrao));
     b.append(el("span", "num", op.valor), texto);
     b.addEventListener("click", () => enviar(op.valor));
     grade.appendChild(b);
   }
   controles.replaceChildren(grade);
-  if (cancelavel) controles.appendChild(el("div", "barra")).appendChild(botao("Cancelar", "secundario", () => enviar("")));
+  if (cancelavel) controles.appendChild(el("div", "barra")).appendChild(botao(T.cancelar, "secundario", () => enviar("")));
 }
 
 function desenharSimNao(pergunta, padrao) {
   const barra = el("div", "barra");
-  const sim = botao("Sim", padrao === "s" ? null : "secundario", () => enviar("s"));
-  const nao = botao("Não", padrao === "n" ? null : "secundario", () => enviar("n"));
+  const sim = botao(T.sim, padrao === "s" ? null : "secundario", () => enviar(T.resposta_sim));
+  const nao = botao(T.nao, padrao === "n" ? null : "secundario", () => enviar(T.resposta_nao));
   barra.append(sim, nao);
   controles.replaceChildren(el("p", null, pergunta), barra);
 }
@@ -243,12 +399,12 @@ function desenharTexto(pergunta, padrao, palavra) {
   });
 
   const barra = el("div", "barra");
-  barra.append(campo, botao(palavra ? "Confirmar" : "Continuar →", palavra ? "perigo" : null, enviarCampo));
+  barra.append(campo, botao(palavra ? T.confirmar : T.continuar, palavra ? "perigo" : null, enviarCampo));
   campo.style.flex = "1";
 
   let dica = "";
-  if (palavra) dica = `Digite exatamente "${palavra}" para confirmar. Qualquer outra coisa cancela.`;
-  else if (padrao) dica = `Deixe vazio para usar ${padrao}.`;
+  if (palavra) dica = T.digite_palavra(palavra);
+  else if (padrao) dica = T.vazio_padrao(padrao);
 
   const filhos = [];
   if (pergunta) filhos.push(el("p", null, pergunta));
@@ -266,7 +422,7 @@ function desenharPergunta(prompt) {
   for (const m of estado.bloco) {
     const texto = limpar(m.texto);
     const op = m.tipo === "info" && texto.match(/^(\d+)\)\s+(.+)$/);
-    const confirmar = texto.match(/Digite exatamente "([^"]+)"/);
+    const confirmar = texto.match(T.re.digite_exatamente);
     if (op) {
       opcoes.push({ valor: op[1], rotulo: op[2] });
     } else if (confirmar) {
@@ -286,28 +442,32 @@ function desenharPergunta(prompt) {
 
   let padrao = null;
   for (const op of opcoes) {
-    if (/\(padrão\)/.test(op.rotulo)) {
-      op.rotulo = op.rotulo.replace(/\s*\(padrão\)/, "");
+    if (T.re.marca_padrao.test(op.rotulo)) {
+      op.rotulo = op.rotulo.replace(T.re.marca_padrao, "");
       padrao = op.valor;
     }
   }
   if (entreColchetes && opcoes.some((o) => o.valor === entreColchetes[1])) padrao = entreColchetes[1];
 
-  if (/separados por vírgula/i.test(bruto) && opcoes.length) {
+  if (T.re.separados_virgula.test(bruto) && opcoes.length) {
     desenharServicos(opcoes.filter((o) => o.valor !== "0"));
   } else if (opcoes.length) {
-    desenharOpcoes(opcoes, padrao, /vazio para cancelar/i.test(bruto));
-  } else if (/\[s\/n\]/i.test(bruto)) {
-    desenharSimNao(pergunta, entreColchetes[1].includes("S") ? "s" : "n");
-  } else if (/Pressione Enter/i.test(bruto)) {
-    controles.replaceChildren(botao("Voltar ao menu", null, () => enviar("")));
+    desenharOpcoes(opcoes, padrao, T.re.vazio_cancelar.test(bruto));
+  } else if (T.re.sim_nao.test(bruto)) {
+    desenharSimNao(pergunta, entreColchetes[1].includes(T.re.maiuscula_sim) ? "s" : "n");
+  } else if (T.re.pressione_enter.test(bruto)) {
+    controles.replaceChildren(botao(T.voltar_menu, null, () => enviar("")));
   } else {
-    const padraoTexto = (entreColchetes && entreColchetes[1]) || (bruto.match(/\(padrão ([^)]+)\)/) || [])[1];
+    const padraoTexto = (entreColchetes && entreColchetes[1]) || (bruto.match(T.re.padrao_entre_parenteses) || [])[1];
     desenharTexto(pergunta, padraoTexto, palavra);
   }
 }
 
 function processar(m) {
+  if (m.tipo === "idioma") {
+    aplicarIdioma(m.texto);
+    return;
+  }
   adicionarLog(m);
   const texto = limpar(m.texto).trim();
 
@@ -331,7 +491,7 @@ function processar(m) {
       avancarEtapa(texto);
       break;
     case "pergunta":
-      if (estado.fluxo && !estado.erro && /Pressione Enter/i.test(texto)) estado.concluido = true;
+      if (estado.fluxo && !estado.erro && T.re.pressione_enter.test(texto)) estado.concluido = true;
       desenharEtapas();
       desenharPergunta(m.texto);
       return;
@@ -343,11 +503,11 @@ function processar(m) {
     case "fim":
       estado.terminou = true;
       fonte.close();
-      sobretitulo.textContent = "Sessão encerrada";
-      titulo.textContent = "Tudo pronto";
+      sobretitulo.textContent = T.sessao_encerrada;
+      titulo.textContent = T.tudo_pronto;
       contexto.replaceChildren(el("p", null, texto));
       controles.replaceChildren();
-      conexao.textContent = "Servidor encerrado";
+      conexao.textContent = T.servidor_encerrado;
       conexao.className = "pilula";
       $("abrir-editor").hidden = true;
       return;
@@ -365,12 +525,12 @@ function processar(m) {
 
 const fonte = new EventSource("/eventos");
 fonte.onopen = () => {
-  conexao.textContent = "Conectado";
+  conexao.textContent = T.conectado;
   conexao.className = "pilula online";
 };
 fonte.onerror = () => {
   if (estado.terminou) return;
-  conexao.textContent = "Reconectando…";
+  conexao.textContent = T.reconectando;
   conexao.className = "pilula offline";
 };
 fonte.onmessage = (e) => processar(JSON.parse(e.data));
@@ -456,7 +616,7 @@ async function carregarServicos() {
 }
 
 async function carregarCompose(nome) {
-  statusEditor("Carregando…");
+  statusEditor(T.carregando);
   const r = await fetch(`/api/compose/${encodeURIComponent(nome)}`);
   if (!r.ok) {
     statusEditor(await r.text(), "falha");
@@ -475,14 +635,14 @@ async function abrirEditor(nome) {
   if (!editor.dialogo.open) editor.dialogo.showModal();
   const alvo = nome || editor.atual || editor.servico.value;
   if (alvo !== editor.atual) {
-    if (alterado() && !confirm("Descartar as alterações não salvas?")) return;
+    if (alterado() && !confirm(T.descartar)) return;
     await carregarCompose(alvo);
   }
   editor.texto.focus();
 }
 
 async function enviarCompose(metodo, url) {
-  statusEditor(metodo === "PUT" ? "Validando e salvando…" : "Validando…");
+  statusEditor(metodo === "PUT" ? T.validando_salvando : T.validando);
   const r = await fetch(url, { method: metodo, body: editor.texto.value });
   if (!r.ok) {
     statusEditor(await r.text(), "falha");
@@ -495,7 +655,7 @@ async function enviarCompose(metodo, url) {
 
 editor.servico.addEventListener("change", () => {
   const nome = editor.servico.value;
-  if (alterado() && !confirm("Descartar as alterações não salvas?")) {
+  if (alterado() && !confirm(T.descartar)) {
     editor.servico.value = editor.atual;
     return;
   }
@@ -514,7 +674,7 @@ $("editor-salvar").addEventListener("click", salvarCompose);
 $("editor-desfazer").addEventListener("click", () => {
   editor.texto.value = editor.original;
   destacar();
-  statusEditor("Alterações desfeitas.");
+  statusEditor(T.desfeitas);
 });
 
 editor.texto.addEventListener("keydown", (e) => {
@@ -529,10 +689,10 @@ editor.texto.addEventListener("keydown", (e) => {
 });
 
 editor.dialogo.addEventListener("cancel", (e) => {
-  if (alterado() && !confirm("Fechar sem salvar?")) e.preventDefault();
+  if (alterado() && !confirm(T.fechar_sem_salvar)) e.preventDefault();
 });
 editor.dialogo.querySelector(".fechar").addEventListener("click", (e) => {
-  if (alterado() && !confirm("Fechar sem salvar?")) e.preventDefault();
+  if (alterado() && !confirm(T.fechar_sem_salvar)) e.preventDefault();
 });
 
 $("abrir-editor").addEventListener("click", () => abrirEditor());

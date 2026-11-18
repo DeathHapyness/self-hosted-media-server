@@ -70,7 +70,7 @@ func (Terminal) Info(text string) {
 }
 
 func (Terminal) Perigo(text string) {
-	fmt.Printf("%s %s\n", ColorText("[PERIGO]", RED+BOLD), text)
+	fmt.Printf("%s %s\n", ColorText(Tr("[PERIGO]", "[DANGER]"), RED+BOLD), text)
 }
 
 func (Terminal) Texto(text string) {

@@ -18,7 +18,7 @@ type dono struct {
 
 func (d *dono) LogValue() slog.Value {
 	if d == nil {
-		return slog.StringValue("nenhum")
+		return slog.StringValue("none")
 	}
 	return slog.StringValue(fmt.Sprintf("%d:%d", d.uid, d.gid))
 }
@@ -82,7 +82,7 @@ func perguntarCaminho(rotulo, padrao string) string {
 		if filepath.IsAbs(caminho) {
 			return caminho
 		}
-		PrintWarning("Use um caminho absoluto, começando com /.")
+		PrintWarning(Tr("Use um caminho absoluto, começando com /.", "Use an absolute path, starting with /."))
 	}
 }
 
@@ -112,30 +112,31 @@ func setupEnv() error {
 
 	if _, err := os.Stat(env); err == nil {
 		LoadEnvIntoState()
-		slog.Info("Caminhos lidos do .env", "dados", BASE_DIR, "midia", MEDIA_DIR)
-		Registrar("caminhos", "origem", ".env", "dados", BASE_DIR, "midia", MEDIA_DIR)
-		PrintOk(".env already present")
-		PrintInfo("dados/configs: " + BASE_DIR)
-		PrintInfo("biblioteca de mídia: " + MEDIA_DIR)
+		slog.Info("Paths read from .env", "data", BASE_DIR, "media", MEDIA_DIR)
+		Registrar("paths", "source", ".env", "data", BASE_DIR, "media", MEDIA_DIR)
+		PrintOk(Tr(".env já presente", ".env already present"))
+		PrintInfo(Tr("dados/configs: ", "data/configs: ") + BASE_DIR)
+		PrintInfo(Tr("biblioteca de mídia: ", "media library: ") + MEDIA_DIR)
 		return nil
 	}
 
-	PrintSection("Onde este servidor vai guardar os arquivos?")
-	PrintInfo("Os padrões servem para a maioria dos casos — Enter aceita cada um.")
-	base := perguntarCaminho("Dados e configs dos serviços", DefaultBaseDir)
-	media := perguntarCaminho("Biblioteca de mídia", DefaultMediaDir)
+	PrintSection(Tr("Onde este servidor vai guardar os arquivos?", "Where will this server store its files?"))
+	PrintInfo(Tr("Os padrões servem para a maioria dos casos — Enter aceita cada um.",
+		"The defaults suit most setups — Enter accepts each one."))
+	base := perguntarCaminho(Tr("Dados e configs dos serviços", "Service data and configs"), DefaultBaseDir)
+	media := perguntarCaminho(Tr("Biblioteca de mídia", "Media library"), DefaultMediaDir)
 	BASE_DIR = base
 	MEDIA_DIR = media
-	slog.Info("Caminhos escolhidos pelo usuario", "dados", base, "midia", media)
-	Registrar("caminhos", "origem", "usuario", "dados", base, "midia", media)
+	slog.Info("Paths chosen by the user", "data", base, "media", media)
+	Registrar("paths", "source", "user", "data", base, "media", media)
 
 	owner := detectRealUser()
-	slog.Info("PUID/PGID detectados", "owner", owner)
+	slog.Info("PUID/PGID detected", "owner", owner)
 
 	if DRY_RUN {
-		PrintInfo(fmt.Sprintf("[dry-run] criaria .env com DATA_DIR=%s e MEDIA_DIR=%s", base, media))
+		PrintInfo(fmt.Sprintf(Tr("[dry-run] criaria .env com DATA_DIR=%s e MEDIA_DIR=%s", "[dry-run] would create .env with DATA_DIR=%s and MEDIA_DIR=%s"), base, media))
 		if owner != nil {
-			PrintInfo(fmt.Sprintf("[dry-run] gravaria PUID=%d PGID=%d", owner.uid, owner.gid))
+			PrintInfo(fmt.Sprintf(Tr("[dry-run] gravaria PUID=%d PGID=%d", "[dry-run] would write PUID=%d PGID=%d"), owner.uid, owner.gid))
 		}
 		return nil
 	}
@@ -167,17 +168,20 @@ func setupEnv() error {
 	}
 
 	if err := os.WriteFile(env, []byte(conteudo), 0o644); err != nil {
-		return fmt.Errorf("Não foi possível criar %s: %v", env, err)
+		return fmt.Errorf(Tr("Não foi possível criar %s: %v", "Could not create %s: %v"), env, err)
 	}
-	slog.Info("Arquivo .env criado", "caminho", env)
-	PrintOk(fmt.Sprintf(".env created (DATA_DIR=%s, MEDIA_DIR=%s)", base, media))
+	slog.Info(".env file created", "path", env)
+	PrintOk(fmt.Sprintf(Tr(".env criado (DATA_DIR=%s, MEDIA_DIR=%s)", ".env created (DATA_DIR=%s, MEDIA_DIR=%s)"), base, media))
 	if owner != nil {
-		PrintOk(fmt.Sprintf("PUID=%d PGID=%d detectados a partir de SUDO_USER", owner.uid, owner.gid))
+		PrintOk(fmt.Sprintf(Tr("PUID=%d PGID=%d detectados a partir de SUDO_USER", "PUID=%d PGID=%d detected from SUDO_USER"), owner.uid, owner.gid))
 	} else {
-		PrintWarning("SUDO_USER não definido — PUID/PGID ficaram com os valores do exemplo. " +
-			"Confira com 'id -u' e 'id -g' antes de subir os serviços.")
+		PrintWarning(Tr("SUDO_USER não definido — PUID/PGID ficaram com os valores do exemplo. "+
+			"Confira com 'id -u' e 'id -g' antes de subir os serviços.",
+			"SUDO_USER not set — PUID/PGID kept the example values. "+
+				"Check them with 'id -u' and 'id -g' before starting the services."))
 	}
-	PrintWarning("Revise o .env criado e preencha os valores necessários antes de subir os serviços.")
+	PrintWarning(Tr("Revise o .env criado e preencha os valores necessários antes de subir os serviços.",
+		"Review the created .env and fill in the required values before starting the services."))
 	return nil
 }
 
@@ -187,7 +191,7 @@ func existe(caminho string) bool {
 }
 
 func createDirectories() error {
-	PrintSection("Creating directories...")
+	PrintSection(Tr("Criando diretórios...", "Creating directories..."))
 	dirs := ServiceDirs()
 	nomes := make([]string, 0, len(dirs))
 	for nome := range dirs {
@@ -204,21 +208,21 @@ func createDirectories() error {
 			if DRY_RUN {
 				if !existia {
 					criouAlgum = true
-					PrintInfo("[dry-run] criaria " + d)
+					PrintInfo(Tr("[dry-run] criaria ", "[dry-run] would create ") + d)
 				}
 				continue
 			}
 			if err := os.MkdirAll(d, 0o755); err != nil {
-				return fmt.Errorf("Não foi possível criar %s: %v", d, err)
+				return fmt.Errorf(Tr("Não foi possível criar %s: %v", "Could not create %s: %v"), d, err)
 			}
 			if !existia {
 				criouAlgum = true
 			}
 		}
 		if criouAlgum {
-			PrintOk(nome + " directories")
+			PrintOk(fmt.Sprintf(Tr("Diretórios do %s", "%s directories"), nome))
 		} else {
-			PrintOk(nome + " directories (already existed)")
+			PrintOk(fmt.Sprintf(Tr("Diretórios do %s (já existiam)", "%s directories (already existed)"), nome))
 		}
 	}
 
@@ -227,29 +231,29 @@ func createDirectories() error {
 		existia := existe(caminho)
 		if DRY_RUN {
 			if !existia {
-				PrintInfo("[dry-run] criaria " + caminho)
+				PrintInfo(Tr("[dry-run] criaria ", "[dry-run] would create ") + caminho)
 			}
 			continue
 		}
 		if err := os.MkdirAll(caminho, 0o755); err != nil {
-			return fmt.Errorf("Não foi possível criar %s: %v", caminho, err)
+			return fmt.Errorf(Tr("Não foi possível criar %s: %v", "Could not create %s: %v"), caminho, err)
 		}
 		if !existia {
-			PrintOk(caminho + " created")
+			PrintOk(caminho + Tr(" criado", " created"))
 		}
 	}
 	return nil
 }
 
 func configurePermissions() {
-	PrintSection("Configuring permissions...")
+	PrintSection(Tr("Configurando permissões...", "Configuring permissions..."))
 	owner := resolvePuidPgid()
 	alvos := writable_dirs()
-	slog.Info("Ajustando permissoes", "total", len(alvos), "base", BASE_DIR, "owner", owner)
+	slog.Info("Setting permissions", "total", len(alvos), "base", BASE_DIR, "owner", owner)
 
 	if DRY_RUN {
-		PrintInfo(fmt.Sprintf("[dry-run] ajustaria permissões de %d diretórios e de %s", len(alvos), MEDIA_DIR))
-		PrintOk("Permissions configured (simulado)")
+		PrintInfo(fmt.Sprintf(Tr("[dry-run] ajustaria permissões de %d diretórios e de %s", "[dry-run] would set permissions on %d directories and on %s"), len(alvos), MEDIA_DIR))
+		PrintOk(Tr("Permissões configuradas (simulado)", "Permissions configured (simulated)"))
 		return
 	}
 
@@ -258,11 +262,11 @@ func configurePermissions() {
 			continue
 		}
 		if err := os.Chmod(d, WRITABLE_MODE); err != nil {
-			PrintWarning(fmt.Sprintf("Não foi possível ajustar permissões de %s: %v", d, err))
+			PrintWarning(fmt.Sprintf(Tr("Não foi possível ajustar permissões de %s: %v", "Could not set permissions on %s: %v"), d, err))
 		}
 		if owner != nil {
 			if err := os.Chown(d, owner.uid, owner.gid); err != nil {
-				PrintWarning(fmt.Sprintf("Não foi possível ajustar dono de %s para PUID/PGID do .env", d))
+				PrintWarning(fmt.Sprintf(Tr("Não foi possível ajustar dono de %s para PUID/PGID do .env", "Could not change the owner of %s to the .env PUID/PGID"), d))
 			}
 		}
 	}
@@ -270,18 +274,21 @@ func configurePermissions() {
 	for _, d := range []string{MEDIA_DIR, filepath.Join(MEDIA_DIR, "downloads")} {
 		if existe(d) {
 			if err := os.Chmod(d, 0o775); err != nil {
-				PrintWarning(fmt.Sprintf("Não foi possível ajustar permissões de %s: %v", d, err))
+				PrintWarning(fmt.Sprintf(Tr("Não foi possível ajustar permissões de %s: %v", "Could not set permissions on %s: %v"), d, err))
 			}
 		}
 	}
 
 	if owner != nil {
-		PrintOk(fmt.Sprintf("Permissions configured (PUID=%d PGID=%d)", owner.uid, owner.gid))
+		PrintOk(fmt.Sprintf(Tr("Permissões configuradas (PUID=%d PGID=%d)", "Permissions configured (PUID=%d PGID=%d)"), owner.uid, owner.gid))
 	} else {
-		PrintOk("Permissions configured")
-		PrintWarning("Nenhum PUID/PGID encontrado em .env — mantendo dono atual dos " +
-			"diretórios. Ajuste manualmente se os containers rodarem com outro " +
-			"usuário.")
+		PrintOk(Tr("Permissões configuradas", "Permissions configured"))
+		PrintWarning(Tr("Nenhum PUID/PGID encontrado em .env — mantendo dono atual dos "+
+			"diretórios. Ajuste manualmente se os containers rodarem com outro "+
+			"usuário.",
+			"No PUID/PGID found in .env — keeping the directories' current owner. "+
+				"Adjust manually if the containers run as another user."))
 	}
-	PrintInfo("Jellyfin e Navidrome devem montar a mídia como somente leitura (:ro) no docker-compose.yml")
+	PrintInfo(Tr("Jellyfin e Navidrome devem montar a mídia como somente leitura (:ro) no docker-compose.yml",
+		"Jellyfin and Navidrome should mount the media read-only (:ro) in docker-compose.yml"))
 }

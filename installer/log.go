@@ -22,13 +22,8 @@ func SetupLogging(loFile string) error {
 }
 
 func renomearCampos(grupos []string, a slog.Attr) slog.Attr {
-	switch a.Key {
-	case slog.TimeKey:
-		return slog.String("hora", a.Value.Time().Format("2006-01-02 15:04:05"))
-	case slog.LevelKey:
-		a.Key = "nivel"
-	case slog.MessageKey:
-		a.Key = "mensagem"
+	if a.Key == slog.TimeKey {
+		return slog.String(slog.TimeKey, a.Value.Time().Format("2006-01-02 15:04:05"))
 	}
 	return a
 }

@@ -16,18 +16,20 @@ import (
 
 func CheckOS() error {
 	if runtime.GOOS != "linux" {
-		return fmt.Errorf("Sistema operacional não suportado: %s. Este instalador requer Linux.", runtime.GOOS)
+		return fmt.Errorf(Tr("Sistema operacional não suportado: %s. Este instalador requer Linux.",
+			"Unsupported operating system: %s. This installer requires Linux."), runtime.GOOS)
 	}
-	slog.Info("Sistema operacional", "so", runtime.GOOS)
-	PrintOk("Linux detected")
+	slog.Info("Operating system", "os", runtime.GOOS)
+	PrintOk(Tr("Linux detectado", "Linux detected"))
 	return nil
 }
 
 func CheckPrivileges() error {
 	if os.Geteuid() != 0 {
-		return fmt.Errorf("Este instalador precisa ser executado como root (sudo).\n    Execute: sudo %s", os.Args[0])
+		return fmt.Errorf(Tr("Este instalador precisa ser executado como root (sudo).\n    Execute: sudo %s",
+			"This installer must be run as root (sudo).\n    Run: sudo %s"), os.Args[0])
 	}
-	PrintOk("Running with sufficient privileges")
+	PrintOk(Tr("Executando com privilégios suficientes", "Running with sufficient privileges"))
 	return nil
 }
 
@@ -52,7 +54,7 @@ func CheckMediaMount(caminho string) bool {
 	if !isMount(caminho) {
 		return false
 	}
-	PrintOk(fmt.Sprintf("%s mounted", caminho))
+	PrintOk(fmt.Sprintf(Tr("%s montado", "%s mounted"), caminho))
 	return true
 }
 
@@ -60,11 +62,13 @@ func resolveMediaMountInteractive() bool {
 	if CheckMediaMount(MEDIA_DIR) {
 		return true
 	}
-	PrintWarning(fmt.Sprintf(
+	PrintWarning(fmt.Sprintf(Tr(
 		"%s não existe ou não é um mount separado. Ter um disco dedicado "+
 			"é opcional — você pode seguir usando esse caminho como uma pasta comum no disco raiz.",
+		"%s does not exist or is not a separate mount. A dedicated disk "+
+			"is optional — you can keep using this path as a regular folder on the root disk."),
 		MEDIA_DIR))
-	return strings.ToLower(readLine("Continuar mesmo assim? [s/N]: ")) == "s"
+	return Confirmou(readLine(Tr("Continuar mesmo assim? [s/N]: ", "Continue anyway? [y/N]: ")), false)
 }
 
 func primeiroExistente(caminho string) string {
@@ -92,25 +96,27 @@ func checkDiskSpace() error {
 	dataPath := primeiroExistente(BASE_DIR)
 	dataLivre, err := espacoLivreGB(dataPath)
 	if err != nil {
-		return fmt.Errorf("Não foi possível verificar o espaço em %s: %v", dataPath, err)
+		return fmt.Errorf(Tr("Não foi possível verificar o espaço em %s: %v", "Could not check free space on %s: %v"), dataPath, err)
 	}
 	if dataLivre < MIN_DISK_SPACE_DATA_GB {
-		return fmt.Errorf("Espaço insuficiente em %s: %.1fGB livres, mínimo exigido %dGB.",
+		return fmt.Errorf(Tr("Espaço insuficiente em %s: %.1fGB livres, mínimo exigido %dGB.",
+			"Not enough space on %s: %.1fGB free, at least %dGB required."),
 			dataPath, dataLivre, MIN_DISK_SPACE_DATA_GB)
 	}
-	slog.Info("Espaco livre", "caminho", dataPath, "gb", fmt.Sprintf("%.1f", dataLivre))
+	slog.Info("Free space", "path", dataPath, "gb", fmt.Sprintf("%.1f", dataLivre))
 
 	mediaPath := primeiroExistente(MEDIA_DIR)
 	mediaLivre, err := espacoLivreGB(mediaPath)
 	if err != nil {
-		return fmt.Errorf("Não foi possível verificar o espaço em %s: %v", mediaPath, err)
+		return fmt.Errorf(Tr("Não foi possível verificar o espaço em %s: %v", "Could not check free space on %s: %v"), mediaPath, err)
 	}
-	slog.Info("Espaco livre", "caminho", mediaPath, "gb", fmt.Sprintf("%.1f", mediaLivre))
+	slog.Info("Free space", "path", mediaPath, "gb", fmt.Sprintf("%.1f", mediaLivre))
 	if mediaLivre < MIN_DISK_SPACE_MEDIA_GB {
-		PrintWarning(fmt.Sprintf("Pouco espaço livre em %s: %.1fGB (recomendado: %dGB+). Continuando mesmo assim.",
+		PrintWarning(fmt.Sprintf(Tr("Pouco espaço livre em %s: %.1fGB (recomendado: %dGB+). Continuando mesmo assim.",
+			"Low free space on %s: %.1fGB (recommended: %dGB+). Continuing anyway."),
 			mediaPath, mediaLivre, MIN_DISK_SPACE_MEDIA_GB))
 	} else {
-		PrintOk(fmt.Sprintf("Storage available (%.1fGB free on %s)", mediaLivre, mediaPath))
+		PrintOk(fmt.Sprintf(Tr("Armazenamento disponível (%.1fGB livres em %s)", "Storage available (%.1fGB free on %s)"), mediaLivre, mediaPath))
 	}
 	return nil
 }
@@ -124,7 +130,8 @@ func checkPorts(composeFiles map[string]string) error {
 	}
 
 	if len(esperadas) == 0 {
-		PrintWarning("Não foi possível extrair portas dos compose files, usando lista padrão.")
+		PrintWarning(Tr("Não foi possível extrair portas dos compose files, usando lista padrão.",
+			"Could not read ports from the compose files, using the default list."))
 		for porta, servico := range DEFAULT_EXPECTED_PORTS {
 			esperadas[porta] = servico
 		}
@@ -150,14 +157,16 @@ func checkPorts(composeFiles map[string]string) error {
 		for _, porta := range ocupadas {
 			lista = append(lista, fmt.Sprintf("%d (%s)", porta, esperadas[porta]))
 		}
-		slog.Warn("Portas ocupadas", "portas", strings.Join(lista, ", "))
-		PrintFail("Portas em uso detectadas:")
+		slog.Warn("Ports in use", "ports", strings.Join(lista, ", "))
+		PrintFail(Tr("Portas em uso detectadas:", "Ports already in use:"))
 		for _, porta := range ocupadas {
-			PrintInfo(fmt.Sprintf("porta %d (%s) já está em uso", porta, esperadas[porta]))
+			PrintInfo(fmt.Sprintf(Tr("porta %d (%s) já está em uso", "port %d (%s) is already in use"), porta, esperadas[porta]))
 		}
-		return errors.New("Libere as portas acima (pare o serviço que as está usando) ou ajuste " +
-			"o docker-compose.yml antes de continuar.")
+		return errors.New(Tr("Libere as portas acima (pare o serviço que as está usando) ou ajuste "+
+			"o docker-compose.yml antes de continuar.",
+			"Free the ports above (stop the service using them) or adjust "+
+				"the docker-compose.yml before continuing."))
 	}
-	PrintOk("Required ports available")
+	PrintOk(Tr("Portas necessárias disponíveis", "Required ports available"))
 	return nil
 }

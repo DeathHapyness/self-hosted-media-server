@@ -13,21 +13,47 @@ import (
 const MaxExecucoes int = 10000
 
 type Evento struct {
-	Hora     string         `json:"hora"`
-	Acao     string         `json:"acao"`
-	Detalhes map[string]any `json:"detalhes,omitempty"`
+	Hora     string         `json:"time"`
+	Acao     string         `json:"action"`
+	Detalhes map[string]any `json:"details,omitempty"`
 }
 
 type Execucao struct {
-	Inicio  string   `json:"inicio"`
-	Fim     *string  `json:"fim"`
+	Inicio  string   `json:"start"`
+	Fim     *string  `json:"end"`
 	Status  string   `json:"status"`
 	DryRun  bool     `json:"dry_run"`
-	Eventos []Evento `json:"eventos"`
+	Eventos []Evento `json:"events"`
 }
 
 type Historico struct {
-	Execucoes []*Execucao `json:"execucoes"`
+	Execucoes []*Execucao `json:"runs"`
+}
+
+type historicoLegado struct {
+	Execucoes []struct {
+		Inicio  string  `json:"inicio"`
+		Fim     *string `json:"fim"`
+		Status  string  `json:"status"`
+		DryRun  bool    `json:"dry_run"`
+		Eventos []struct {
+			Hora     string         `json:"hora"`
+			Acao     string         `json:"acao"`
+			Detalhes map[string]any `json:"detalhes,omitempty"`
+		} `json:"eventos"`
+	} `json:"execucoes"`
+}
+
+func (l historicoLegado) converter() Historico {
+	h := Historico{Execucoes: []*Execucao{}}
+	for _, e := range l.Execucoes {
+		ex := &Execucao{Inicio: e.Inicio, Fim: e.Fim, Status: e.Status, DryRun: e.DryRun, Eventos: []Evento{}}
+		for _, ev := range e.Eventos {
+			ex.Eventos = append(ex.Eventos, Evento{Hora: ev.Hora, Acao: ev.Acao, Detalhes: ev.Detalhes})
+		}
+		h.Execucoes = append(h.Execucoes, ex)
+	}
+	return h
 }
 
 var historico = Historico{Execucoes: []*Execucao{}}
@@ -51,11 +77,16 @@ func carregar() Historico {
 	if err := json.Unmarshal(dados, &h); err == nil && h.Execucoes != nil {
 		return h
 	}
-	backup := strings.TrimSuffix(HistoryFile, ".json") + ".json.corrompido"
+	var legado historicoLegado
+	if err := json.Unmarshal(dados, &legado); err == nil && legado.Execucoes != nil {
+		slog.Info("Legacy history format found; migrating", "file", HistoryFile)
+		return legado.converter()
+	}
+	backup := strings.TrimSuffix(HistoryFile, ".json") + ".json.corrupted"
 	if err := os.Rename(HistoryFile, backup); err != nil {
-		slog.Error("Historico ilegivel e nao foi possivel move-lo", "error", err)
+		slog.Error("History file unreadable and could not be moved", "error", err)
 	} else {
-		slog.Warn("Historico ilegivel; Movido e recomecado", "backup", backup)
+		slog.Warn("History file unreadable; moved aside and started fresh", "backup", backup)
 	}
 	return vazio
 }
@@ -64,23 +95,23 @@ func salvar() {
 	tmp := HistoryFile + ".tmp"
 
 	if err := os.MkdirAll(filepath.Dir(HistoryFile), 0o755); err != nil {
-		slog.Error("não foi possível gravar o histórico", "arquivo", HistoryFile, "erro", err)
+		slog.Error("Could not write the history", "file", HistoryFile, "error", err)
 		return
 	}
 
 	dados, err := json.MarshalIndent(historico, "", "  ")
 	if err != nil {
-		slog.Error("não foi possível serializar o histórico", "erro", err)
+		slog.Error("Could not serialize the history", "error", err)
 		return
 	}
 
 	if err := os.WriteFile(tmp, dados, 0o644); err != nil {
-		slog.Error("não foi possível gravar o histórico", "arquivo", HistoryFile, "erro", err)
+		slog.Error("Could not write the history", "file", HistoryFile, "error", err)
 		return
 	}
 
 	if err := os.Rename(tmp, HistoryFile); err != nil {
-		slog.Error("não foi possível gravar o histórico", "arquivo", HistoryFile, "erro", err)
+		slog.Error("Could not write the history", "file", HistoryFile, "error", err)
 		return
 	}
 }
@@ -91,7 +122,7 @@ func IniciarExecucao() {
 	historico = carregar()
 	atual = &Execucao{
 		Inicio:  _agora(),
-		Status:  "em andamento",
+		Status:  "running",
 		DryRun:  DRY_RUN,
 		Eventos: []Evento{},
 	}
@@ -100,7 +131,7 @@ func IniciarExecucao() {
 		historico.Execucoes = historico.Execucoes[len(historico.Execucoes)-MaxExecucoes:]
 	}
 	salvar()
-	slog.Info("Histórico", "arquivo", HistoryFile)
+	slog.Info("History", "file", HistoryFile)
 }
 
 func Registrar(acao string, detalhes ...any) {

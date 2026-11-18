@@ -55,8 +55,8 @@ func PrintText(text string) {
 func readLine(prompt string) string {
 	linha, err := UI.Perguntar(prompt)
 	if err != nil {
-		slog.Warn("Entrada encerrada; saindo", "erro", err)
-		FinalizarExecucao("cancelada (entrada encerrada)")
+		slog.Warn("Input closed; exiting", "error", err)
+		FinalizarExecucao("cancelled (input closed)")
 		os.Exit(1)
 	}
 	return linha

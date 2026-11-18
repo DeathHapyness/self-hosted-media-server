@@ -25,10 +25,10 @@ func chooseEngine() string {
 	podmanOk := temBinario("podman")
 
 	if dockerOk && podmanOk {
-		PrintSection("Docker e Podman detectados neste sistema.")
-		PrintInfo("1) Docker (padrão)")
+		PrintSection(Tr("Docker e Podman detectados neste sistema.", "Docker and Podman detected on this system."))
+		PrintInfo(Tr("1) Docker (padrão)", "1) Docker (default)"))
 		PrintInfo("2) Podman")
-		if readLine("Qual usar? [1]: ") == "2" {
+		if readLine(Tr("Qual usar? [1]: ", "Which one to use? [1]: ")) == "2" {
 			return "podman"
 		}
 		return "docker"
@@ -44,21 +44,27 @@ func checkEngineBinary() error {
 	binary := CONTAINER_ENGINE
 	if !temBinario(binary) {
 		if binary == "podman" {
-			return errors.New("Podman não encontrado. Instale com o gerenciador de pacotes da sua " +
-				"distro (ex: apt install podman) ou veja: https://podman.io/docs/installation")
+			return errors.New(Tr("Podman não encontrado. Instale com o gerenciador de pacotes da sua "+
+				"distro (ex: apt install podman) ou veja: https://podman.io/docs/installation",
+				"Podman not found. Install it with your distro's package manager "+
+					"(e.g. apt install podman) or see: https://podman.io/docs/installation"))
 		}
-		return errors.New("Docker não encontrado.\n" +
-			"    Instale com: curl -fsSL https://get.docker.com | sh\n" +
-			"    Ou veja: https://docs.docker.com/engine/install/\n" +
-			"    Fonte do script: https://github.com/docker/docker-install")
+		return errors.New(Tr("Docker não encontrado.\n"+
+			"    Instale com: curl -fsSL https://get.docker.com | sh\n"+
+			"    Ou veja: https://docs.docker.com/engine/install/\n"+
+			"    Fonte do script: https://github.com/docker/docker-install",
+			"Docker not found.\n"+
+				"    Install it with: curl -fsSL https://get.docker.com | sh\n"+
+				"    Or see: https://docs.docker.com/engine/install/\n"+
+				"    Script source: https://github.com/docker/docker-install"))
 	}
 	stdout, _, err := run(binary, "--version")
 	if err != nil {
-		return fmt.Errorf("%s está instalado, mas '%s --version' falhou.", binary, binary)
+		return fmt.Errorf(Tr("%s está instalado, mas '%s --version' falhou.", "%s is installed, but '%s --version' failed."), binary, binary)
 	}
 	versao := strings.TrimSpace(stdout)
-	slog.Info("Engine", "binario", binary, "versao", versao)
-	PrintOk(fmt.Sprintf("%s installed (%s)", capitalize(binary), versao))
+	slog.Info("Engine", "binary", binary, "version", versao)
+	PrintOk(fmt.Sprintf(Tr("%s instalado (%s)", "%s installed (%s)"), capitalize(binary), versao))
 	return nil
 }
 
@@ -67,7 +73,7 @@ func checkComposePlugin() error {
 	stdout, _, err := run(engine, "compose", "version")
 	if err == nil {
 		Compose_Standalone = false
-		PrintOk(fmt.Sprintf("%s Compose installed (%s)", capitalize(engine), strings.TrimSpace(stdout)))
+		PrintOk(fmt.Sprintf(Tr("%s Compose instalado (%s)", "%s Compose installed (%s)"), capitalize(engine), strings.TrimSpace(stdout)))
 		return nil
 	}
 
@@ -75,22 +81,26 @@ func checkComposePlugin() error {
 		stdout, _, err := run("podman-compose", "--version")
 		if err == nil {
 			Compose_Standalone = true
-			PrintOk(fmt.Sprintf("podman-compose installed (%s)", strings.TrimSpace(stdout)))
+			PrintOk(fmt.Sprintf(Tr("podman-compose instalado (%s)", "podman-compose installed (%s)"), strings.TrimSpace(stdout)))
 			return nil
 		}
 	}
 
-	return fmt.Errorf("Compose não encontrado para %s. Instale o plugin '%s compose' "+
-		"ou, no caso do Podman, o pacote podman-compose.", engine, engine)
+	return fmt.Errorf(Tr("Compose não encontrado para %s. Instale o plugin '%s compose' "+
+		"ou, no caso do Podman, o pacote podman-compose.",
+		"Compose not found for %s. Install the '%s compose' plugin "+
+			"or, for Podman, the podman-compose package."), engine, engine)
 }
 
 func checkEngineDaemon() error {
 	engine := CONTAINER_ENGINE
 	if _, _, err := run(engine, "info"); err != nil {
-		return fmt.Errorf("%s não está rodando ou o usuário atual não tem permissão. "+
-			"Tente 'sudo systemctl start %s' ou rode este script com sudo.", capitalize(engine), engine)
+		return fmt.Errorf(Tr("%s não está rodando ou o usuário atual não tem permissão. "+
+			"Tente 'sudo systemctl start %s' ou rode este script com sudo.",
+			"%s is not running or the current user lacks permission. "+
+				"Try 'sudo systemctl start %s' or run this script with sudo."), capitalize(engine), engine)
 	}
-	PrintOk(fmt.Sprintf("%s daemon running", capitalize(engine)))
+	PrintOk(fmt.Sprintf(Tr("Daemon do %s rodando", "%s daemon running"), capitalize(engine)))
 	return nil
 }
 
@@ -107,10 +117,12 @@ func checkOptional(checkFn func() error, label string) bool {
 		return true
 	}
 	PrintFail(err.Error())
-	resposta := strings.ToLower(readLine(fmt.Sprintf("\nContinuar mesmo assim, pulando a verificação de %s? [s/N]: ", label)))
-	if resposta == "s" {
-		slog.Warn("Usuario optou por pular a verificacao apos falha", "verificacao", label, "erro", err)
-		PrintWarning(fmt.Sprintf("Continuando sem validar %s — por sua conta e risco.", label))
+	resposta := readLine(fmt.Sprintf(Tr("\nContinuar mesmo assim, pulando a verificação de %s? [s/N]: ",
+		"\nContinue anyway, skipping the %s check? [y/N]: "), label))
+	if Confirmou(resposta, false) {
+		slog.Warn("User chose to skip a failed check", "check", label, "error", err)
+		PrintWarning(fmt.Sprintf(Tr("Continuando sem validar %s — por sua conta e risco.",
+			"Continuing without validating %s — at your own risk."), label))
 		return true
 	}
 	return false

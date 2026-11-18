@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"strings"
 )
 
-var opcoesMenu = map[string]string{"1": "instalar", "2": "desinstalar", "3": "disco de mídia", "4": "sair"}
+var opcoesMenu = map[string]string{"1": "install", "2": "uninstall", "3": "media disk", "4": "language", "5": "exit"}
 
 func interromperInstalacao(motivo string) {
-	PrintText(fmt.Sprintf("\n%s\n\n", ColorText("Instalação interrompida.", RED+BOLD)))
-	slog.Warn("Instalação interrompida", "motivo", motivo)
-	Registrar("instalacao", "resultado", "interrompida", "motivo", motivo)
+	PrintText(fmt.Sprintf("\n%s\n\n", ColorText(Tr("Instalação interrompida.", "Installation aborted."), RED+BOLD)))
+	slog.Warn("Installation aborted", "reason", motivo)
+	Registrar("install", "result", "aborted", "reason", motivo)
 }
 
 func etapasInstalacao() (map[string]string, error) {
@@ -31,7 +30,7 @@ func etapasInstalacao() (map[string]string, error) {
 	}
 	for _, c := range engineChecks {
 		if !checkOptional(c.fn, c.label) {
-			interromperInstalacao(fmt.Sprintf("verificação de %s falhou", c.label))
+			interromperInstalacao(fmt.Sprintf("%s check failed", c.label))
 			return nil, nil
 		}
 	}
@@ -41,7 +40,7 @@ func etapasInstalacao() (map[string]string, error) {
 	}
 
 	if !resolveMediaMountInteractive() {
-		interromperInstalacao(fmt.Sprintf("usuário não quis continuar sem %s montado", MEDIA_DIR))
+		interromperInstalacao(fmt.Sprintf("user chose not to continue without %s mounted", MEDIA_DIR))
 		return nil, nil
 	}
 
@@ -51,10 +50,11 @@ func etapasInstalacao() (map[string]string, error) {
 
 	todosCompose := findComposeFiles()
 	if len(todosCompose) == 0 {
-		return nil, errors.New("Nenhum arquivo docker-compose.yml/yaml encontrado nas pastas do repositório.")
+		return nil, errors.New(Tr("Nenhum arquivo docker-compose.yml/yaml encontrado nas pastas do repositório.",
+			"No docker-compose.yml/yaml file found in the repository folders."))
 	}
 	composeFiles := escolherServicos(todosCompose)
-	Registrar("servicos_escolhidos", "servicos", nomesOrdenados(composeFiles))
+	Registrar("services_selected", "services", nomesOrdenados(composeFiles))
 	ativarLoger := perguntarLoger()
 	if err := checkPorts(composeFiles); err != nil {
 		return nil, err
@@ -78,13 +78,13 @@ func etapasInstalacao() (map[string]string, error) {
 }
 
 func fluxoInstalar() {
-	PrintHeader("INSTALAÇÃO")
+	PrintHeader(Tr("INSTALAÇÃO", "INSTALLATION"))
 	if DRY_RUN {
-		PrintWarning("Modo --dry-run ativo: nenhuma alteração real será feita.")
+		PrintWarning(Tr("Modo --dry-run ativo: nenhuma alteração real será feita.", "--dry-run mode on: no real changes will be made."))
 	}
 
 	CONTAINER_ENGINE = chooseEngine()
-	Registrar("instalacao", "resultado", "iniciada", "engine", CONTAINER_ENGINE)
+	Registrar("install", "result", "started", "engine", CONTAINER_ENGINE)
 
 	composeFiles, err := etapasInstalacao()
 	if err != nil {
@@ -96,99 +96,106 @@ func fluxoInstalar() {
 		return
 	}
 
-	Registrar("instalacao", "resultado", "concluida", "servicos", nomesOrdenados(composeFiles))
-	PrintHeader("INSTALLATION COMPLETE")
-	slog.Info("Instalação concluída")
+	Registrar("install", "result", "completed", "services", nomesOrdenados(composeFiles))
+	PrintHeader(Tr("INSTALAÇÃO CONCLUÍDA", "INSTALLATION COMPLETE"))
+	slog.Info("Installation completed")
 }
 
 func fluxoDesinstalar() {
-	PrintHeader("DESINSTALAÇÃO")
+	PrintHeader(Tr("DESINSTALAÇÃO", "UNINSTALLATION"))
 
 	LoadEnvIntoState()
 	CONTAINER_ENGINE = chooseEngine()
-	Registrar("desinstalacao", "resultado", "iniciada", "engine", CONTAINER_ENGINE)
+	Registrar("uninstall", "result", "started", "engine", CONTAINER_ENGINE)
 
 	composeFiles := findComposeFiles()
 	stopServices(composeFiles)
-	Registrar("containers_parados", "servicos", nomesOrdenados(composeFiles))
+	Registrar("containers_stopped", "services", nomesOrdenados(composeFiles))
 	desinstalarLoger()
 
-	PrintInfo(fmt.Sprintf("\n%s NUNCA é tocado por esta opção — seus arquivos de mídia estão seguros.", MEDIA_DIR))
+	PrintInfo(fmt.Sprintf(Tr("\n%s NUNCA é tocado por esta opção — seus arquivos de mídia estão seguros.",
+		"\n%s is NEVER touched by this option — your media files are safe."), MEDIA_DIR))
 
 	alvos := collectDataDirs(composeFiles)
 	if len(alvos) == 0 {
-		PrintInfo("Nenhuma pasta de dados de serviço encontrada no disco.")
-		PrintInfo("Apenas os containers foram parados.")
-		Registrar("desinstalacao", "resultado", "concluida", "configs", "nenhuma pasta encontrada")
+		PrintInfo(Tr("Nenhuma pasta de dados de serviço encontrada no disco.", "No service data folders found on disk."))
+		PrintInfo(Tr("Apenas os containers foram parados.", "Only the containers were stopped."))
+		Registrar("uninstall", "result", "completed", "configs", "no folders found")
 		return
 	}
 
-	PrintSection("Pastas de dados encontradas no disco:")
+	PrintSection(Tr("Pastas de dados encontradas no disco:", "Data folders found on disk:"))
 	for _, alvo := range alvos {
 		PrintInfo(fmt.Sprintf("%s  (%s)", alvo, tamanhoLegivel(alvo)))
 	}
 
-	resposta := strings.ToLower(readLine("\nTambém remover as pastas listadas acima? " +
-		"Isso apaga bancos de dados e configs dos serviços. [s/N]: "))
-	if resposta != "s" {
-		PrintInfo("Configurações mantidas. Apenas os containers foram parados.")
-		Registrar("desinstalacao", "resultado", "concluida", "configs", "mantidas")
+	resposta := readLine(Tr("\nTambém remover as pastas listadas acima? "+
+		"Isso apaga bancos de dados e configs dos serviços. [s/N]: ",
+		"\nAlso remove the folders listed above? "+
+			"This deletes the services' databases and configs. [y/N]: "))
+	if !Confirmou(resposta, false) {
+		PrintInfo(Tr("Configurações mantidas. Apenas os containers foram parados.", "Configs kept. Only the containers were stopped."))
+		Registrar("uninstall", "result", "completed", "configs", "kept")
 		return
 	}
 
-	aviso := fmt.Sprintf("Isso vai apagar PERMANENTEMENTE as pastas listadas acima: configs, "+
+	aviso := fmt.Sprintf(Tr("Isso vai apagar PERMANENTEMENTE as pastas listadas acima: configs, "+
 		"bancos de dados (File Browser, Navidrome, etc.) e caches.\n"+
-		"    %s continua intocado.", MEDIA_DIR)
-	if !confirmDangerous(aviso, "CONFIRMO") {
-		PrintInfo("Operação cancelada — configurações mantidas.")
-		Registrar("desinstalacao", "resultado", "concluida", "configs", "mantidas (confirmação cancelada)")
+		"    %s continua intocado.",
+		"This will PERMANENTLY delete the folders listed above: configs, "+
+			"databases (File Browser, Navidrome, etc.) and caches.\n"+
+			"    %s stays untouched."), MEDIA_DIR)
+	if !confirmDangerous(aviso, PalavraConfirmacao()) {
+		PrintInfo(Tr("Operação cancelada — configurações mantidas.", "Operation cancelled — configs kept."))
+		Registrar("uninstall", "result", "completed", "configs", "kept (confirmation cancelled)")
 		return
 	}
 
 	if DRY_RUN {
 		for _, alvo := range alvos {
-			PrintInfo("[dry-run] removeria " + alvo)
+			PrintInfo(Tr("[dry-run] removeria ", "[dry-run] would remove ") + alvo)
 		}
-		Registrar("desinstalacao", "resultado", "concluida",
-			"configs", fmt.Sprintf("[dry-run] removeria %d pasta(s)", len(alvos)))
+		Registrar("uninstall", "result", "completed",
+			"configs", fmt.Sprintf("[dry-run] would remove %d folder(s)", len(alvos)))
 		return
 	}
 
 	removidas := []string{}
 	for _, alvo := range alvos {
-		slog.Warn("Removendo", "caminho", alvo)
+		slog.Warn("Removing", "path", alvo)
 		os.RemoveAll(alvo)
 		if existe(alvo) {
-			PrintWarning(alvo + " não pôde ser removido por completo")
+			PrintWarning(alvo + Tr(" não pôde ser removido por completo", " could not be fully removed"))
 		} else {
-			PrintOk(alvo + " removido")
+			PrintOk(alvo + Tr(" removido", " removed"))
 			removidas = append(removidas, alvo)
 		}
 	}
-	Registrar("desinstalacao", "resultado", "concluida", "configs_removidas", removidas)
+	Registrar("uninstall", "result", "completed", "configs_removed", removidas)
 }
 
 func MainMenu() {
 	LoadEnvIntoState()
 	for {
-		PrintHeader("MEDIA SERVER INSTALLER")
+		PrintHeader(Tr("INSTALADOR DO MEDIA SERVER", "MEDIA SERVER INSTALLER"))
 		if DRY_RUN {
-			PrintWarning("Modo --dry-run ativo\n")
+			PrintWarning(Tr("Modo --dry-run ativo\n", "--dry-run mode on\n"))
 		}
 
-		PrintInfo("1) Instalar / atualizar serviços")
-		PrintInfo("2) Desinstalar serviços")
-		PrintInfo(fmt.Sprintf("3) Gerenciar disco de mídia (%s)", MEDIA_DIR))
-		PrintInfo("4) Sair")
+		PrintInfo(Tr("1) Instalar / atualizar serviços", "1) Install / update services"))
+		PrintInfo(Tr("2) Desinstalar serviços", "2) Uninstall services"))
+		PrintInfo(fmt.Sprintf(Tr("3) Gerenciar disco de mídia (%s)", "3) Manage media disk (%s)"), MEDIA_DIR))
+		PrintInfo("4) Idioma / Language")
+		PrintInfo(Tr("5) Sair", "5) Exit"))
 
-		escolha := readLine("\nEscolha uma opção: ")
-		slog.Info("Opção escolhida", "opcao", escolha)
+		escolha := readLine(Tr("\nEscolha uma opção: ", "\nChoose an option: "))
+		slog.Info("Option chosen", "option", escolha)
 
 		significado, ok := opcoesMenu[escolha]
 		if !ok {
-			significado = "inválida"
+			significado = "invalid"
 		}
-		Registrar("menu", "opcao", escolha, "significado", significado)
+		Registrar("menu", "option", escolha, "meaning", significado)
 
 		switch escolha {
 		case "1":
@@ -200,10 +207,12 @@ func MainMenu() {
 		case "3":
 			MediaMountMenu()
 		case "4":
-			PrintInfo("Até mais!")
+			EscolherIdioma()
+		case "5":
+			PrintInfo(Tr("Até mais!", "Goodbye!"))
 			return
 		default:
-			PrintFail("Opção inválida.")
+			PrintFail(Tr("Opção inválida.", "Invalid option."))
 		}
 	}
 }
@@ -217,22 +226,22 @@ const (
 // interface web. Enter sem nada escolhe o terminal.
 func EscolherModo() string {
 	for {
-		PrintHeader("MODO DE INSTALAÇÃO")
-		PrintInfo("1) Terminal (CLI) (padrão)")
-		PrintInfo("2) Navegador (Web)")
+		PrintHeader(Tr("MODO DE INSTALAÇÃO", "INSTALLATION MODE"))
+		PrintInfo(Tr("1) Terminal (CLI) (padrão)", "1) Terminal (CLI) (default)"))
+		PrintInfo(Tr("2) Navegador (Web)", "2) Browser (Web)"))
 
-		escolha := readLine("\nComo deseja usar o instalador? [1]: ")
+		escolha := readLine(Tr("\nComo deseja usar o instalador? [1]: ", "\nHow do you want to use the installer? [1]: "))
 		switch escolha {
 		case "", "1":
-			slog.Info("Modo escolhido", "modo", MODO_CLI)
-			Registrar("modo", "modo", MODO_CLI)
+			slog.Info("Mode chosen", "mode", MODO_CLI)
+			Registrar("mode", "mode", MODO_CLI)
 			return MODO_CLI
 		case "2":
-			slog.Info("Modo escolhido", "modo", MODO_WEB)
-			Registrar("modo", "modo", MODO_WEB)
+			slog.Info("Mode chosen", "mode", MODO_WEB)
+			Registrar("mode", "mode", MODO_WEB)
 			return MODO_WEB
 		default:
-			PrintFail("Opção inválida.")
+			PrintFail(Tr("Opção inválida.", "Invalid option."))
 		}
 	}
 }

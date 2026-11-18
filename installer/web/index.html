@@ -11,8 +11,8 @@
 <header class="topo">
   <span class="marca">Self-Hosted Media Server</span>
   <div class="acoes-topo">
-    <button id="abrir-editor" class="link" type="button">editar compose</button>
-    <span id="conexao" class="pilula">Conectando…</span>
+    <button id="abrir-editor" class="link" type="button" data-t="editar_compose">editar compose</button>
+    <span id="conexao" class="pilula" data-t="conectando">Conectando…</span>
   </div>
 </header>
 
@@ -22,7 +22,7 @@
 
   <section id="cartao" class="cartao">
     <p id="fluxo" class="sobretitulo"></p>
-    <h1 id="titulo">Conectando ao instalador…</h1>
+    <h1 id="titulo" data-t="conectando_instalador">Conectando ao instalador…</h1>
     <div id="contexto" class="contexto"></div>
     <form id="controles" class="controles"></form>
   </section>
@@ -37,10 +37,10 @@
 <dialog id="editor" class="editor">
   <form method="dialog" class="editor-topo">
     <label>
-      <span class="sobretitulo">docker-compose de</span>
+      <span class="sobretitulo" data-t="compose_de">docker-compose de</span>
       <select id="editor-servico"></select>
     </label>
-    <button class="fechar" aria-label="Fechar">✕</button>
+    <button class="fechar" aria-label="Fechar" data-t-aria="fechar">✕</button>
   </form>
   <div class="codigo">
     <pre id="editor-destaque" aria-hidden="true"></pre>
@@ -48,10 +48,10 @@
   </div>
   <p id="editor-status" class="editor-status"></p>
   <div class="editor-rodape">
-    <button id="editor-desfazer" class="botao secundario" type="button">Desfazer</button>
+    <button id="editor-desfazer" class="botao secundario" type="button" data-t="desfazer">Desfazer</button>
     <span class="espaco"></span>
-    <button id="editor-validar" class="botao secundario" type="button">Validar</button>
-    <button id="editor-salvar" class="botao" type="button">Salvar</button>
+    <button id="editor-validar" class="botao secundario" type="button" data-t="validar">Validar</button>
+    <button id="editor-salvar" class="botao" type="button" data-t="salvar">Salvar</button>
   </div>
 </dialog>
 </body>

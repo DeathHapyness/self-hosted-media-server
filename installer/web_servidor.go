@@ -24,19 +24,19 @@ func ModoWeb(porta int) error {
 	w := novaWeb()
 	ouvinte, err := net.Listen("tcp", fmt.Sprintf(":%d", porta))
 	if err != nil {
-		return fmt.Errorf("não foi possível abrir a porta %d para a interface web: %w", porta, err)
+		return fmt.Errorf(Tr("não foi possível abrir a porta %d para a interface web: %w", "could not open port %d for the web interface: %w"), porta, err)
 	}
 	servidor := &http.Server{Handler: w.rotas(), ReadHeaderTimeout: 10 * time.Second}
 	go servidor.Serve(ouvinte)
 
 	porta = ouvinte.Addr().(*net.TCPAddr).Port
-	slog.Info("Interface web iniciada", "porta", porta)
-	Registrar("modo_web", "porta", porta)
+	slog.Info("Web interface started", "port", porta)
+	Registrar("web_mode", "port", porta)
 
-	PrintOk("Interface web iniciada.")
-	PrintInfo("Abra este link no navegador (vale para um único acesso):")
+	PrintOk(Tr("Interface web iniciada.", "Web interface started."))
+	PrintInfo(Tr("Abra este link no navegador (vale para um único acesso):", "Open this link in your browser (single use):"))
 	PrintInfo(ColorText(fmt.Sprintf("http://%s:%d/?token=%s", ipLocal(), porta, w.token), BOLD))
-	PrintInfo(fmt.Sprintf("O link expira em %d minutos se não for usado. Ctrl+C cancela.",
+	PrintInfo(fmt.Sprintf(Tr("O link expira em %d minutos se não for usado. Ctrl+C cancela.", "The link expires in %d minutes if unused. Ctrl+C cancels."),
 		int(validadeToken.Minutes())))
 
 	time.AfterFunc(validadeToken, func() {
@@ -45,24 +45,26 @@ func ModoWeb(porta int) error {
 		w.token = ""
 		w.mu.Unlock()
 		if naoUsado {
-			Terminal{}.Aviso("O link da interface web expirou sem ser usado.")
-			slog.Warn("Token web expirou sem uso")
+			Terminal{}.Aviso(Tr("O link da interface web expirou sem ser usado.", "The web interface link expired without being used."))
+			slog.Warn("Web token expired unused")
 			w.fechar()
 		}
 	})
 
 	UI = w
+	aoTrocarIdioma = func() { w.emitir("idioma", IDIOMA) }
 	MainMenu()
+	aoTrocarIdioma = nil
 	UI = Terminal{}
 
-	w.emitir("fim", "Configuração concluída. O servidor web foi encerrado; pode fechar esta aba.")
+	w.emitir("fim", Tr("Configuração concluída. O servidor web foi encerrado; pode fechar esta aba.", "Setup finished. The web server was shut down; you can close this tab."))
 	w.fechar()
 	ctx, cancelar := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelar()
 	if err := servidor.Shutdown(ctx); err != nil {
-		slog.Warn("Servidor web não encerrou limpo", "erro", err)
+		slog.Warn("Web server did not shut down cleanly", "error", err)
 	}
-	slog.Info("Interface web encerrada")
-	PrintOk("Interface web encerrada.")
+	slog.Info("Web interface closed")
+	PrintOk(Tr("Interface web encerrada.", "Web interface closed."))
 	return nil
 }

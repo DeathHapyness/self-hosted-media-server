@@ -89,7 +89,7 @@ func ListUnmountedBlockDevices() ([]BlockDevice, error) {
 	if err != nil {
 		return nil, err
 	}
-	slog.Info("lsblk", "saida", result)
+	slog.Info("lsblk", "output", result)
 	all := parseLsblk(result)
 
 	hasChildren := map[string]bool{}
@@ -116,10 +116,11 @@ func ListUnmountedBlockDevices() ([]BlockDevice, error) {
 }
 
 func MountRealDeviceMenu() {
-	PrintSection("Discos/partições disponíveis (sem uso no momento):")
+	PrintSection(Tr("Discos/partições disponíveis (sem uso no momento):", "Available disks/partitions (currently unused):"))
 	devices, err := ListUnmountedBlockDevices()
 	if err != nil || len(devices) == 0 {
-		PrintWarning("Nenhum disco/partição livre foi encontrado (ou 'lsblk' não está disponível).")
+		PrintWarning(Tr("Nenhum disco/partição livre foi encontrado (ou 'lsblk' não está disponível).",
+			"No free disk/partition found (or 'lsblk' is not available)."))
 		return
 	}
 
@@ -127,128 +128,135 @@ func MountRealDeviceMenu() {
 		PrintInfo(fmt.Sprintf("%d) %s (%s)", i+1, d.Path(), d.Size))
 	}
 
-	escolha := readLine("\nDigite o número do dispositivo (ou vazio para cancelar): ")
+	escolha := readLine(Tr("\nDigite o número do dispositivo (ou vazio para cancelar): ", "\nType the device number (or empty to cancel): "))
 	if escolha == "" {
-		PrintInfo("Cancelado.")
+		PrintInfo(Tr("Cancelado.", "Cancelled."))
 		return
 	}
 
 	n, err := strconv.Atoi(escolha)
 	if err != nil || n < 1 || n > len(devices) {
-		PrintFail("Opção inválida.")
+		PrintFail(Tr("Opção inválida.", "Invalid option."))
 		return
 	}
 	device := devices[n-1]
 	devicePath := device.Path()
 
-	aviso := fmt.Sprintf(
+	aviso := fmt.Sprintf(Tr(
 		"Você está prestes a FORMATAR %s (%s) como ext4.\n"+
 			"    TODOS OS DADOS atualmente nesse dispositivo serão APAGADOS PERMANENTEMENTE.\n"+
 			"    Confirme que %s é realmente o disco certo antes de continuar.",
+		"You are about to FORMAT %s (%s) as ext4.\n"+
+			"    ALL DATA currently on this device will be PERMANENTLY ERASED.\n"+
+			"    Make sure %s is really the right disk before continuing."),
 		devicePath, device.Size, devicePath)
 	if !confirmDangerous(aviso, devicePath) {
-		PrintInfo("Operação cancelada — nada foi alterado.")
-		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "cancelado")
+		PrintInfo(Tr("Operação cancelada — nada foi alterado.", "Operation cancelled — nothing was changed."))
+		Registrar("format_disk", "device", devicePath, "result", "cancelled")
 		return
 	}
 
 	if DRY_RUN {
-		PrintOk(fmt.Sprintf("[dry-run] formataria %s como ext4 e montaria em %s", devicePath, MEDIA_DIR))
-		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "dry-run")
+		PrintOk(fmt.Sprintf(Tr("[dry-run] formataria %s como ext4 e montaria em %s", "[dry-run] would format %s as ext4 and mount it on %s"), devicePath, MEDIA_DIR))
+		Registrar("format_disk", "device", devicePath, "result", "dry-run")
 		return
 	}
 
 	if err := os.MkdirAll(MEDIA_DIR, 0o755); err != nil {
-		PrintFail(fmt.Sprintf("Não foi possível criar %s: %v", MEDIA_DIR, err))
+		PrintFail(fmt.Sprintf(Tr("Não foi possível criar %s: %v", "Could not create %s: %v"), MEDIA_DIR, err))
 		return
 	}
 
-	PrintSection(fmt.Sprintf("Formatando %s...", devicePath))
+	PrintSection(fmt.Sprintf(Tr("Formatando %s...", "Formatting %s..."), devicePath))
 	if _, stderr, err := run("mkfs.ext4", "-F", devicePath); err != nil {
-		PrintFail("Falha ao formatar:")
+		PrintFail(Tr("Falha ao formatar:", "Formatting failed:"))
 		PrintInfo(stderr)
-		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "falha ao formatar", "erro", stderr)
+		Registrar("format_disk", "device", devicePath, "result", "format failed", "error", stderr)
 		return
 	}
-	PrintOk("Formatado com sucesso")
+	PrintOk(Tr("Formatado com sucesso", "Formatted successfully"))
 
 	if _, stderr, err := run("mount", devicePath, MEDIA_DIR); err != nil {
-		PrintFail("Falha ao montar:")
+		PrintFail(Tr("Falha ao montar:", "Mount failed:"))
 		PrintInfo(stderr)
-		Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "falha ao montar", "erro", stderr)
+		Registrar("format_disk", "device", devicePath, "result", "mount failed", "error", stderr)
 		return
 	}
-	PrintOk(fmt.Sprintf("%s montado em %s", devicePath, MEDIA_DIR))
-	Registrar("formatar_disco", "dispositivo", devicePath, "resultado", "montado em "+MEDIA_DIR)
+	PrintOk(fmt.Sprintf(Tr("%s montado em %s", "%s mounted on %s"), devicePath, MEDIA_DIR))
+	Registrar("format_disk", "device", devicePath, "result", "mounted on "+MEDIA_DIR)
 
 	adicionarFstab(fmt.Sprintf("%s %s ext4 defaults 0 2", devicePath, MEDIA_DIR))
 }
 
 func CreateVirtualDiskMenu() {
-	PrintSection(fmt.Sprintf("Criar disco virtual (arquivo de imagem) para %s", MEDIA_DIR))
-	PrintInfo("Isso ocupa espaço no disco atual — só recomendado para testes ou quando")
-	PrintInfo("não há disco físico disponível. Para produção, prefira um disco real.")
+	PrintSection(fmt.Sprintf(Tr("Criar disco virtual (arquivo de imagem) para %s", "Create a virtual disk (image file) for %s"), MEDIA_DIR))
+	PrintInfo(Tr("Isso ocupa espaço no disco atual — só recomendado para testes ou quando",
+		"This uses space on the current disk — only recommended for testing or when"))
+	PrintInfo(Tr("não há disco físico disponível. Para produção, prefira um disco real.",
+		"no physical disk is available. For production, prefer a real disk."))
 
-	tamanho := readLine("\nTamanho em GB (padrão 20): ")
+	tamanho := readLine(Tr("\nTamanho em GB (padrão 20): ", "\nSize in GB (default 20): "))
 	if tamanho == "" {
 		tamanho = "20"
 	}
 	tamanhoGB, err := strconv.Atoi(tamanho)
 	if err != nil || tamanhoGB <= 0 {
-		PrintFail("Tamanho inválido.")
+		PrintFail(Tr("Tamanho inválido.", "Invalid size."))
 		return
 	}
 
-	aviso := fmt.Sprintf(
+	aviso := fmt.Sprintf(Tr(
 		"Será criado um arquivo de %dGB em %s e montado em %s.\n"+
 			"    Se já existir um disco virtual anterior nesse caminho, ele será sobrescrito.",
+		"A %dGB file will be created at %s and mounted on %s.\n"+
+			"    If a previous virtual disk already exists at that path, it will be overwritten."),
 		tamanhoGB, virtualDiskPath, MEDIA_DIR)
-	if !confirmDangerous(aviso, "CONFIRMO") {
-		PrintInfo("Operação cancelada — nada foi alterado.")
-		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "cancelado")
+	if !confirmDangerous(aviso, PalavraConfirmacao()) {
+		PrintInfo(Tr("Operação cancelada — nada foi alterado.", "Operation cancelled — nothing was changed."))
+		Registrar("create_virtual_disk", "size_gb", tamanhoGB, "result", "cancelled")
 		return
 	}
 
 	if DRY_RUN {
-		PrintOk(fmt.Sprintf("[dry-run] criaria %s (%dGB) e montaria em %s", virtualDiskPath, tamanhoGB, MEDIA_DIR))
-		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "dry-run")
+		PrintOk(fmt.Sprintf(Tr("[dry-run] criaria %s (%dGB) e montaria em %s", "[dry-run] would create %s (%dGB) and mount it on %s"), virtualDiskPath, tamanhoGB, MEDIA_DIR))
+		Registrar("create_virtual_disk", "size_gb", tamanhoGB, "result", "dry-run")
 		return
 	}
 
 	if err := os.MkdirAll(MEDIA_DIR, 0o755); err != nil {
-		PrintFail(fmt.Sprintf("Não foi possível criar %s: %v", MEDIA_DIR, err))
+		PrintFail(fmt.Sprintf(Tr("Não foi possível criar %s: %v", "Could not create %s: %v"), MEDIA_DIR, err))
 		return
 	}
 
-	PrintSection("Criando arquivo de disco virtual...")
+	PrintSection(Tr("Criando arquivo de disco virtual...", "Creating the virtual disk file..."))
 	if _, _, err := run("fallocate", "-l", fmt.Sprintf("%dG", tamanhoGB), virtualDiskPath); err != nil {
 		_, stderr, err := run("dd", "if=/dev/zero", "of="+virtualDiskPath, "bs=1M",
 			fmt.Sprintf("count=%d", tamanhoGB*1024))
 		if err != nil {
-			PrintFail("Falha ao criar o arquivo de disco virtual:")
+			PrintFail(Tr("Falha ao criar o arquivo de disco virtual:", "Failed to create the virtual disk file:"))
 			PrintInfo(stderr)
-			Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao criar arquivo", "erro", stderr)
+			Registrar("create_virtual_disk", "size_gb", tamanhoGB, "result", "file creation failed", "error", stderr)
 			return
 		}
 	}
-	PrintOk(fmt.Sprintf("Arquivo criado (%dGB)", tamanhoGB))
+	PrintOk(fmt.Sprintf(Tr("Arquivo criado (%dGB)", "File created (%dGB)"), tamanhoGB))
 
 	if _, stderr, err := run("mkfs.ext4", "-F", virtualDiskPath); err != nil {
-		PrintFail("Falha ao formatar:")
+		PrintFail(Tr("Falha ao formatar:", "Formatting failed:"))
 		PrintInfo(stderr)
-		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao formatar", "erro", stderr)
+		Registrar("create_virtual_disk", "size_gb", tamanhoGB, "result", "format failed", "error", stderr)
 		return
 	}
-	PrintOk("Formatado como ext4")
+	PrintOk(Tr("Formatado como ext4", "Formatted as ext4"))
 
 	if _, stderr, err := run("mount", "-o", "loop", virtualDiskPath, MEDIA_DIR); err != nil {
-		PrintFail("Falha ao montar:")
+		PrintFail(Tr("Falha ao montar:", "Mount failed:"))
 		PrintInfo(stderr)
-		Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "falha ao montar", "erro", stderr)
+		Registrar("create_virtual_disk", "size_gb", tamanhoGB, "result", "mount failed", "error", stderr)
 		return
 	}
-	PrintOk(fmt.Sprintf("Montado em %s", MEDIA_DIR))
-	Registrar("criar_disco_virtual", "tamanho_gb", tamanhoGB, "resultado", "montado em "+MEDIA_DIR)
+	PrintOk(fmt.Sprintf(Tr("Montado em %s", "Mounted on %s"), MEDIA_DIR))
+	Registrar("create_virtual_disk", "size_gb", tamanhoGB, "result", "mounted on "+MEDIA_DIR)
 
 	adicionarFstab(fmt.Sprintf("%s %s ext4 loop 0 0", virtualDiskPath, MEDIA_DIR))
 }
@@ -258,51 +266,55 @@ func adicionarFstab(linha string) {
 
 	conteudo, err := os.ReadFile(fstab)
 	if err != nil && !errors.Is(err, fs.ErrNotExist) {
-		PrintFail(fmt.Sprintf("Não foi possível ler %s: %v", fstab, err))
+		PrintFail(fmt.Sprintf(Tr("Não foi possível ler %s: %v", "Could not read %s: %v"), fstab, err))
 		return
 	}
 	if strings.Contains(string(conteudo), linha) {
-		PrintOk("/etc/fstab já contém essa entrada")
+		PrintOk(Tr("/etc/fstab já contém essa entrada", "/etc/fstab already has this entry"))
 		return
 	}
 
-	resposta := strings.ToLower(readLine("\nAdicionar entrada em /etc/fstab para sobreviver a um reboot? [s/N]: "))
-	if resposta != "s" {
-		PrintInfo("Pulado — o mount não sobrevive a um reboot até você adicionar manualmente.")
-		Registrar("fstab", "linha", linha, "resultado", "pulado")
+	resposta := readLine(Tr("\nAdicionar entrada em /etc/fstab para sobreviver a um reboot? [s/N]: ",
+		"\nAdd an /etc/fstab entry so it survives a reboot? [y/N]: "))
+	if !Confirmou(resposta, false) {
+		PrintInfo(Tr("Pulado — o mount não sobrevive a um reboot até você adicionar manualmente.",
+			"Skipped — the mount will not survive a reboot until you add it manually."))
+		Registrar("fstab", "line", linha, "result", "skipped")
 		return
 	}
 
-	slog.Warn("Adicionando entrada em /etc/fstab", "linha", linha)
+	slog.Warn("Adding /etc/fstab entry", "line", linha)
 	f, err := os.OpenFile(fstab, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
-		PrintFail(fmt.Sprintf("Não foi possível abrir %s: %v", fstab, err))
+		PrintFail(fmt.Sprintf(Tr("Não foi possível abrir %s: %v", "Could not open %s: %v"), fstab, err))
 		return
 	}
 	defer f.Close()
 	if _, err := fmt.Fprintf(f, "\n%s\n", linha); err != nil {
-		PrintFail(fmt.Sprintf("Não foi possível gravar em %s: %v", fstab, err))
+		PrintFail(fmt.Sprintf(Tr("Não foi possível gravar em %s: %v", "Could not write to %s: %v"), fstab, err))
 		return
 	}
-	PrintOk("/etc/fstab atualizado")
-	Registrar("fstab", "linha", linha, "resultado", "adicionada")
+	PrintOk(Tr("/etc/fstab atualizado", "/etc/fstab updated"))
+	Registrar("fstab", "line", linha, "result", "added")
 }
 
 func MediaMountMenu() {
 	for {
-		PrintHeader("GESTÃO DO DISCO DE MÍDIA")
-		status := ColorText("NÃO montado", RED)
+		PrintHeader(Tr("GESTÃO DO DISCO DE MÍDIA", "MEDIA DISK MANAGEMENT"))
+		status := ColorText(Tr("NÃO montado", "NOT mounted"), RED)
 		if CheckMediaMount(MEDIA_DIR) {
-			status = ColorText("montado", GREEN)
+			status = ColorText(Tr("montado", "mounted"), GREEN)
 		}
-		PrintText(fmt.Sprintf("Status atual de %s: %s\n\n", MEDIA_DIR, status))
+		PrintText(fmt.Sprintf(Tr("Status atual de %s: %s\n\n", "Current status of %s: %s\n\n"), MEDIA_DIR, status))
 
-		PrintInfo("1) Já montei manualmente — só verificar")
-		PrintInfo("2) Usar um disco/partição existente (formata e monta — APAGA DADOS do disco escolhido)")
-		PrintInfo("3) Criar um disco virtual (arquivo, menos arriscado, ocupa espaço do disco atual)")
-		PrintInfo("4) Voltar ao menu principal")
+		PrintInfo(Tr("1) Já montei manualmente — só verificar", "1) I already mounted it manually — just check"))
+		PrintInfo(Tr("2) Usar um disco/partição existente (formata e monta — APAGA DADOS do disco escolhido)",
+			"2) Use an existing disk/partition (formats and mounts — ERASES DATA on the chosen disk)"))
+		PrintInfo(Tr("3) Criar um disco virtual (arquivo, menos arriscado, ocupa espaço do disco atual)",
+			"3) Create a virtual disk (file, less risky, uses space on the current disk)"))
+		PrintInfo(Tr("4) Voltar ao menu principal", "4) Back to the main menu"))
 
-		switch readLine("\nEscolha uma opção: ") {
+		switch readLine(Tr("\nEscolha uma opção: ", "\nChoose an option: ")) {
 		case "1":
 			CheckMediaMount(MEDIA_DIR)
 			pressEnterToContinue()
@@ -315,7 +327,7 @@ func MediaMountMenu() {
 		case "4":
 			return
 		default:
-			PrintFail("Opção inválida.")
+			PrintFail(Tr("Opção inválida.", "Invalid option."))
 		}
 	}
 }

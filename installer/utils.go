@@ -17,7 +17,7 @@ func run(name string, args ...string) (stdout, stderr string, err error) {
 
 func runEnv(env []string, name string, args ...string) (stdout, stderr string, err error) {
 	comando := name + " " + strings.Join(args, " ")
-	slog.Info("Executando", "comando", comando)
+	slog.Info("Running", "command", comando)
 
 	var out, errOut bytes.Buffer
 	cmd := exec.Command(name, args...)
@@ -29,21 +29,22 @@ func runEnv(env []string, name string, args ...string) (stdout, stderr string, e
 	stdout = out.String()
 	stderr = strings.TrimSpace(errOut.String())
 	if err != nil {
-		slog.Error("Comando falhou", "comando", comando, "erro", err, "stderr", stderr)
+		slog.Error("Command failed", "command", comando, "error", err, "stderr", stderr)
 	} else if s := strings.TrimSpace(stdout); s != "" {
-		slog.Debug("stdout", "comando", comando, "saida", s)
+		slog.Debug("stdout", "command", comando, "output", s)
 	}
 	return stdout, stderr, err
 }
 
 func confirmDangerous(explicacao, palavra string) bool {
 	PrintDanger(explicacao)
-	PrintInfo(fmt.Sprintf("Isto NÃO pode ser desfeito automaticamente. Digite exatamente \"%s\" para continuar.", palavra))
+	PrintInfo(fmt.Sprintf(Tr("Isto NÃO pode ser desfeito automaticamente. Digite exatamente \"%s\" para continuar.",
+		"This can NOT be undone automatically. Type exactly \"%s\" to continue."), palavra))
 	confirmado := readLine("> ") == palavra
 	if confirmado {
-		slog.Warn("Ação destrutiva CONFIRMADA pelo usuário", "explicacao", explicacao)
+		slog.Warn("Destructive action CONFIRMED by the user", "explanation", explicacao)
 	} else {
-		slog.Info("Ação destrutiva cancelada pelo usuário")
+		slog.Info("Destructive action cancelled by the user")
 	}
 	return confirmado
 }
@@ -74,5 +75,5 @@ func tamanhoLegivel(caminho string) string {
 }
 
 func pressEnterToContinue() {
-	readLine("\nPressione Enter para voltar ao menu...")
+	readLine(Tr("\nPressione Enter para voltar ao menu...", "\nPress Enter to return to the menu..."))
 }

@@ -45,62 +45,72 @@ func dockerbuddyInstalado() bool {
 // perguntarDockerBuddy explica o que é o DockerBuddy e pergunta se deve ser
 // instalado. Vem marcado: Enter sem nada instala.
 func perguntarDockerBuddy() bool {
-	PrintSection("Colinha de comandos Docker (DockerBuddy)")
-	PrintInfo("O DockerBuddy é uma colinha de comandos Docker no terminal. Você digita " +
-		"'dockerbuddy', escolhe um número e ele mostra os comandos mais usados, cada um " +
-		"com uma explicação curta: containers, imagens, volumes, redes, Docker Compose " +
-		"e filtros do 'docker ps'.")
-	PrintInfo("Serve para o dia a dia do servidor: ver logs, reiniciar um serviço, " +
-		"limpar imagens velhas, sem precisar procurar o comando na internet.")
-	PrintInfo(fmt.Sprintf("Não é container nem serviço: não abre porta e não fica rodando. "+
+	PrintSection(Tr("Colinha de comandos Docker (DockerBuddy)", "Docker command cheat sheet (DockerBuddy)"))
+	PrintInfo(Tr("O DockerBuddy é uma colinha de comandos Docker no terminal. Você digita "+
+		"'dockerbuddy', escolhe um número e ele mostra os comandos mais usados, cada um "+
+		"com uma explicação curta: containers, imagens, volumes, redes, Docker Compose "+
+		"e filtros do 'docker ps'.",
+		"DockerBuddy is a Docker command cheat sheet for the terminal. You type "+
+			"'dockerbuddy', pick a number and it shows the most used commands, each "+
+			"with a short explanation: containers, images, volumes, networks, Docker Compose "+
+			"and 'docker ps' filters."))
+	PrintInfo(Tr("Serve para o dia a dia do servidor: ver logs, reiniciar um serviço, "+
+		"limpar imagens velhas, sem precisar procurar o comando na internet.",
+		"Handy for day-to-day server work: reading logs, restarting a service, "+
+			"cleaning up old images, without searching the web for the command."))
+	PrintInfo(fmt.Sprintf(Tr("Não é container nem serviço: não abre porta e não fica rodando. "+
 		"São só um script e alguns arquivos de texto em %s, com o comando %s. "+
-		"Detalhes em docs/dockerbuddy.md.", DOCKERBUDDY_DIR, DOCKERBUDDY_BIN))
+		"Detalhes em docs/dockerbuddy.md.",
+		"It is not a container or a service: it opens no port and does not keep running. "+
+			"It is just a script and a few text files in %s, with the %s command. "+
+			"Details in docs/dockerbuddy.md."), DOCKERBUDDY_DIR, DOCKERBUDDY_BIN))
 
-	resposta := strings.ToLower(readLine("\nInstalar o DockerBuddy? [S/n]: "))
-	ativado := resposta != "n" && resposta != "nao" && resposta != "não"
+	resposta := readLine(Tr("\nInstalar o DockerBuddy? [S/n]: ", "\nInstall DockerBuddy? [Y/n]: "))
+	ativado := Confirmou(resposta, true)
 	if ativado {
-		PrintOk("DockerBuddy será instalado")
+		PrintOk(Tr("DockerBuddy será instalado", "DockerBuddy will be installed"))
 	} else {
-		PrintInfo("DockerBuddy não será instalado")
+		PrintInfo(Tr("DockerBuddy não será instalado", "DockerBuddy will not be installed"))
 	}
-	Registrar("dockerbuddy", "ativado", ativado)
+	Registrar("dockerbuddy", "enabled", ativado)
 	return ativado
 }
 
 // instalarDockerBuddy baixa o DockerBuddy e cria o comando. Falhas aqui não
 // interrompem a instalação: é opcional e os serviços já subiram.
 func instalarDockerBuddy() {
-	PrintSection("Instalando o DockerBuddy...")
+	PrintSection(Tr("Instalando o DockerBuddy...", "Installing DockerBuddy..."))
 
 	if DRY_RUN {
 		if existe(DOCKERBUDDY_DIR) {
-			PrintInfo("[dry-run] manteria a pasta existente " + DOCKERBUDDY_DIR)
+			PrintInfo(Tr("[dry-run] manteria a pasta existente ", "[dry-run] would keep the existing folder ") + DOCKERBUDDY_DIR)
 		} else {
-			PrintInfo(fmt.Sprintf("[dry-run] baixaria %s para %s", DOCKERBUDDY_URL, DOCKERBUDDY_DIR))
+			PrintInfo(fmt.Sprintf(Tr("[dry-run] baixaria %s para %s", "[dry-run] would download %s to %s"), DOCKERBUDDY_URL, DOCKERBUDDY_DIR))
 		}
-		PrintInfo(fmt.Sprintf("[dry-run] criaria o link %s -> %s", DOCKERBUDDY_BIN, dockerbuddyScript()))
+		PrintInfo(fmt.Sprintf(Tr("[dry-run] criaria o link %s -> %s", "[dry-run] would create the link %s -> %s"), DOCKERBUDDY_BIN, dockerbuddyScript()))
 		return
 	}
 
 	// Não sobrescreve uma pasta existente: os .txt podem ter sido editados à mão.
 	if existe(DOCKERBUDDY_DIR) {
-		PrintOk(DOCKERBUDDY_DIR + " já existe, mantido")
+		PrintOk(DOCKERBUDDY_DIR + Tr(" já existe, mantido", " already exists, kept"))
 	} else if err := baixarDockerBuddy(); err != nil {
-		PrintWarning("Não foi possível baixar o DockerBuddy: " + err.Error())
-		Registrar("dockerbuddy", "resultado", "falhou", "erro", err.Error())
+		PrintWarning(Tr("Não foi possível baixar o DockerBuddy: ", "Could not download DockerBuddy: ") + err.Error())
+		Registrar("dockerbuddy", "result", "failed", "error", err.Error())
 		return
 	} else {
-		PrintOk("DockerBuddy baixado em " + DOCKERBUDDY_DIR)
+		PrintOk(Tr("DockerBuddy baixado em ", "DockerBuddy downloaded to ") + DOCKERBUDDY_DIR)
 	}
 
 	if err := linkarDockerBuddy(); err != nil {
 		PrintWarning(err.Error())
-		Registrar("dockerbuddy", "resultado", "falhou", "erro", err.Error())
+		Registrar("dockerbuddy", "result", "failed", "error", err.Error())
 		return
 	}
 
-	PrintOk("DockerBuddy pronto. Digite 'dockerbuddy' no terminal para abrir a colinha.")
-	Registrar("dockerbuddy", "resultado", "instalado")
+	PrintOk(Tr("DockerBuddy pronto. Digite 'dockerbuddy' no terminal para abrir a colinha.",
+		"DockerBuddy ready. Type 'dockerbuddy' in the terminal to open the cheat sheet."))
+	Registrar("dockerbuddy", "result", "installed")
 }
 
 // linkarDockerBuddy cria DOCKERBUDDY_BIN apontando para o script. Se já
@@ -110,19 +120,20 @@ func linkarDockerBuddy() error {
 	if info, err := os.Lstat(DOCKERBUDDY_BIN); err == nil {
 		if info.Mode()&os.ModeSymlink != 0 {
 			if atual, _ := os.Readlink(DOCKERBUDDY_BIN); atual == alvo {
-				PrintOk(DOCKERBUDDY_BIN + " já existe, mantido")
+				PrintOk(DOCKERBUDDY_BIN + Tr(" já existe, mantido", " already exists, kept"))
 				return nil
 			}
 		}
-		return fmt.Errorf("%s já existe e não aponta para %s; mantido sem alterar", DOCKERBUDDY_BIN, alvo)
+		return fmt.Errorf(Tr("%s já existe e não aponta para %s; mantido sem alterar",
+			"%s already exists and does not point to %s; left unchanged"), DOCKERBUDDY_BIN, alvo)
 	}
 	if err := os.MkdirAll(filepath.Dir(DOCKERBUDDY_BIN), 0o755); err != nil {
-		return fmt.Errorf("não foi possível criar %s: %w", filepath.Dir(DOCKERBUDDY_BIN), err)
+		return fmt.Errorf(Tr("não foi possível criar %s: %w", "could not create %s: %w"), filepath.Dir(DOCKERBUDDY_BIN), err)
 	}
 	if err := os.Symlink(alvo, DOCKERBUDDY_BIN); err != nil {
-		return fmt.Errorf("não foi possível criar o link %s: %w", DOCKERBUDDY_BIN, err)
+		return fmt.Errorf(Tr("não foi possível criar o link %s: %w", "could not create the link %s: %w"), DOCKERBUDDY_BIN, err)
 	}
-	PrintOk(fmt.Sprintf("Link criado: %s -> %s", DOCKERBUDDY_BIN, alvo))
+	PrintOk(fmt.Sprintf(Tr("Link criado: %s -> %s", "Link created: %s -> %s"), DOCKERBUDDY_BIN, alvo))
 	return nil
 }
 
@@ -130,7 +141,7 @@ func linkarDockerBuddy() error {
 // conhecidos numa pasta temporária, que depois é renomeada para
 // DOCKERBUDDY_DIR. Assim uma falha no meio não deixa uma instalação pela metade.
 func baixarDockerBuddy() error {
-	PrintInfo("Baixando " + DOCKERBUDDY_URL + "...")
+	PrintInfo(Tr("Baixando ", "Downloading ") + DOCKERBUDDY_URL + "...")
 	cliente := &http.Client{Timeout: 60 * time.Second}
 	resp, err := cliente.Get(DOCKERBUDDY_URL)
 	if err != nil {
@@ -138,7 +149,7 @@ func baixarDockerBuddy() error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("download respondeu %s", resp.Status)
+		return fmt.Errorf(Tr("download respondeu %s", "download returned %s"), resp.Status)
 	}
 
 	if err := os.MkdirAll(filepath.Dir(DOCKERBUDDY_DIR), 0o755); err != nil {
@@ -163,7 +174,7 @@ func baixarDockerBuddy() error {
 func extrairDockerBuddy(r io.Reader, destino string) error {
 	gz, err := gzip.NewReader(r)
 	if err != nil {
-		return fmt.Errorf("arquivo baixado não é um .tar.gz válido: %w", err)
+		return fmt.Errorf(Tr("arquivo baixado não é um .tar.gz válido: %w", "downloaded file is not a valid .tar.gz: %w"), err)
 	}
 	defer gz.Close()
 
@@ -179,7 +190,7 @@ func extrairDockerBuddy(r io.Reader, destino string) error {
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("erro lendo o .tar.gz: %w", err)
+			return fmt.Errorf(Tr("erro lendo o .tar.gz: %w", "error reading the .tar.gz: %w"), err)
 		}
 		if h.Typeflag != tar.TypeReg {
 			continue
@@ -218,7 +229,7 @@ func extrairDockerBuddy(r io.Reader, destino string) error {
 	}
 
 	if !temScript || !temDados {
-		return errors.New("o arquivo baixado não tem dockerbuddy.sh e data/*.txt")
+		return errors.New(Tr("o arquivo baixado não tem dockerbuddy.sh e data/*.txt", "the downloaded file lacks dockerbuddy.sh and data/*.txt"))
 	}
 	return nil
 }
@@ -228,16 +239,16 @@ func desinstalarDockerBuddy() {
 	if !dockerbuddyInstalado() {
 		return
 	}
-	PrintSection("DockerBuddy (colinha de comandos Docker)")
-	resposta := strings.ToLower(readLine("Também desinstalar o DockerBuddy? [s/N]: "))
-	if resposta != "s" {
-		PrintInfo("DockerBuddy mantido.")
-		Registrar("dockerbuddy", "desinstalacao", "mantido")
+	PrintSection(Tr("DockerBuddy (colinha de comandos Docker)", "DockerBuddy (Docker command cheat sheet)"))
+	resposta := readLine(Tr("Também desinstalar o DockerBuddy? [s/N]: ", "Also uninstall DockerBuddy? [y/N]: "))
+	if !Confirmou(resposta, false) {
+		PrintInfo(Tr("DockerBuddy mantido.", "DockerBuddy kept."))
+		Registrar("dockerbuddy", "uninstall", "kept")
 		return
 	}
 
 	if DRY_RUN {
-		PrintInfo(fmt.Sprintf("[dry-run] removeria %s e %s", DOCKERBUDDY_BIN, DOCKERBUDDY_DIR))
+		PrintInfo(fmt.Sprintf(Tr("[dry-run] removeria %s e %s", "[dry-run] would remove %s and %s"), DOCKERBUDDY_BIN, DOCKERBUDDY_DIR))
 		return
 	}
 
@@ -247,20 +258,21 @@ func desinstalarDockerBuddy() {
 		atual, _ := os.Readlink(DOCKERBUDDY_BIN)
 		if info.Mode()&os.ModeSymlink != 0 && atual == dockerbuddyScript() {
 			if err := os.Remove(DOCKERBUDDY_BIN); err != nil {
-				PrintWarning(DOCKERBUDDY_BIN + " não pôde ser removido: " + err.Error())
+				PrintWarning(DOCKERBUDDY_BIN + Tr(" não pôde ser removido: ", " could not be removed: ") + err.Error())
 			} else {
-				PrintOk(DOCKERBUDDY_BIN + " removido")
+				PrintOk(DOCKERBUDDY_BIN + Tr(" removido", " removed"))
 			}
 		} else {
-			PrintInfo(DOCKERBUDDY_BIN + " não aponta para o DockerBuddy instalado aqui; mantido")
+			PrintInfo(DOCKERBUDDY_BIN + Tr(" não aponta para o DockerBuddy instalado aqui; mantido",
+				" does not point to the DockerBuddy installed here; kept"))
 		}
 	}
 	if existe(DOCKERBUDDY_DIR) {
 		if err := os.RemoveAll(DOCKERBUDDY_DIR); err != nil {
-			PrintWarning(DOCKERBUDDY_DIR + " não pôde ser removido: " + err.Error())
+			PrintWarning(DOCKERBUDDY_DIR + Tr(" não pôde ser removido: ", " could not be removed: ") + err.Error())
 		} else {
-			PrintOk(DOCKERBUDDY_DIR + " removido")
+			PrintOk(DOCKERBUDDY_DIR + Tr(" removido", " removed"))
 		}
 	}
-	Registrar("dockerbuddy", "desinstalacao", "removido")
+	Registrar("dockerbuddy", "uninstall", "removed")
 }
