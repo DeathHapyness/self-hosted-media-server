@@ -10,12 +10,13 @@
   <img src="assets/banner-verde-agua.png" alt="Self-Hosted Media Server" width="900">
 </picture>
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Podman](https://img.shields.io/badge/Podman-892CA0?style=for-the-badge&logo=podman&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-platform-FCC624?style=flat&labelColor=11120f&logo=linux&logoColor=white)
+![Go](https://img.shields.io/badge/Go-installer-00ADD8?style=flat&labelColor=11120f&logo=go&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-containers-2496ED?style=flat&labelColor=11120f&logo=docker&logoColor=white)
+![Podman](https://img.shields.io/badge/Podman-containers-892CA0?style=flat&labelColor=11120f&logo=podman&logoColor=white)
 
-<a href="https://buymeacoffee.com/rique.dev"><img src="https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee"></a>
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-support-FFDD00?style=flat&labelColor=11120f&logo=buymeacoffee&logoColor=white)](https://buymeacoffee.com/rique.dev)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/DeathHapyness/badge.svg)](https://hub.xerj.org/contributors/DeathHapyness)
 </div>
 
 <div align="center">
