@@ -1,7 +1,6 @@
 package installer
 
 import (
-	_ "embed"
 	"fmt"
 	"log/slog"
 	"os"
@@ -9,7 +8,7 @@ import (
 	"strings"
 )
 
-// O Loger (auditoria do servidor) roda direto no host, pelo systemd, e não
+// O Loger (auditoria do servidor) roda direto no host, como serviço do init, e não
 // como container: ele precisa enxergar os processos, sessões e arquivos do
 // próprio host. O binário é extraído da imagem publicada no GHCR (sem rodar
 // container nenhum), o que já entrega a arquitetura certa (amd64/arm64).
@@ -17,19 +16,23 @@ import (
 const (
 	LOGER_IMAGE   = "ghcr.io/deathhapyness/loger:latest"
 	LOGER_BIN     = "/usr/local/bin/loger"
-	LOGER_UNIT    = "/etc/systemd/system/loger.service"
 	LOGER_LOG_DIR = "/var/log/loger"
 )
 
-//go:embed loger/loger.service
-var logerUnit string
-
-func temSystemd() bool {
-	return isDir("/run/systemd/system") && temBinario("systemctl")
+func initDoSistema() *initLoger {
+	return detectarInitLoger(isDir, temBinario)
 }
 
 func logerInstalado() bool {
-	return existe(LOGER_BIN) || existe(LOGER_UNIT)
+	if existe(LOGER_BIN) {
+		return true
+	}
+	for _, alvo := range arquivosServicoLoger() {
+		if existeLink(alvo) {
+			return true
+		}
+	}
+	return false
 }
 
 // perguntarLoger pergunta se o Loger deve ser instalado. Ele vem ativado:
@@ -40,10 +43,14 @@ func perguntarLoger() bool {
 		"alterações em arquivos sensíveis, chaves SSH e portas novas.",
 		"Loger is enabled by default. It records logins, commands, sudo usage, "+
 			"changes to sensitive files, SSH keys and new ports."))
-	PrintInfo(fmt.Sprintf(Tr("Roda direto no host como serviço do systemd (%s) e grava os logs em %s. "+
+	nomeInit := Tr("init não suportado", "unsupported init")
+	if i := initDoSistema(); i != nil {
+		nomeInit = i.nome
+	}
+	PrintInfo(fmt.Sprintf(Tr("Roda direto no host como serviço do sistema (%s, %s) e grava os logs em %s. "+
 		"Detalhes em docs/loger.md.",
-		"It runs directly on the host as a systemd service (%s) and writes its logs to %s. "+
-			"Details in docs/loger.md."), LOGER_BIN, LOGER_LOG_DIR))
+		"It runs directly on the host as a system service (%s, %s) and writes its logs to %s. "+
+			"Details in docs/loger.md."), nomeInit, LOGER_BIN, LOGER_LOG_DIR))
 
 	resposta := readLine(Tr("\nManter o Loger ativado? [S/n]: ", "\nKeep Loger enabled? [Y/n]: "))
 	ativado := Confirmou(resposta, true)
@@ -56,19 +63,21 @@ func perguntarLoger() bool {
 	return ativado
 }
 
-// instalarLoger instala o binário e o serviço do systemd. Falhas aqui não
+// instalarLoger instala o binário e o serviço do init. Falhas aqui não
 // interrompem a instalação: o Loger é opcional e os outros serviços já subiram.
 func instalarLoger() {
 	PrintSection(Tr("Instalando o Loger...", "Installing Loger..."))
 
-	if !temSystemd() {
-		PrintWarning(Tr("systemd não encontrado: o Loger não foi instalado. "+
-			"Para outro init, deixe 'loger daemon' rodando como root (veja docs/loger.md).",
-			"systemd not found: Loger was not installed. "+
-				"With another init, keep 'loger daemon' running as root (see docs/loger.md)."))
-		Registrar("loger", "result", "skipped", "reason", "no systemd")
+	ini := initDoSistema()
+	if ini == nil {
+		PrintWarning(Tr("Nenhum init suportado encontrado (systemd, OpenRC ou runit): o Loger não foi instalado. "+
+			"Deixe 'loger daemon' rodando como root pelo init da distro (veja docs/loger.md).",
+			"No supported init found (systemd, OpenRC or runit): Loger was not installed. "+
+				"Keep 'loger daemon' running as root with your distro's init (see docs/loger.md)."))
+		Registrar("loger", "result", "skipped", "reason", "unsupported init")
 		return
 	}
+	slog.Info("Loger init", "init", ini.nome)
 
 	if DRY_RUN {
 		if existe(LOGER_BIN) {
@@ -76,10 +85,15 @@ func instalarLoger() {
 		} else {
 			PrintInfo(fmt.Sprintf(Tr("[dry-run] extrairia /loger de %s para %s", "[dry-run] would extract /loger from %s to %s"), LOGER_IMAGE, LOGER_BIN))
 		}
-		if !existe(LOGER_UNIT) {
-			PrintInfo(Tr("[dry-run] criaria ", "[dry-run] would create ") + LOGER_UNIT)
+		if !existe(ini.arquivo) {
+			PrintInfo(fmt.Sprintf(Tr("[dry-run] criaria %s (%s)", "[dry-run] would create %s (%s)"), ini.arquivo, ini.nome))
 		}
-		PrintInfo(Tr("[dry-run] rodaria: ", "[dry-run] would run: ") + "systemctl daemon-reload && systemctl enable --now loger")
+		if ini.link != "" && !existeLink(ini.link) {
+			PrintInfo(fmt.Sprintf(Tr("[dry-run] criaria o link %s -> %s", "[dry-run] would create the link %s -> %s"), ini.link, filepath.Dir(ini.arquivo)))
+		}
+		if len(ini.ativar) > 0 {
+			PrintInfo(Tr("[dry-run] rodaria: ", "[dry-run] would run: ") + juntarComandos(ini.ativar))
+		}
 		return
 	}
 
@@ -92,29 +106,26 @@ func instalarLoger() {
 		return
 	}
 
-	// Não sobrescreve um loger.service existente: pode ter sido ajustado à mão.
-	if existe(LOGER_UNIT) {
-		PrintOk(LOGER_UNIT + Tr(" já existe, mantido", " already exists, kept"))
-	} else if err := os.WriteFile(LOGER_UNIT, []byte(logerUnit), 0o644); err != nil {
-		PrintWarning(Tr("Não foi possível criar ", "Could not create ") + LOGER_UNIT + ": " + err.Error())
+	// Não sobrescreve um serviço existente: pode ter sido ajustado à mão.
+	if ini.instalado() {
+		PrintOk(ini.arquivo + Tr(" já existe, mantido", " already exists, kept"))
+	} else if err := ini.criar(); err != nil {
+		PrintWarning(Tr("Não foi possível criar ", "Could not create ") + ini.arquivo + ": " + err.Error())
 		Registrar("loger", "result", "failed", "error", err.Error())
 		return
 	} else {
-		PrintOk(LOGER_UNIT + Tr(" criado", " created"))
+		PrintOk(fmt.Sprintf(Tr("%s criado (%s)", "%s created (%s)"), ini.arquivo, ini.nome))
 	}
 
-	if _, stderr, err := run("systemctl", "daemon-reload"); err != nil {
-		PrintWarning(Tr("systemctl daemon-reload falhou: ", "systemctl daemon-reload failed: ") + stderr)
-	}
-	if _, stderr, err := run("systemctl", "enable", "--now", "loger"); err != nil {
+	if stderr, err := rodarComandos(ini.ativar); err != nil {
 		PrintWarning(Tr("Não foi possível iniciar o Loger: ", "Could not start Loger: ") + stderr)
-		PrintInfo(Tr("Veja o motivo com: ", "See why with: ") + "journalctl -u loger -n 50")
-		Registrar("loger", "result", "failed", "error", stderr)
+		PrintInfo(Tr("Veja o motivo com: ", "See why with: ") + ini.logs)
+		Registrar("loger", "result", "failed", "init", ini.nome, "error", stderr)
 		return
 	}
-	PrintOk(Tr("Loger ativo (systemctl status loger). Consulte com: sudo loger show -n 50",
-		"Loger active (systemctl status loger). Query it with: sudo loger show -n 50"))
-	Registrar("loger", "result", "installed")
+	PrintOk(fmt.Sprintf(Tr("Loger ativo (%s). Consulte com: sudo loger show -n 50",
+		"Loger active (%s). Query it with: sudo loger show -n 50"), ini.status))
+	Registrar("loger", "result", "installed", "init", ini.nome)
 }
 
 // extrairBinarioLoger baixa a imagem e copia /loger dela para LOGER_BIN.
@@ -171,29 +182,36 @@ func desinstalarLoger() {
 		return
 	}
 
+	ini := initDoSistema()
+	var alvos []string
+	for _, alvo := range append(arquivosServicoLoger(), LOGER_BIN) {
+		if existeLink(alvo) {
+			alvos = append(alvos, alvo)
+		}
+	}
+
 	if DRY_RUN {
-		PrintInfo(Tr("[dry-run] rodaria: ", "[dry-run] would run: ") + "systemctl disable --now loger")
-		PrintInfo(fmt.Sprintf(Tr("[dry-run] removeria %s e %s", "[dry-run] would remove %s and %s"), LOGER_UNIT, LOGER_BIN))
+		if ini != nil && len(ini.desativar) > 0 {
+			PrintInfo(Tr("[dry-run] rodaria: ", "[dry-run] would run: ") + juntarComandos(ini.desativar))
+		}
+		PrintInfo(Tr("[dry-run] removeria ", "[dry-run] would remove ") + strings.Join(alvos, ", "))
 		return
 	}
 
-	if temSystemd() {
-		if _, stderr, err := run("systemctl", "disable", "--now", "loger"); err != nil {
-			slog.Warn("systemctl disable loger failed", "stderr", stderr)
+	if ini != nil {
+		if stderr, err := rodarComandos(ini.desativar); err != nil {
+			slog.Warn("Stopping loger failed", "init", ini.nome, "stderr", stderr)
 		}
 	}
-	for _, alvo := range []string{LOGER_UNIT, LOGER_BIN} {
-		if !existe(alvo) {
-			continue
-		}
-		if err := os.Remove(alvo); err != nil {
+	for _, alvo := range alvos {
+		if err := os.RemoveAll(alvo); err != nil {
 			PrintWarning(alvo + Tr(" não pôde ser removido: ", " could not be removed: ") + err.Error())
 		} else {
 			PrintOk(alvo + Tr(" removido", " removed"))
 		}
 	}
-	if temSystemd() {
-		run("systemctl", "daemon-reload")
+	if ini != nil {
+		rodarComandos(ini.aposRemover)
 	}
 	PrintInfo(fmt.Sprintf(Tr("Logs mantidos em %s (para apagar: sudo chattr -R -a %s && sudo rm -rf %s).",
 		"Logs kept in %s (to delete them: sudo chattr -R -a %s && sudo rm -rf %s)."),
