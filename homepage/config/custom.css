@@ -1,54 +1,332 @@
-/*COLOQUE DE ACORDO COM O SEU GOSTO OU CONFIG ESSA E A MINHA*/
-
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
 
 :root {
-    --cyber-cyan: #00f3ff;
-    --cyber-magenta: #ff00ff;
-    --cyber-yellow: #fcee0a;
-    --cyber-red: #ff003c;
-    --card-bg: rgba(10, 10, 20, 0.8);
+  --fundo: #0b0c0f;
+  --card: #121318;
+  --card2: #16181e;
+  --linha: #1f2128;
+  --linha2: #2d3039;
+  --texto: #e4e4e7;
+  --fraco: #8b8d98;
+  --ac: #5eead4;
+  --ac2: #a78bfa;
+  --ok: #5eead4;
+  --aviso: #fbbf24;
+  --erro: #f87171;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-body {
-    font-family: 'Fira Code', monospace !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+html, body, #page_wrapper {
+  background: var(--fundo) !important;
+  font-family: "Inter", system-ui, sans-serif !important;
 }
 
-.card {
-    border: 1px solid var(--cyber-cyan) !important;
-    background-color: var(--card-bg) !important;
-    backdrop-filter: blur(8px) !important;
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.1) !important;
-    border-radius: 0px !important; /* Colțuri drepte pentru look industrial */
-    transition: all 0.3s ease;
+#page_wrapper::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 340px;
+  background:
+    radial-gradient(40rem 14rem at 15% -10%, rgb(94 234 212 / 0.10), transparent 70%),
+    radial-gradient(34rem 12rem at 85% -15%, rgb(167 139 250 / 0.08), transparent 70%);
+  pointer-events: none;
 }
 
-.card:hover {
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4) !important;
-    transform: translateY(-2px);
-    border-color: var(--cyber-magenta) !important;
+#inner_wrapper {
+  position: relative;
+  padding-bottom: 4rem;
 }
 
-.section-title {
-    color: var(--cyber-magenta) !important;
-    text-shadow: 0 0 10px var(--cyber-magenta);
-    font-weight: 700;
-    border-bottom: 2px solid var(--cyber-magenta);
-    display: inline-block;
-    margin-bottom: 1rem !important;
+#information-widgets {
+  border-bottom: 1px solid var(--linha);
+  padding-bottom: 0.75rem;
 }
 
-.graph-bar-filler {
-    background: linear-gradient(90deg, var(--cyber-cyan), var(--cyber-blue)) !important;
-    box-shadow: 0 0 8px var(--cyber-cyan);
+.information-widget-greeting span {
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+  color: var(--texto) !important;
 }
 
-.text-xs {
-    font-family: 'Fira Code', monospace !important;
-    color: var(--cyber-cyan) !important;
+.information-widget-greeting span em {
+  font-style: normal;
+  color: var(--ac);
 }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--cyber-cyan); box-shadow: 0 0 10px var(--cyber-cyan); }
+.information-widget-datetime span {
+  font-family: var(--mono) !important;
+  color: var(--texto) !important;
+}
+
+ul[role="tablist"] {
+  background: var(--card) !important;
+  border: 1px solid var(--linha) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  padding: 4px !important;
+}
+
+ul[role="tablist"] button {
+  border-radius: 7px !important;
+  color: var(--fraco) !important;
+  background: transparent !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  transition: color 0.2s, background 0.2s !important;
+}
+
+ul[role="tablist"] button:hover {
+  color: var(--texto) !important;
+}
+
+ul[role="tablist"] button[aria-selected="true"] {
+  color: var(--texto) !important;
+  background: var(--card2) !important;
+  box-shadow: inset 0 0 0 1px var(--linha2), inset 0 -2px 0 var(--ac) !important;
+}
+
+.service-group-name,
+.bookmark-group-name {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fraco) !important;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.service-group-name svg {
+  color: var(--ac) !important;
+}
+
+.service-group-name::after,
+.bookmark-group-name::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  margin-left: 0.6rem;
+  background: linear-gradient(90deg, var(--linha2), transparent);
+}
+
+.service-card,
+.bookmark > a,
+.bookmark > div {
+  background: var(--card) !important;
+  border: 1px solid var(--linha) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  transition: transform 0.25s ease, border-color 0.25s, background 0.25s !important;
+  animation: entrar 0.45s ease both;
+  animation-delay: calc(var(--i, 0) * 35ms);
+}
+
+.service-card:hover,
+.bookmark:hover > a,
+.bookmark:hover > div {
+  transform: translateY(-2px);
+  background: var(--card2) !important;
+  border-color: rgb(94 234 212 / 0.35) !important;
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+.service-name {
+  font-weight: 600 !important;
+  color: var(--texto) !important;
+}
+
+.service-description,
+.bookmark-description {
+  color: var(--fraco) !important;
+}
+
+.service-icon img {
+  transition: transform 0.3s ease;
+}
+
+.service-card:hover .service-icon img {
+  transform: scale(1.1);
+}
+
+.bookmark-icon {
+  background: transparent !important;
+}
+
+.service-block {
+  background: var(--fundo) !important;
+  border: 1px solid var(--linha);
+  border-radius: 7px !important;
+}
+
+.service-block-value {
+  font-family: var(--mono) !important;
+  color: var(--ac) !important;
+}
+
+.service-tags [class*="bg-emerald"],
+.service-tags [class*="bg-green"] {
+  background: var(--ok) !important;
+  animation: respirar 3s ease-in-out infinite;
+}
+
+.service-tags [class*="bg-rose"],
+.service-tags [class*="bg-red"] {
+  background: var(--erro) !important;
+  animation: piscar 1.2s steps(2) infinite;
+}
+
+.service-tags [class*="bg-orange"],
+.service-tags [class*="bg-amber"],
+.service-tags [class*="bg-yellow"] {
+  background: var(--aviso) !important;
+}
+
+@keyframes respirar { 50% { opacity: 0.35; } }
+@keyframes piscar { 50% { opacity: 0.2; } }
+
+#barra {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 0.5rem;
+  border-top: 1px solid var(--linha);
+  background: rgb(11 12 15 / 0.92);
+  backdrop-filter: blur(10px);
+  font: 500 11.5px var(--mono);
+  color: var(--fraco);
+}
+
+#barra .m {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0 0.85rem;
+  border-right: 1px solid var(--linha);
+  white-space: nowrap;
+  cursor: default;
+}
+
+#barra .m:hover {
+  background: rgb(255 255 255 / 0.02);
+}
+
+#barra .r {
+  color: var(--fraco);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+#barra b {
+  color: var(--texto);
+  font-weight: 600;
+  min-width: 3.2ch;
+  text-align: right;
+  display: inline-block;
+}
+
+#barra b.alto { color: var(--aviso); }
+#barra b.critico { color: var(--erro); }
+
+#barra .spark {
+  width: 46px;
+  height: 18px;
+}
+
+#barra .fim {
+  margin-left: auto;
+  border-right: 0;
+  border-left: 1px solid var(--linha);
+}
+
+#barra .estado {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 0 rgb(94 234 212 / 0.6);
+  animation: aura 2.2s ease-out infinite;
+}
+
+#barra .estado.aviso { background: var(--aviso); animation: none; }
+#barra .estado.erro { background: var(--erro); animation: piscar 1.2s steps(2) infinite; }
+
+@keyframes aura {
+  100% { box-shadow: 0 0 0 7px rgb(94 234 212 / 0); }
+}
+
+#barra .offline { opacity: 0.4; }
+
+@media (max-width: 1100px) {
+  #barra .m.opc { display: none; }
+}
+
+@media (max-width: 640px) {
+  #barra .m.opc2 { display: none; }
+}
+
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 3rem;
+  background: var(--fundo);
+  font: 12px/1.7 var(--mono);
+  color: var(--fraco);
+  white-space: pre;
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+#boot.saindo { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+#boot .ok { color: var(--ok); }
+#boot .erro { color: var(--erro); }
+#boot .aviso { color: var(--aviso); }
+#boot .cur { display: inline-block; width: 7px; height: 13px; background: var(--ac); vertical-align: -2px; animation: piscar 1s steps(2) infinite; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--linha2); }
+::selection { background: var(--ac); color: var(--fundo); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; }
+  #boot { display: none; }
+}
+
+.service-tags {
+  gap: 0 !important;
+  margin-right: 0.6rem !important;
+}
+
+.service-tag .site-monitor-status,
+.service-tag .docker-status,
+.service-tag > div {
+  padding: 1.1rem 0.2rem !important;
+}
+
+.site-monitor-status [class*="rounded-full"],
+.docker-status [class*="rounded-full"] {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.service-stats {
+  padding: 0 0.35rem 0.35rem;
+}
+
+.service-stats .service-block {
+  padding: 0.4rem 0.25rem !important;
+  animation: none !important;
+}
+
+.service-stats .service-block-value {
+  font-size: 0.8rem !important;
+}

@@ -1,24 +1,14 @@
-# For configuration options and examples, please see:
-# https://gethomepage.dev/configs/info-widgets/
+- greeting:
+    text_size: xl
+    text: "Media Server"
 
-#- resources:
-#    cpu: true
-#    memory: true
-#    disk: /
-
-- glances:
-    url: IP DO SEU GLANCES
-    version: 4
-    cpu: true
-    mem: true
-    cputemp: true
-    uptime: true
-    disk: /
-    expanded: true
+- search:
+    provider: custom
+    url: "https://www.ecosia.org/search?method=index&q="
+    target: _blank
 
 - datetime:
-    text_size: l
+    text_size: xl
     format:
-      dateStyle: short
       timeStyle: short
       hour12: false
