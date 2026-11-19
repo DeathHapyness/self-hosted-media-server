@@ -76,6 +76,10 @@ e ajusta permissões de pastas usadas pelos containers.
 
 Exemplo: `sudo ./instalador-linux-amd64 --dry-run`
 
+Ao iniciar, o instalador pergunta o idioma (`1) Português` / `2) English`); Enter aceita o idioma do sistema. Dá para trocar a qualquer momento pela opção **Idioma / Language** do menu principal, no terminal ou na interface web.
+
+O log (`/var/log/media-server-installer.log`) e o histórico (`installer/json/media-server-history.json`) são sempre gravados em inglês, qualquer que seja o idioma escolhido. Um histórico antigo, com chaves em português, é convertido automaticamente na primeira execução.
+
 ### Modo terminal ou modo web
 
 Ao iniciar, o instalador pergunta como você quer usá-lo:
