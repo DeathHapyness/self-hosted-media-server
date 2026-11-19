@@ -185,6 +185,8 @@ JavaScript customizado, injetado e executado no navegador junto com o dashboard.
 console.log("Homepage carregado");
 ```
 
+O `custom.js` deste repositório adiciona uma barra de status fixa no rodapé (serviços no ar, CPU, RAM, temperatura, rede, load, contêineres e uptime), lida direto da API do Glances em `http://<host>:61208`. Sem o Glances rodando, a barra fica apagada e o resto do painel funciona normalmente. Ele também mostra uma tela de boot ao abrir o painel, uma vez por sessão.
+
 > ⚠️ Este script roda no contexto do seu navegador com acesso à página. Só coloque aqui código de sua autoria ou de fontes em que você confia plenamente — nunca cole scripts de origem desconhecida.
 
 ## `logs/`
