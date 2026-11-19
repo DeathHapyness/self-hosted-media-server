@@ -72,3 +72,8 @@ dist/
 /self-hosted-media-server
 
 /.serena
+# site (fora do repo por enquanto)
+website/
+/.superpowers
+
+/homepage/config/kubernetes.yaml
