@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+
+name="loger"
+description="Loger - auditoria do servidor"
+command="/usr/local/bin/loger"
+command_args="daemon"
+supervisor="supervise-daemon"
+respawn_delay=2
+respawn_max=0
+extra_started_commands="reload"
+
+depend() {
+	need localmount
+	before sshd
+}
+
+reload() {
+	ebegin "Reloading ${RC_SVCNAME}"
+	supervise-daemon "${RC_SVCNAME}" --signal HUP
+	eend $?
+}
